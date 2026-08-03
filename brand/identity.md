@@ -2,16 +2,15 @@
 
 ## Status and architecture
 
-The identity architecture is proposed: a horizontal hybrid lockup with the
-wordmark attached to a simple Deep Navy house outline with an open doorway.
-Inside it sits the complete owned hand, person and three ascending steps
-artwork; the steps are Warm Sand. The symbol is placed left of, and remains
-optically subordinate to, the wordmark. It is not approved or exportable as a
-standalone badge in Stage 1.
+D-14 is the only current proposed primary artwork direction: a faithful
+production cleanup of the supplied house, moving person, steps and outlined
+hand reference. It supersedes the deprecated D-11 hybrid exploration and D-13
+filled-hand/open-doorway geometry. The supplied PNG is an immutable visual
+reconstruction reference, not production artwork.
 
-Use the owned source faithfully for later vector reconstruction. Do not use an
-image model to reproduce or reinterpret its geometry. The final public artwork
-must remain proposed until Melanie Watsham explicitly approves it.
+Do not use an image model to reproduce or reinterpret its geometry. The final
+public artwork must remain proposed until Melanie Watsham explicitly approves
+it and the supplied image's ownership/usage rights are confirmed.
 
 ## Palette and typography
 
