@@ -38,8 +38,9 @@ REQUIRED_LOGO_TEXT = (
 )
 REQUIRED_LOGO_TITLE = "Stronger at Home Physiotherapy by Melanie Watsham"
 REQUIRED_LOGO_DESCRIPTION = (
-    "A supporting hand and progressing person within an open-doorway home, "
-    "beside the Stronger at Home Physiotherapy wordmark."
+    "An open-bottom home above a supporting outlined hand, with a moving person "
+    "and three ascending steps, beside the Stronger at Home Physiotherapy "
+    "wordmark."
 )
 SVG_PAINT_ATTRIBUTES = {"color", "fill", "flood-color", "stop-color", "stroke"}
 CSS_PAINT_DECLARATION = re.compile(

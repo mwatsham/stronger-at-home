@@ -27,6 +27,15 @@
     h1 { margin: 0 0 8px; font-family: "Source Serif 4", serif; font-size: clamp(38px, 5vw, 64px); line-height: 1.05; }
     .supporting-line { margin: 0; font-size: 22px; font-weight: 600; }
     .status { display: inline-block; margin-top: 24px; padding: 10px 14px; border: 2px solid #203E55; border-radius: 999px; font-size: 14px; font-weight: 600; letter-spacing: 0.08em; }
+    .comparison { margin: 0 0 28px; padding: 36px; border: 1px solid #C3A26E; border-radius: 24px; background: #F7F2E8; }
+    .comparison h2 { margin: 0 0 24px; font: 600 30px/1.1 "Source Serif 4", serif; }
+    .comparison-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
+    .comparison-card { padding: 20px; border-radius: 18px; background: #E8F1F6; }
+    .comparison-card h3 { margin: 0 0 14px; font-size: 16px; letter-spacing: 0.04em; text-transform: uppercase; }
+    .symbol-stage { position: relative; width: 340px; max-width: 100%; height: 340px; overflow: hidden; margin-inline: auto; background: #fff; }
+    .symbol-stage img { position: absolute; display: block; max-width: none; }
+    .reference-stage img { width: 560px; left: -110px; top: -105px; }
+    .production-stage img { width: 1160px; height: 340px; left: 0; top: 0; }
     .field { margin: 0 0 28px; padding: 36px; border-radius: 24px; overflow: hidden; }
     .field h2 { margin: 0 0 24px; font: 600 24px/1.1 "Source Serif 4", serif; }
     .pale-sky { background: #E8F1F6; }
@@ -45,10 +54,13 @@
     .symbol-crop img { position: absolute; left: 0; top: 0; width: 1092px; height: 320px; max-width: none; }
     .detail-copy h2 { margin: 0 0 12px; font: 600 36px/1.1 "Source Serif 4", serif; }
     .detail-copy p { max-width: 56ch; margin: 0; font-size: 18px; line-height: 1.5; }
+    .checklist { margin: 18px 0 0; padding-left: 22px; font-size: 17px; line-height: 1.55; }
     @media (max-width: 760px) {
       header, main { width: min(100% - 24px, 1296px); }
       .field { padding: 20px; }
       .detail-grid { grid-template-columns: 1fr; padding: 20px; }
+      .comparison { padding: 20px; }
+      .comparison-grid { grid-template-columns: 1fr; }
       .symbol-crop { width: min(320px, 100%); }
     }
   </style>
@@ -60,6 +72,20 @@
     <p class="status">PROPOSED — NOT FOR PUBLIC USE</p>
   </header>
   <main>
+    <section class="comparison" aria-labelledby="comparison-title">
+      <h2 id="comparison-title">Supplied reference and faithful production cleanup</h2>
+      <div class="comparison-grid">
+        <article class="comparison-card">
+          <h3>Immutable supplied PNG</h3>
+          <div class="symbol-stage reference-stage"><img src="../reference/stronger-at-home-supplied-logo-reference.png" alt="Supplied raster reference showing a moving person and ascending steps inside an open-bottom home above a supporting outlined hand"></div>
+        </article>
+        <article class="comparison-card">
+          <h3>Exact proposed production SVG</h3>
+          <div class="symbol-stage production-stage"><img src="../source/logo-primary-hybrid.svg" alt="Proposed vector reconstruction of the supplied symbol"></div>
+        </article>
+      </div>
+    </section>
+
     <section class="field pale-sky" aria-labelledby="pale-sky-title">
       <h2 id="pale-sky-title">Pale Sky field</h2>
       <div class="scale-stack">
@@ -88,10 +114,17 @@
     </section>
 
     <section class="detail-grid" aria-labelledby="symbol-detail-title">
-      <div class="symbol-crop"><img src="../source/logo-primary-hybrid.svg" alt="Close-up of the proposed open-doorway house, supporting hand, progressing person and three steps"></div>
+      <div class="symbol-crop"><img src="../source/logo-primary-hybrid.svg" alt="Close-up of the proposed open-bottom home, outlined supporting hand, moving person and three ascending steps"></div>
       <div class="detail-copy">
         <h2 id="symbol-detail-title">Symbol close-up</h2>
-        <p>The open doorway aligns with the lowest progression step. The complete owned hand path supports a newly reconstructed vector person, while the house stays optically subordinate to the wordmark.</p>
+        <p>The production cleanup keeps the supplied composition while replacing raster glow, blur and background with editable vector geometry and approved brand colours.</p>
+        <ul class="checklist">
+          <li>Open-bottom home and right chimney retained</li>
+          <li>Moving person and exactly three ascending steps retained</li>
+          <li>Outlined supporting hand retained</li>
+          <li>Navy geometry with Warm Sand progression steps</li>
+          <li>No glow, blur, shadow, gradient or embedded raster in production artwork</li>
+        </ul>
       </div>
     </section>
   </main>

@@ -10,7 +10,7 @@ from scripts.validate_brand import contrast_ratio, validate_project
 VALID_HYBRID_SVG = """\
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1160 340">
   <title>Stronger at Home Physiotherapy by Melanie Watsham</title>
-  <desc>A supporting hand and progressing person within an open-doorway home, beside the Stronger at Home Physiotherapy wordmark.</desc>
+  <desc>An open-bottom home above a supporting outlined hand, with a moving person and three ascending steps, beside the Stronger at Home Physiotherapy wordmark.</desc>
   <path fill="none" stroke="#203E55" d="M10 100 L50 50 L90 100"/>
   <circle fill="#203E55" cx="40" cy="75" r="5"/>
   <rect fill="#C3A26E" x="50" y="80" width="20" height="5"/>
@@ -126,7 +126,7 @@ class BrandValidationTests(unittest.TestCase):
             "  <title>Stronger at Home Physiotherapy by Melanie Watsham</title>\n",
             "",
         ).replace(
-            "  <desc>A supporting hand and progressing person within an open-doorway home, beside the Stronger at Home Physiotherapy wordmark.</desc>\n",
+            "  <desc>An open-bottom home above a supporting outlined hand, with a moving person and three ascending steps, beside the Stronger at Home Physiotherapy wordmark.</desc>\n",
             "",
         )
         with TemporaryDirectory() as directory:
@@ -166,7 +166,7 @@ class BrandValidationTests(unittest.TestCase):
             errors = validate_project(root)
 
         self.assertIn(
-            "Hybrid logo description must equal: A supporting hand and progressing person within an open-doorway home, beside the Stronger at Home Physiotherapy wordmark.",
+            "Hybrid logo description must equal: An open-bottom home above a supporting outlined hand, with a moving person and three ascending steps, beside the Stronger at Home Physiotherapy wordmark.",
             errors,
         )
 

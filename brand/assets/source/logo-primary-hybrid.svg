@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1160 340" role="img" aria-labelledby="logo-title logo-description">
   <title id="logo-title">Stronger at Home Physiotherapy by Melanie Watsham</title>
-  <desc id="logo-description">A supporting hand and progressing person within an open-doorway home, beside the Stronger at Home Physiotherapy wordmark.</desc>
+  <desc id="logo-description">An open-bottom home above a supporting outlined hand, with a moving person and three ascending steps, beside the Stronger at Home Physiotherapy wordmark.</desc>
   <defs>
     <style>
       @font-face {
@@ -36,27 +36,30 @@
     </style>
   </defs>
 
-  <path d="M122 316 H28 V140 L165 26 L302 140 V316 H232 V232 H122 V316" fill="none" stroke="#203E55" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <g id="supplied-reference-symbol" transform="translate(12 4)">
+    <path d="M42 226 V116 L146 30 L250 116 V226" fill="none" stroke="#203E55" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M198 73 V51 H219 V91" fill="none" stroke="#203E55" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
 
-  <path transform="translate(282.1 82) scale(-1.07 1.07)" d="M28 116 C20 109 20 103 25 100 C30 97 36 101 43 105 L72 122 L48 103 C44 100 45 96 50 95 C56 94 62 98 68 102 L93 119 L70 99 C66 96 68 92 73 92 C79 92 86 98 92 103 L109 115 C116 120 125 118 136 114 C143 111 143 106 136 105 C123 103 113 106 103 102 C95 99 88 91 91 86 C94 82 100 87 107 89 C116 92 124 91 133 90 C157 88 175 92 187 102 C197 110 204 122 209 134 C185 149 160 158 135 160 C104 162 78 151 56 139 Z" fill="#203E55"/>
+    <g id="moving-person" fill="none" stroke="#203E55" stroke-width="16" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="112" cy="108" r="12" fill="#203E55" stroke="none"/>
+      <path d="M108 137 L132 164"/>
+      <path d="M108 141 L89 165 M121 149 L151 157"/>
+      <path d="M132 164 L118 205"/>
+      <path d="M132 164 L169 181 L164 212"/>
+    </g>
 
-  <g transform="translate(36 82) scale(1.07)" fill="none" stroke="#203E55" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="79" cy="9" r="7.5" fill="#203E55" stroke="none"/>
-    <path d="M70 23 H78 L75 49 L91 50 L89 69"/>
-    <path d="M70 25 L67 42"/>
-    <path d="M78 29 L93 31"/>
-    <path d="M75 49 L70 72"/>
-  </g>
+    <g id="progression-steps" fill="#C3A26E">
+      <rect x="88" y="213" width="46" height="12" rx="6"/>
+      <rect x="145" y="178" width="46" height="12" rx="6"/>
+      <rect x="202" y="143" width="42" height="12" rx="6"/>
+    </g>
 
-  <g transform="translate(36 82) scale(1.07)" fill="#C3A26E">
-    <rect x="90" y="68" width="36" height="10" rx="5"/>
-    <rect x="132" y="43" width="36" height="10" rx="5"/>
-    <rect x="174" y="18" width="30" height="10" rx="5"/>
+    <path d="M38 281 C61 247 89 237 120 244 C151 252 176 251 201 239 C215 232 225 240 213 251 C200 262 181 267 161 265 C182 274 203 274 222 264 L263 232 C273 224 283 234 274 243 L241 273 L281 244 C292 237 301 249 291 258 L253 286 L298 261 C309 255 317 268 306 276 L266 305 C231 330 186 335 142 324 L91 309 L42 309 Z" fill="none" stroke="#203E55" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
 
   <g fill="#203E55">
-    <text class="wordmark-primary" x="370" y="132">Stronger at Home</text>
-    <text class="wordmark-secondary" x="372" y="207">Physiotherapy</text>
-    <text class="endorsement" x="374" y="258">by Melanie Watsham</text>
+    <text class="wordmark-primary" x="330" y="132">Stronger at Home</text>
+    <text class="wordmark-secondary" x="332" y="207">Physiotherapy</text>
+    <text class="endorsement" x="334" y="258">by Melanie Watsham</text>
   </g>
 </svg>
