@@ -1,8 +1,8 @@
 # Supplied Logo Production Cleanup Design
 
-**Date:** 2026-08-03  
-**Brand:** Stronger at Home Physiotherapy by Melanie Watsham  
-**Status:** Approved design direction; production artwork remains proposed  
+**Date:** 2026-08-03
+**Brand:** Stronger at Home Physiotherapy by Melanie Watsham
+**Status:** Approved design direction; production artwork remains proposed
 **Approval owner for final artwork:** Melanie Watsham
 
 ## Objective
