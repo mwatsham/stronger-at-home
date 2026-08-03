@@ -37,7 +37,15 @@ REQUIRED_LOGO_TEXT = (
     "by Melanie Watsham",
 )
 REQUIRED_LOGO_TITLE = "Stronger at Home Physiotherapy by Melanie Watsham"
+REQUIRED_LOGO_DESCRIPTION = (
+    "A supporting hand and progressing person within an open-doorway home, "
+    "beside the Stronger at Home Physiotherapy wordmark."
+)
 SVG_PAINT_ATTRIBUTES = {"color", "fill", "flood-color", "stop-color", "stroke"}
+CSS_PAINT_DECLARATION = re.compile(
+    r"(?<![\w-])(?:color|fill|flood-color|stop-color|stroke)\s*:\s*([^;}]+)",
+    re.IGNORECASE,
+)
 
 
 def _relative_luminance(hex_colour: str) -> float:
@@ -66,6 +74,16 @@ def _element_text(element: ET.Element | None) -> str:
     return " ".join("".join(element.itertext()).split())
 
 
+def _css_paint_values(declarations: str) -> set[str]:
+    values = set()
+    for match in CSS_PAINT_DECLARATION.finditer(declarations):
+        value = re.sub(
+            r"\s*!important\s*$", "", match.group(1).strip(), flags=re.IGNORECASE
+        )
+        values.add(value)
+    return values
+
+
 def _validate_hybrid_logo(path: Path) -> list[str]:
     try:
         root = ET.parse(path).getroot()
@@ -88,10 +106,15 @@ def _validate_hybrid_logo(path: Path) -> list[str]:
     title_text = _element_text(title)
     if not title_text:
         errors.append("Hybrid logo is missing an accessible title")
-    elif REQUIRED_LOGO_TITLE not in title_text:
-        errors.append(f"Hybrid logo title must include: {REQUIRED_LOGO_TITLE}")
-    if not _element_text(description):
+    elif title_text != REQUIRED_LOGO_TITLE:
+        errors.append(f"Hybrid logo title must equal: {REQUIRED_LOGO_TITLE}")
+    description_text = _element_text(description)
+    if not description_text:
         errors.append("Hybrid logo is missing an accessible description")
+    elif description_text != REQUIRED_LOGO_DESCRIPTION:
+        errors.append(
+            f"Hybrid logo description must equal: {REQUIRED_LOGO_DESCRIPTION}"
+        )
 
     editable_text = {
         _element_text(element)
@@ -109,8 +132,10 @@ def _validate_hybrid_logo(path: Path) -> list[str]:
                 paint = value.strip()
                 if paint.lower() != "none":
                     colours.add(paint)
+            elif _local_name(attribute) == "style":
+                colours.update(_css_paint_values(value))
         if _local_name(element.tag) == "style" and element.text:
-            colours.update(re.findall(r"#[0-9A-Fa-f]{6}", element.text))
+            colours.update(_css_paint_values(element.text))
     for colour in sorted(colours):
         if colour.upper() not in ALLOWED_LOGO_COLOURS:
             errors.append(f"Hybrid logo uses disallowed colour: {colour}")
@@ -162,17 +187,23 @@ def _validate_asset_manifest(root: Path, manifest: object) -> list[str]:
         status = asset.get("status")
         if status not in ALLOWED_STATUSES:
             errors.append(f"Asset {asset_id or '<unknown>'} has invalid status: {status}")
-        if status == "approved":
-            if asset.get("reviewed_by") != "Melanie Watsham":
-                errors.append(
-                    f"Approved asset {asset_id or '<unknown>'} must be reviewed by Melanie Watsham"
-                )
-            if not _is_iso_date(asset.get("reviewed_on")):
-                errors.append(
-                    f"Approved asset {asset_id or '<unknown>'} must have an ISO review date"
-                )
-
         if asset.get("role") == "primary_hybrid_logo":
+            if status == "approved":
+                if asset.get("reviewed_by") != "Melanie Watsham":
+                    errors.append(
+                        f"Approved asset {asset_id or '<unknown>'} must be reviewed by Melanie Watsham"
+                    )
+                if not _is_iso_date(asset.get("reviewed_on")):
+                    errors.append(
+                        f"Approved asset {asset_id or '<unknown>'} must have an ISO review date"
+                    )
+            elif status == "proposed" and (
+                asset.get("reviewed_by") is not None
+                or asset.get("reviewed_on") is not None
+            ):
+                errors.append(
+                    f"Proposed asset {asset_id or '<unknown>'} must not have review metadata"
+                )
             errors.extend(_validate_hybrid_logo(asset_path))
     return errors
 

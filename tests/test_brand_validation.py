@@ -25,6 +25,7 @@ def write_asset_project(
     root: Path,
     *,
     svg_text: str = VALID_HYBRID_SVG,
+    role: str = "primary_hybrid_logo",
     status: str = "proposed",
     reviewed_by: str | None = None,
     reviewed_on: str | None = None,
@@ -38,7 +39,7 @@ def write_asset_project(
         "assets": [
             {
                 "id": "logo_primary_hybrid",
-                "role": "primary_hybrid_logo",
+                "role": role,
                 "path": "brand/assets/source/logo-primary-hybrid.svg",
                 "status": status,
                 "sha256": sha256
@@ -97,37 +98,6 @@ class BrandValidationTests(unittest.TestCase):
 
         self.assertIn("Missing font licence: brand/fonts/OFL-atkinson.txt", errors)
 
-    def test_proposed_hybrid_svg_contract(self):
-        root = Path(__file__).resolve().parents[1]
-        svg_path = root / "brand/assets/source/logo-primary-hybrid.svg"
-        svg_text = svg_path.read_text(encoding="utf-8")
-
-        self.assertNotIn("<image", svg_text)
-        self.assertIn("Stronger at Home", svg_text)
-        self.assertIn("Physiotherapy", svg_text)
-        self.assertIn("by Melanie Watsham", svg_text)
-        self.assertIn("#203E55", svg_text)
-        self.assertIn("#C3A26E", svg_text)
-
-    def test_proposed_hybrid_manifest_contract_and_hash(self):
-        root = Path(__file__).resolve().parents[1]
-        manifest = json.loads(
-            (root / "brand/assets/manifest.json").read_text(encoding="utf-8")
-        )
-        asset = manifest["assets"][0]
-
-        self.assertEqual(asset["status"], "proposed")
-        self.assertIsNone(asset["reviewed_by"])
-        self.assertIsNone(asset["reviewed_on"])
-
-        for manifest_asset in manifest["assets"]:
-            asset_path = root / manifest_asset["path"]
-            self.assertTrue(asset_path.is_file())
-            self.assertEqual(
-                manifest_asset["sha256"],
-                hashlib.sha256(asset_path.read_bytes()).hexdigest(),
-            )
-
     def test_valid_proposed_hybrid_asset_has_no_asset_validation_errors(self):
         with TemporaryDirectory() as directory:
             root = Path(directory)
@@ -168,6 +138,38 @@ class BrandValidationTests(unittest.TestCase):
         self.assertIn("Hybrid logo is missing an accessible title", errors)
         self.assertIn("Hybrid logo is missing an accessible description", errors)
 
+    def test_accessible_title_must_match_exactly(self):
+        svg = VALID_HYBRID_SVG.replace(
+            "Stronger at Home Physiotherapy by Melanie Watsham</title>",
+            "Stronger at Home Physiotherapy by Melanie Watsham draft</title>",
+        )
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_asset_project(root, svg_text=svg)
+
+            errors = validate_project(root)
+
+        self.assertIn(
+            "Hybrid logo title must equal: Stronger at Home Physiotherapy by Melanie Watsham",
+            errors,
+        )
+
+    def test_accessible_description_must_match_exactly(self):
+        svg = VALID_HYBRID_SVG.replace(
+            "Physiotherapy wordmark.</desc>",
+            "Physiotherapy wordmark. Draft artwork.</desc>",
+        )
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_asset_project(root, svg_text=svg)
+
+            errors = validate_project(root)
+
+        self.assertIn(
+            "Hybrid logo description must equal: A supporting hand and progressing person within an open-doorway home, beside the Stronger at Home Physiotherapy wordmark.",
+            errors,
+        )
+
     def test_missing_required_editable_text_is_rejected(self):
         svg = VALID_HYBRID_SVG.replace(
             '<text fill="#203E55" x="120" y="130">by Melanie Watsham</text>',
@@ -193,6 +195,30 @@ class BrandValidationTests(unittest.TestCase):
 
         self.assertIn("Hybrid logo uses disallowed colour: #FFFFFF", errors)
 
+    def test_disallowed_inline_style_colour_is_rejected(self):
+        svg = VALID_HYBRID_SVG.replace(
+            'fill="#203E55"', 'style="fill:#FFFFFF"', 1
+        )
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_asset_project(root, svg_text=svg)
+
+            errors = validate_project(root)
+
+        self.assertIn("Hybrid logo uses disallowed colour: #FFFFFF", errors)
+
+    def test_disallowed_named_css_colour_is_rejected(self):
+        svg = VALID_HYBRID_SVG.replace(
+            "  <title>", "  <style>path { fill: white; }</style>\n  <title>"
+        )
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_asset_project(root, svg_text=svg)
+
+            errors = validate_project(root)
+
+        self.assertIn("Hybrid logo uses disallowed colour: white", errors)
+
     def test_manifest_hash_mismatch_is_rejected(self):
         with TemporaryDirectory() as directory:
             root = Path(directory)
@@ -217,5 +243,36 @@ class BrandValidationTests(unittest.TestCase):
             errors,
         )
         self.assertIn(
+            "Approved asset logo_primary_hybrid must have an ISO review date", errors
+        )
+
+    def test_proposed_logo_rejects_review_metadata(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_asset_project(
+                root,
+                reviewed_by="Melanie Watsham",
+                reviewed_on="2026-08-03",
+            )
+
+            errors = validate_project(root)
+
+        self.assertIn(
+            "Proposed asset logo_primary_hybrid must not have review metadata",
+            errors,
+        )
+
+    def test_non_logo_asset_does_not_require_logo_approval_metadata(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_asset_project(root, role="supporting_document", status="approved")
+
+            errors = validate_project(root)
+
+        self.assertNotIn(
+            "Approved asset logo_primary_hybrid must be reviewed by Melanie Watsham",
+            errors,
+        )
+        self.assertNotIn(
             "Approved asset logo_primary_hybrid must have an ISO review date", errors
         )

@@ -22,7 +22,7 @@
     }
     * { box-sizing: border-box; }
     body { margin: 0; }
-    header, main { width: min(1240px, calc(100% - 48px)); margin-inline: auto; }
+    header, main { width: min(1296px, calc(100% - 48px)); margin-inline: auto; }
     header { padding: 56px 0 32px; }
     h1 { margin: 0 0 8px; font-family: "Source Serif 4", serif; font-size: clamp(38px, 5vw, 64px); line-height: 1.05; }
     .supporting-line { margin: 0; font-size: 22px; font-weight: 600; }
@@ -35,21 +35,19 @@
     .scale-stack { display: grid; gap: 24px; }
     figure { margin: 0; }
     figcaption { margin-bottom: 8px; font-size: 14px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
-    .logo { display: block; width: 100%; height: auto; }
-    .half { width: 50%; min-width: 360px; }
-    .small { width: 30%; min-width: 300px; }
-    .holding-surface { width: fit-content; max-width: 100%; padding: 16px; border-radius: 14px; background: #F7F2E8; }
-    .deep-navy .full .holding-surface { width: 100%; }
-    .deep-navy .half .holding-surface, .deep-navy .small .holding-surface { width: 100%; }
+    .logo { display: block; max-width: 100%; height: auto; }
+    .full .logo { width: 1160px; }
+    .half .logo { width: 580px; }
+    .small .logo { width: 348px; }
+    .holding-surface { display: inline-block; max-width: 100%; padding: 16px; border-radius: 14px; background: #F7F2E8; }
     .detail-grid { display: grid; grid-template-columns: minmax(300px, 340px) 1fr; gap: 36px; align-items: center; margin: 48px 0 72px; padding: 36px; border: 1px solid #C3A26E; border-radius: 24px; background: #F7F2E8; }
     .symbol-crop { position: relative; width: 320px; height: 320px; overflow: hidden; border-radius: 18px; background: #E8F1F6; }
     .symbol-crop img { position: absolute; left: 0; top: 0; width: 1092px; height: 320px; max-width: none; }
     .detail-copy h2 { margin: 0 0 12px; font: 600 36px/1.1 "Source Serif 4", serif; }
     .detail-copy p { max-width: 56ch; margin: 0; font-size: 18px; line-height: 1.5; }
     @media (max-width: 760px) {
-      header, main { width: min(100% - 24px, 1240px); }
+      header, main { width: min(100% - 24px, 1296px); }
       .field { padding: 20px; }
-      .half, .small { width: 100%; min-width: 0; }
       .detail-grid { grid-template-columns: 1fr; padding: 20px; }
       .symbol-crop { width: min(320px, 100%); }
     }
