@@ -24,3 +24,27 @@ class BrandValidationTests(unittest.TestCase):
             )
             errors = validate_project(root)
         self.assertIn("Invalid decision status in DECISIONS.md: final", errors)
+
+    def test_source_serif_requires_its_licence_file(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            font = root / "brand/fonts/source-serif-4.ttf"
+            font.parent.mkdir(parents=True)
+            font.write_bytes(b"font")
+
+            errors = validate_project(root)
+
+        self.assertIn(
+            "Missing font licence: brand/fonts/OFL-source-serif.txt", errors
+        )
+
+    def test_atkinson_hyperlegible_requires_its_licence_file(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            font = root / "brand/fonts/atkinson-hyperlegible-next.ttf"
+            font.parent.mkdir(parents=True)
+            font.write_bytes(b"font")
+
+            errors = validate_project(root)
+
+        self.assertIn("Missing font licence: brand/fonts/OFL-atkinson.txt", errors)

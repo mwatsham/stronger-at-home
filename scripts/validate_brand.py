@@ -23,6 +23,10 @@ REQUIRED_FILES = (
     ".ai/context/brand.json",
     "brand/assets/manifest.json",
 )
+FONT_LICENCE_PAIRS = {
+    "brand/fonts/source-serif-4.ttf": "brand/fonts/OFL-source-serif.txt",
+    "brand/fonts/atkinson-hyperlegible-next.ttf": "brand/fonts/OFL-atkinson.txt",
+}
 
 
 def _relative_luminance(hex_colour: str) -> float:
@@ -43,6 +47,9 @@ def contrast_ratio(foreground: str, background: str) -> float:
 
 def validate_project(root: Path) -> list[str]:
     errors = [f"Missing required file: {path}" for path in REQUIRED_FILES if not (root / path).is_file()]
+    for font, licence in FONT_LICENCE_PAIRS.items():
+        if (root / font).is_file() and not (root / licence).is_file():
+            errors.append(f"Missing font licence: {licence}")
     decisions = root / "DECISIONS.md"
     if decisions.is_file():
         for line in decisions.read_text(encoding="utf-8").splitlines():
