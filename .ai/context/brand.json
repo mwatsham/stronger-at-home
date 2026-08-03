@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "brand_name": "Stronger at Home Physiotherapy",
+  "brand_name_status": "proposed",
+  "endorsement": "by Melanie Watsham",
+  "audiences": {"primary": ["patients", "older adults"], "secondary": ["professional referrers"]},
+  "services": {"focus": ["older-adult rehabilitation", "post-operative rehabilitation"], "radius": "10–15 miles around Epsom, Surrey"},
+  "claims": {"approved": ["20+ years of NHS experience"], "verification_gated": ["HCPC", "CSP", "AGILE", "ATOCP"]},
+  "personality": ["warm", "practical", "clinically credible"],
+  "voice": ["reassuring", "hopeful", "empowering"],
+  "identity_architecture": {"status": "proposed", "type": "hybrid", "standalone_symbol_allowed": false},
+  "prohibitions": ["unverified claims", "guaranteed outcomes", "public use before clearance", "standalone symbol in Stage 1"],
+  "approval_owner": "Melanie Watsham"
+}
