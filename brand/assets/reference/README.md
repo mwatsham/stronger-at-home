@@ -1,9 +1,10 @@
-# Owned logo references
+# Legacy owned SVG logo references
 
-These files are immutable provenance references for the proposed hybrid logo.
-They are not production-ready masters: both supplied SVGs contain an embedded
-raster figure. The project sponsor confirmed full ownership on 2026-08-03.
-The files were copied into this repository on 2026-08-03 without modification.
+These two legacy SVG files are immutable provenance references for the
+deprecated proposed hybrid logo. They are not production-ready masters: both
+contain an embedded raster figure. The project sponsor confirmed full ownership
+of these two SVGs on 2026-08-03. They were copied into this repository without
+modification on 2026-08-03.
 
 | Reference copy | Original source path | SHA-256 |
 |---|---|---|
@@ -13,6 +14,9 @@ The files were copied into this repository on 2026-08-03 without modification.
 Do not edit these copies. The editable proposed artwork belongs in
 `brand/assets/source/`.
 
+The ownership confirmation above applies only to these two legacy SVGs; it does
+not establish ownership or usage rights for the supplied PNG below.
+
 ## Supplied production-cleanup reference
 
 - Project path: `brand/assets/reference/stronger-at-home-supplied-logo-reference.png`
@@ -21,4 +25,5 @@ Do not edit these copies. The editable proposed artwork belongs in
 - Dimensions: 1254 × 1254 pixels
 - SHA-256: `6d066dbeff88023aece19346a1d0a9a1d3f4577f7846545e359ad59fab24f889`
 - Role: immutable visual reconstruction reference; not production artwork
-- Rights: explicit ownership/usage-rights confirmation for this exact image remains required before public use
+- Rights: unresolved. Explicit ownership/usage-rights confirmation for this
+  exact image remains required before public use.

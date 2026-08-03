@@ -14,7 +14,9 @@ authoritative visual reference for the new production-cleanup direction. Its
 rights status remains unresolved for public use pending explicit
 ownership/usage-rights confirmation for that exact supplied image.
 
-The governing exploration requirements are in
-[the approved hybrid logo specification](docs/superpowers/specs/2026-08-03-stronger-at-home-hybrid-logo-exploration-design.md).
+The governing requirements are in
+[the supplied-logo production-cleanup specification](docs/superpowers/specs/2026-08-03-supplied-logo-production-cleanup-design.md).
+The earlier [hybrid logo exploration specification](docs/superpowers/specs/2026-08-03-stronger-at-home-hybrid-logo-exploration-design.md)
+is superseded for the primary artwork direction.
 The owned artwork evidence remains read-only at
 `/Users/mwatsham/Documents/Codex/2026-08-03/i/outputs`; it must not be altered.
