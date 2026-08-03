@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1160 340" role="img" aria-labelledby="logo-title logo-description">
+  <title id="logo-title">Stronger at Home Physiotherapy by Melanie Watsham</title>
+  <desc id="logo-description">A supporting hand and progressing person within an open-doorway home, beside the Stronger at Home Physiotherapy wordmark.</desc>
+  <defs>
+    <style>
+      @font-face {
+        font-family: "Source Serif 4";
+        src: url("../../fonts/source-serif-4.ttf") format("truetype");
+        font-style: normal;
+        font-weight: 400 600;
+      }
+      @font-face {
+        font-family: "Atkinson Hyperlegible Next";
+        src: url("../../fonts/atkinson-hyperlegible-next.ttf") format("truetype");
+        font-style: normal;
+        font-weight: 400 600;
+      }
+      .wordmark-primary {
+        font-family: "Source Serif 4", serif;
+        font-size: 76px;
+        font-weight: 600;
+        letter-spacing: -1.2px;
+      }
+      .wordmark-secondary {
+        font-family: "Source Serif 4", serif;
+        font-size: 64px;
+        font-weight: 400;
+        letter-spacing: 0.2px;
+      }
+      .endorsement {
+        font-family: "Atkinson Hyperlegible Next", sans-serif;
+        font-size: 30px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+      }
+    </style>
+  </defs>
+
+  <path d="M122 316 H28 V140 L165 26 L302 140 V316 H232 V232 H122 V316" fill="none" stroke="#203E55" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <path transform="translate(282.1 82) scale(-1.07 1.07)" d="M28 116 C20 109 20 103 25 100 C30 97 36 101 43 105 L72 122 L48 103 C44 100 45 96 50 95 C56 94 62 98 68 102 L93 119 L70 99 C66 96 68 92 73 92 C79 92 86 98 92 103 L109 115 C116 120 125 118 136 114 C143 111 143 106 136 105 C123 103 113 106 103 102 C95 99 88 91 91 86 C94 82 100 87 107 89 C116 92 124 91 133 90 C157 88 175 92 187 102 C197 110 204 122 209 134 C185 149 160 158 135 160 C104 162 78 151 56 139 Z" fill="#203E55"/>
+
+  <g transform="translate(36 82) scale(1.07)" fill="none" stroke="#203E55" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="79" cy="9" r="7.5" fill="#203E55" stroke="none"/>
+    <path d="M70 23 H78 L75 49 L91 50 L89 69"/>
+    <path d="M70 25 L67 42"/>
+    <path d="M78 29 L93 31"/>
+    <path d="M75 49 L70 72"/>
+  </g>
+
+  <g transform="translate(36 82) scale(1.07)" fill="#C3A26E">
+    <rect x="90" y="68" width="36" height="10" rx="5"/>
+    <rect x="132" y="43" width="36" height="10" rx="5"/>
+    <rect x="174" y="18" width="30" height="10" rx="5"/>
+  </g>
+
+  <g fill="#203E55">
+    <text class="wordmark-primary" x="370" y="132">Stronger at Home</text>
+    <text class="wordmark-secondary" x="372" y="207">Physiotherapy</text>
+    <text class="endorsement" x="374" y="258">by Melanie Watsham</text>
+  </g>
+</svg>

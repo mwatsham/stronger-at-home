@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "assets": [
+    {
+      "id": "logo_primary_hybrid",
+      "role": "primary_hybrid_logo",
+      "path": "brand/assets/source/logo-primary-hybrid.svg",
+      "status": "proposed",
+      "sha256": "d28974cb6a0d39e6713ed0cf2c1ea468f6fad0928fe80446463f71020dceae36",
+      "reviewed_by": null,
+      "reviewed_on": null
+    }
+  ]
+}
