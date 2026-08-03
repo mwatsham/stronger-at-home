@@ -5,6 +5,11 @@ from pathlib import Path
 import re
 import sys
 
+try:
+    from scripts.generate_brand_tokens import render_css
+except ImportError:
+    from generate_brand_tokens import render_css
+
 ALLOWED_STATUSES = {"approved", "proposed", "rejected", "deprecated"}
 REQUIRED_FILES = (
     "BRAND.md",
@@ -52,6 +57,16 @@ def validate_project(root: Path) -> list[str]:
                 json.loads(path.read_text(encoding="utf-8"))
             except json.JSONDecodeError as error:
                 errors.append(f"Invalid JSON: {relative}: {error.msg}")
+    token_source = root / "brand/tokens.json"
+    generated_tokens = root / "brand/generated/tokens.css"
+    if token_source.is_file() and generated_tokens.is_file():
+        try:
+            tokens = json.loads(token_source.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            pass
+        else:
+            if generated_tokens.read_text(encoding="utf-8") != render_css(tokens):
+                errors.append("Generated token drift: brand/generated/tokens.css")
     return errors
 
 
