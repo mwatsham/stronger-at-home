@@ -18,9 +18,10 @@ All wordmark text is Deep Navy `#203E55`.
 Do not create SVG derivatives, transparent or monochrome variants, AI-redrawn
 versions, recoloured source artwork, background-removed versions, or altered
 source geometry. D-14 is deprecated historical vector-cleanup direction only.
-The two exact PNG files remain proposed until Melanie Watsham explicitly
-approves their final pixels with an ISO review date; source-image
-ownership/usage rights must also be confirmed before public use.
+Both exact PNG files were approved without changes by Melanie Watsham on
+2026-08-04. That approval applies only to those exact output pixels;
+source-image ownership/usage rights and all other clearance requirements must
+also be confirmed before public use.
 
 ## Palette and typography
 
@@ -38,5 +39,5 @@ before downloading font files into this refreshed repository.
 ## Application boundary
 
 No standalone house symbol, public export, or application template may be made
-in Stage 1. Artwork remains proposed until all required clearance and explicit
-final-artwork approval are recorded.
+in Stage 1. The approved exact artwork may not be used publicly until every
+separate clearance requirement is recorded.

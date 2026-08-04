@@ -14,19 +14,19 @@
       "id": "logo_primary_raster_2048",
       "role": "primary_raster_logo_2048",
       "path": "brand/assets/source/logo-primary-raster-2048.png",
-      "status": "proposed",
+      "status": "approved",
       "sha256": "108c7bf9175868c4dffe15be6b2e4433346093d1f9d692752851a4b9d9bd5864",
-      "reviewed_by": null,
-      "reviewed_on": null
+      "reviewed_by": "Melanie Watsham",
+      "reviewed_on": "2026-08-04"
     },
     {
       "id": "logo_primary_raster_512",
       "role": "primary_raster_logo_512",
       "path": "brand/assets/source/logo-primary-raster-512.png",
-      "status": "proposed",
+      "status": "approved",
       "sha256": "153f964143d1fadae66595871c6bbef5d3a336260bf28f6229043eaf91a23afd",
-      "reviewed_by": null,
-      "reviewed_on": null
+      "reviewed_by": "Melanie Watsham",
+      "reviewed_on": "2026-08-04"
     }
   ]
 }

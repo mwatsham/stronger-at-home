@@ -13,17 +13,20 @@ The proposed exact outputs are
 `brand/assets/source/logo-primary-raster-2048.png` at 2048 × 640 pixels and
 `brand/assets/source/logo-primary-raster-512.png` at 512 × 160 pixels. They
 are opaque raster-only lockups: no SVG, transparent, monochrome or AI-redrawn
-derivatives may be made. Melanie Watsham must explicitly approve both exact
-output files before they become final artwork; that approval requires an ISO
-review date and is separate from the sponsor's design approval.
+derivatives may be made. On 2026-08-04, Melanie Watsham approved both exact
+raster logo files without changes. This exact-output approval is separate from
+the sponsor's design approval and does not approve the business name,
+credentials, source-image ownership/usage rights, contact information, or any
+other clearance item.
 
 ## 2026-08-03 — refreshed-repository rebuild
 
 The Stage 1 repository was rebuilt to restore authoritative Markdown and JSON
 brand sources, a decision ledger, and a dependency-free validation foundation.
 The public name remains proposed pending clearance. The historical hybrid logo
-direction is deprecated. The raster-only primary artwork remains proposed
-until Melanie Watsham explicitly approves the exact output pixels.
+direction is deprecated. The two exact raster-only primary output files are
+approved by Melanie Watsham on 2026-08-04; all other clearance gates remain
+unresolved or verification-gated as recorded in `brand/clearance.md`.
 
 The project sponsor rejected the first reconstructed hybrid logo and selected
 an initial supplied reference for the now-deprecated production-cleanup

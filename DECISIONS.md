@@ -13,4 +13,4 @@
 | D-13 | Filled-hand/open-doorway primary geometry. | deprecated | Project sponsor | 2026-08-03 |
 | D-14 | Faithful production cleanup of the supplied house, moving person, steps and outlined hand reference. | deprecated | Project sponsor | 2026-08-03 |
 | D-15 | Use the exact v2 supplied PNG in opaque raster-only lockups with no SVG derivatives. | approved | Project sponsor | 2026-08-04 |
-| D-16 | Exact 2048-pixel and 512-pixel raster artwork is proposed pending Melanie Watsham approval. | proposed | Project sponsor | 2026-08-04 |
+| D-16 | Exact 2048-pixel and 512-pixel raster artwork approved without changes. | approved | Melanie Watsham | 2026-08-04 |
