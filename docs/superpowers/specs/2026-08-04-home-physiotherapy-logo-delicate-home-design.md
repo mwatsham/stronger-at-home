@@ -10,13 +10,13 @@ Evolve the existing home-physiotherapy logo into a more delicate, coherent symbo
 2. mobility improves through gradual, supported progression; and
 3. the service feels reassuring, personal, and capable.
 
-The approved concept study is stored at `assets/home-physiotherapy-logo-approved-concept.png`. It is a visual reference only. The production artwork must be rebuilt as clean, deterministic vector geometry rather than traced from the raster preview.
+The approved concept study is stored at `assets/home-physiotherapy-logo-approved-concept-v2.png`. It is a visual reference only. The production artwork must be rebuilt as clean, deterministic vector geometry rather than traced from the raster preview.
 
 ## Approved composition
 
 ### Home
 
-- An open navy house outline shelters the figure and steps.
+- An open deep-blue house outline shelters the figure and steps.
 - The outline consists of a shallow pitched roof, a small chimney, and two short side walls.
 - The house remains open at the bottom so it feels welcoming rather than enclosed.
 - The vertical roof-to-head clearance is no more than one-and-a-half figure-head diameters, while retaining an intentional transparent gap.
@@ -24,16 +24,16 @@ The approved concept study is stored at `assets/home-physiotherapy-logo-approved
 
 ### Figure and progression
 
-- A navy monoline figure walks upward inside the house.
+- A deep-blue monoline figure walks upward inside the house.
 - The figure uses the same rounded outline language as the house and hand: outlined circular head, smooth torso, and rounded limbs.
 - The pose remains derived from the user's supplied climbing-figure reference, but it is redrawn into coherent vector linework rather than embedded as a raster silhouette.
-- Exactly three short, slim teal steps rise from left to right.
+- Exactly three short, slim warm-gold steps rise from left to right.
 - The raised front foot sits directly above the lowest step with a narrow transparent gap and no contact.
 - The figure and steps read as one centred activity group with balanced space to the roof and side walls.
 
 ### Supporting hand
 
-- A single cupped navy hand supports the home without touching it.
+- A single cupped deep-blue hand supports the home without touching it.
 - The hand's outline bounding box spans 88–92% of the house outline's width, making it slightly smaller while retaining visual support.
 - The palm uses a light, flowing outline rather than a solid silhouette.
 - Four long, tapered fingers have graduated lengths, natural curvature, and visible negative space between them.
@@ -53,8 +53,8 @@ The approved concept study is stored at `assets/home-physiotherapy-logo-approved
 
 - Delicate, reassuring, supportive, calm, and professional.
 - Rounded linework rather than heavy filled silhouettes or sharp corners.
-- Primary navy: `#17324d`.
-- Progress accent teal: `#4f9f93`.
+- Primary deep blue: `#203E55`, used for the house, figure, and hand.
+- Progress accent warm gold: `#C3A26E`, used only for the three steps.
 - No gradients, shadows, textures, leaves, medical crosses, arrows, or decorative additions.
 - The mark must remain coherent in a single-colour version.
 
