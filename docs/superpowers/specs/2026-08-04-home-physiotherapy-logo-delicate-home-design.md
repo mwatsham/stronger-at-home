@@ -1,6 +1,6 @@
 # Delicate At-Home Physiotherapy Logo Design
 
-Status: Approved raster-only design; awaiting written-spec review.
+Status: Approved raster-only design and written specification; implementation pending.
 
 ## Objective
 
