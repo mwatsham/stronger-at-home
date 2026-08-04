@@ -2,8 +2,10 @@ import hashlib
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
+from unittest.mock import patch
 
 from PIL import Image
+import PIL
 
 from scripts.generate_raster_logo import (
     MASTER_SIZE,
@@ -55,6 +57,17 @@ class RasterLogoGenerationTests(unittest.TestCase):
                 for path in second_paths
             ]
         self.assertEqual(first_hashes, second_hashes)
+
+    def test_generate_rejects_a_non_pinned_pillow_version(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            self._copy_inputs(root)
+            with patch.object(PIL, "__version__", "12.2.0"):
+                with self.assertRaisesRegex(
+                    RuntimeError,
+                    "Raster generation requires Pillow 12.3.0; found 12.2.0",
+                ):
+                    generate(root)
 
     def _copy_inputs(self, root: Path) -> None:
         relative_inputs = (

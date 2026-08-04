@@ -1,6 +1,6 @@
 # Stronger at Home Physiotherapy
 
-Status: approved strategy; proposed public name and proposed raster-only primary artwork
+Status: approved strategy and exact raster-only primary artwork; proposed public name; public use blocked
 Approval owner: Melanie Watsham
 
 Experienced care. Personal progress. At home.
@@ -8,10 +8,12 @@ Experienced care. Personal progress. At home.
 ## Adoption boundary
 
 This repository is the Stage 1 source of truth for the brand system. The public
-name and raster-only primary artwork are proposed materials only: neither may be used
-publicly until their respective clearance and final-artwork approval records
-exist. No patient, referral, website, social, uniform, vehicle or signage
-templates are included in this stage.
+name remains proposed. Melanie Watsham approved both exact raster-only primary
+artwork files without changes on 2026-08-04, but neither the proposed name nor
+the approved artwork may be used publicly until every separate name,
+credential, contact and source-image rights clearance requirement is resolved.
+No patient, referral, website, social, uniform, vehicle or signage templates
+are included in this stage.
 
 Start with [strategy](brand/strategy.md), [messaging](brand/messaging.md),
 [identity](brand/identity.md), [clearance](brand/clearance.md), and the

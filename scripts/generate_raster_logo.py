@@ -3,7 +3,16 @@ from __future__ import annotations
 import hashlib
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFont
+try:
+    import PIL
+    from PIL import Image, ImageDraw, ImageFont
+except ModuleNotFoundError as error:
+    if error.name != "PIL":
+        raise
+    raise RuntimeError(
+        "Raster generation requires Pillow 12.3.0; install the pinned project "
+        "dependencies from requirements.txt."
+    ) from error
 
 
 SOURCE_RELATIVE = Path(
@@ -25,6 +34,17 @@ SOURCE_SERIF = Path("brand/fonts/source-serif-4.ttf")
 ATKINSON = Path("brand/fonts/atkinson-hyperlegible-next.ttf")
 MASTER_OUTPUT = Path("brand/assets/source/logo-primary-raster-2048.png")
 SMALL_OUTPUT = Path("brand/assets/source/logo-primary-raster-512.png")
+REQUIRED_PILLOW_VERSION = "12.3.0"
+
+
+def _require_pinned_pillow() -> None:
+    installed_version = PIL.__version__
+    if installed_version != REQUIRED_PILLOW_VERSION:
+        raise RuntimeError(
+            "Raster generation requires Pillow "
+            f"{REQUIRED_PILLOW_VERSION}; found {installed_version}. "
+            "Install the pinned project dependencies from requirements.txt."
+        )
 
 
 def _verified_source(root: Path) -> Image.Image:
@@ -45,6 +65,7 @@ def _verified_source(root: Path) -> Image.Image:
 
 
 def render_master(root: Path) -> Image.Image:
+    _require_pinned_pillow()
     source = _verified_source(root)
     symbol = source.crop(CROP_BOX)
     symbol.thumbnail(SYMBOL_FIT, Image.Resampling.LANCZOS)

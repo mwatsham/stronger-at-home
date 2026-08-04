@@ -2,14 +2,15 @@
 
 ## 2026-08-04 — raster-only primary artwork
 
-The project sponsor approved the raster-only design direction, not the final
-output pixels. The immutable source is
+The project sponsor approved the raster-only design direction, and Melanie
+Watsham subsequently approved both exact final output files without changes on
+2026-08-04. The immutable source is
 `docs/superpowers/specs/assets/home-physiotherapy-logo-approved-concept-v2.png`
 with SHA-256
 `41267865711ca55f9225df8370c50bca823f68ca966b8fc216852e65a36d0ef1`.
 It is composited only through the fixed crop `(300, 285, 954, 1023)`.
 
-The proposed exact outputs are
+The approved exact outputs are
 `brand/assets/source/logo-primary-raster-2048.png` at 2048 × 640 pixels and
 `brand/assets/source/logo-primary-raster-512.png` at 512 × 160 pixels. They
 are opaque raster-only lockups: no SVG, transparent, monochrome or AI-redrawn

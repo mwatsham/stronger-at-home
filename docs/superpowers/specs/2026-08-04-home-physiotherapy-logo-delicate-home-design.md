@@ -1,6 +1,6 @@
 # Delicate At-Home Physiotherapy Logo Design
 
-Status: Approved raster-only design and written specification; implementation pending.
+Status: Implemented raster-only design; both exact PNG outputs approved without changes by Melanie Watsham on 2026-08-04; public use blocked pending separate clearance.
 
 ## Objective
 
@@ -65,7 +65,7 @@ The approved concept study is stored at `assets/home-physiotherapy-logo-approved
 - Render all wordmark text in approved Deep Navy `#203E55`.
 - Extend the source image's pale edge colour across the complete lockup canvas so the cropped symbol does not appear as a separate square.
 - Keep the symbol and wordmark optically centred with clear separation; neither may overlap the other.
-- The raster lockup remains proposed until Melanie Watsham explicitly approves the exact final pixels.
+- Melanie Watsham approved both exact final raster lockups without changes on 2026-08-04. That approval does not clear the proposed public name, credentials, contact information, source-image ownership or usage rights, or any other public-use requirement.
 
 ## Visual character
 
@@ -101,4 +101,4 @@ The approved concept study is stored at `assets/home-physiotherapy-logo-approved
 
 ## Supersession
 
-This design replaces the solid-hand and embedded-raster-figure treatment defined in `2026-08-03-home-physiotherapy-logo-design.md` and supersedes the vector-output requirements in `2026-08-03-supplied-logo-production-cleanup-design.md`. Existing proposed SVG artwork remains historical until the implementation plan formally deprecates it; it must not be used as the source for the new raster lockup.
+This design replaces the solid-hand and embedded-raster-figure treatment defined in `2026-08-03-home-physiotherapy-logo-design.md` and supersedes the vector-output requirements in `2026-08-03-supplied-logo-production-cleanup-design.md`. The existing SVG artwork is deprecated historical evidence only; it must not be used as the source for the raster lockup.

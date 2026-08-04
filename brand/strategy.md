@@ -18,4 +18,6 @@ read-only reference material, and the user-owned source artwork in
 ownership was confirmed on 2026-08-03.
 
 Stage 1 does not create patient, referral, website, social, uniform, vehicle
-or signage templates. It introduces no external Python or Node dependencies.
+or signage templates. Raster generation and brand validation use the external
+Python package Pillow, pinned exactly to version 12.3.0 in `requirements.txt`;
+there are no external Node dependencies.

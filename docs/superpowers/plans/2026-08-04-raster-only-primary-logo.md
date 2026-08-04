@@ -1,5 +1,9 @@
 # Raster-Only Primary Logo Implementation Plan
 
+Current outcome: Implementation is complete. Melanie Watsham approved both
+exact PNG outputs without changes on 2026-08-04. The public name remains
+proposed and all separate public-use clearance gates remain in force.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Produce deterministic 2048-pixel and 512-pixel opaque PNG lockups that preserve the approved supplied symbol and pair it with the existing Stronger at Home Physiotherapy wordmark for Melanie Watsham's exact-pixel review.
@@ -22,7 +26,7 @@
 - Render all wordmark text in Deep Navy `#203E55`, RGB `(32, 62, 85)`.
 - Save both exports as opaque RGB PNG files with `compress_level=9`; the only resampling is Lanczos scaling required for placement and the smaller export.
 - Keep `Stronger at Home Physiotherapy` proposed pending name clearance. Keep HCPC, CSP, AGILE and ATOCP wording verification-gated.
-- Keep both exact output files proposed until Melanie Watsham explicitly approves them and an ISO review date is recorded.
+- Preserve the recorded approval of both exact output files by Melanie Watsham on 2026-08-04; this exact-artwork approval does not resolve any separate public-use clearance.
 - Retain the existing SVG as deprecated historical evidence; do not delete it and do not treat it as an active production asset.
 - Preserve `sources/` and the parent checkout's staged `AGENTS.md`.
 - Do not install, push, deploy or publish anything while implementing this plan.
@@ -34,16 +38,16 @@
 |---|---|
 | `scripts/generate_raster_logo.py` | Deterministically composes the master and small raster lockups from the immutable PNG and committed fonts |
 | `tests/test_raster_logo_generation.py` | Verifies source protection, fixed geometry, opacity, dimensions and deterministic output |
-| `brand/assets/source/logo-primary-raster-2048.png` | Proposed full-size opaque primary lockup |
-| `brand/assets/source/logo-primary-raster-512.png` | Proposed small opaque primary lockup derived from the master |
+| `brand/assets/source/logo-primary-raster-2048.png` | Approved exact full-size opaque primary lockup; public use remains blocked |
+| `brand/assets/source/logo-primary-raster-512.png` | Approved exact small opaque primary lockup derived from the master; public use remains blocked |
 | `scripts/validate_brand.py` | Enforces raster production requirements, hashes and approval governance |
 | `tests/test_brand_validation.py` | Exercises manifest, raster metadata, source-hash and active-SVG rejection paths |
-| `brand/assets/manifest.json` | Records deprecated SVG and both proposed raster outputs with real SHA-256 values |
+| `brand/assets/manifest.json` | Records the deprecated SVG and both approved exact raster outputs with real SHA-256 values |
 | `brand/assets/review/logo-raster-preview.html` | Presents source, 2048-pixel output and 512-pixel output for exact visual review |
 | `brand/assets/review/logo-hybrid-preview.html` | Marks the previous SVG comparison as historical and deprecated |
-| `BRAND.md` | Points adopters to the current raster-only proposed artwork boundary |
-| `DECISIONS.md` | Deprecates the vector cleanup and records approved raster direction plus proposed exact pixels |
-| `MEMORY.md` | Records why the source PNG is preserved and why final approval remains gated |
+| `BRAND.md` | Distinguishes approved exact raster artwork from the proposed name and blocked public use |
+| `DECISIONS.md` | Deprecates the vector cleanup and records the approved raster direction and exact pixels |
+| `MEMORY.md` | Records why the source PNG is preserved and why public use remains clearance-gated |
 | `brand/identity.md` | Defines the current raster-only architecture and prohibited variants |
 | `brand/clearance.md` | Adds the exact v2 source rights gate and exact-pixel approval gate |
 

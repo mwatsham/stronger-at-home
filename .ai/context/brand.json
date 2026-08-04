@@ -8,7 +8,7 @@
   "claims": {"approved": ["20+ years of NHS experience"], "verification_gated": ["HCPC", "CSP", "AGILE", "ATOCP"]},
   "personality": ["warm", "practical", "clinically credible"],
   "voice": ["reassuring", "hopeful", "empowering"],
-  "identity_architecture": {"status": "proposed", "type": "hybrid", "standalone_symbol_allowed": false},
+  "identity_architecture": {"status": "approved", "type": "raster-only primary lockup", "exact_artwork_reviewed_by": "Melanie Watsham", "exact_artwork_reviewed_on": "2026-08-04", "standalone_symbol_allowed": false},
   "prohibitions": ["unverified claims", "guaranteed outcomes", "public use before clearance", "standalone symbol in Stage 1"],
   "approval_owner": "Melanie Watsham"
 }

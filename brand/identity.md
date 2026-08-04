@@ -5,8 +5,8 @@
 D-15 is the current approved design direction: use the exact immutable v2
 supplied PNG as the symbol in opaque raster-only primary lockups. The source is
 cropped only to `(300, 285, 954, 1023)` and placed on a fixed pale background
-of RGB `(249, 244, 242)` (`#F9F4F2`) so it has no visible seam. The proposed
-outputs are:
+of RGB `(249, 244, 242)` (`#F9F4F2`) so it has no visible seam. The approved
+exact outputs are:
 
 - `brand/assets/source/logo-primary-raster-2048.png` at 2048 × 640 pixels.
 - `brand/assets/source/logo-primary-raster-512.png` at 512 × 160 pixels.

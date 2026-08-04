@@ -8,7 +8,15 @@ import re
 import sys
 import xml.etree.ElementTree as ET
 
-from PIL import Image, UnidentifiedImageError
+try:
+    from PIL import Image, UnidentifiedImageError
+except ModuleNotFoundError as error:
+    if error.name != "PIL":
+        raise
+    raise RuntimeError(
+        "Brand validation requires Pillow; install the pinned project "
+        "dependencies from requirements.txt."
+    ) from error
 
 try:
     from scripts.generate_brand_tokens import render_css
@@ -27,6 +35,7 @@ REQUIRED_FILES = (
     "brand/tokens.json",
     ".ai/context/brand.json",
     "brand/assets/manifest.json",
+    "requirements.txt",
 )
 FONT_LICENCE_PAIRS = {
     "brand/fonts/source-serif-4.ttf": "brand/fonts/OFL-source-serif.txt",
@@ -61,6 +70,13 @@ PRIMARY_RASTER_SIZES = {
     "primary_raster_logo_512": (512, 160),
 }
 PRIMARY_LOGO_ROLES = set(PRIMARY_RASTER_SIZES) | {"primary_hybrid_logo"}
+REQUIRED_ASSET_PATHS = {
+    "primary_hybrid_logo": "brand/assets/source/logo-primary-hybrid.svg",
+    "primary_raster_logo_2048": (
+        "brand/assets/source/logo-primary-raster-2048.png"
+    ),
+    "primary_raster_logo_512": "brand/assets/source/logo-primary-raster-512.png",
+}
 
 
 def _relative_luminance(hex_colour: str) -> float:
@@ -200,6 +216,56 @@ def _validate_asset_manifest(root: Path, manifest: object) -> list[str]:
         return ["Asset manifest must contain an assets array"]
 
     errors: list[str] = []
+    entries_by_role = {
+        role: [
+            asset
+            for asset in assets
+            if isinstance(asset, dict) and asset.get("role") == role
+        ]
+        for role in REQUIRED_ASSET_PATHS
+    }
+    for role, expected_path in REQUIRED_ASSET_PATHS.items():
+        entries = entries_by_role[role]
+        if len(entries) != 1:
+            errors.append(f"Asset manifest must contain exactly one {role} entry")
+            continue
+        if entries[0].get("path") != expected_path:
+            errors.append(
+                f"Asset role {role} must use canonical path: {expected_path}"
+            )
+
+    historical_entries = entries_by_role["primary_hybrid_logo"]
+    if (
+        len(historical_entries) == 1
+        and historical_entries[0].get("status") != "deprecated"
+    ):
+        errors.append(
+            "Historical primary_hybrid_logo asset must have deprecated status"
+        )
+    historical_svg_is_managed = (
+        len(historical_entries) == 1
+        and historical_entries[0].get("path")
+        == REQUIRED_ASSET_PATHS["primary_hybrid_logo"]
+        and historical_entries[0].get("status") == "deprecated"
+    )
+    source_directory = root / "brand/assets/source"
+    if source_directory.is_dir():
+        svg_paths = sorted(
+            path
+            for path in source_directory.rglob("*")
+            if path.is_file() and path.suffix.lower() == ".svg"
+        )
+        for svg_path in svg_paths:
+            relative_path = svg_path.relative_to(root).as_posix()
+            if (
+                relative_path != REQUIRED_ASSET_PATHS["primary_hybrid_logo"]
+                or not historical_svg_is_managed
+            ):
+                errors.append(
+                    "Unmanaged SVG asset in brand/assets/source: "
+                    f"{relative_path}"
+                )
+
     for asset in assets:
         if not isinstance(asset, dict):
             errors.append("Asset manifest entries must be JSON objects")
