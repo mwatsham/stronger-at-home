@@ -2,15 +2,25 @@
 
 ## Status and architecture
 
-D-14 is the only current proposed primary artwork direction: a faithful
-production cleanup of the supplied house, moving person, steps and outlined
-hand reference. It supersedes the deprecated D-11 hybrid exploration and D-13
-filled-hand/open-doorway geometry. The supplied PNG is an immutable visual
-reconstruction reference, not production artwork.
+D-15 is the current approved design direction: use the exact immutable v2
+supplied PNG as the symbol in opaque raster-only primary lockups. The source is
+cropped only to `(300, 285, 954, 1023)` and placed on a fixed pale background
+of RGB `(249, 244, 242)` (`#F9F4F2`) so it has no visible seam. The proposed
+outputs are:
 
-Do not use an image model to reproduce or reinterpret its geometry. The final
-public artwork must remain proposed until Melanie Watsham explicitly approves
-it and the supplied image's ownership/usage rights are confirmed.
+- `brand/assets/source/logo-primary-raster-2048.png` at 2048 × 640 pixels.
+- `brand/assets/source/logo-primary-raster-512.png` at 512 × 160 pixels.
+
+The wordmark uses Source Serif 4 at 112 px for `Stronger at Home` and 82 px
+for `Physiotherapy`; the endorsement uses Atkinson Hyperlegible Next at 44 px.
+All wordmark text is Deep Navy `#203E55`.
+
+Do not create SVG derivatives, transparent or monochrome variants, AI-redrawn
+versions, recoloured source artwork, background-removed versions, or altered
+source geometry. D-14 is deprecated historical vector-cleanup direction only.
+The two exact PNG files remain proposed until Melanie Watsham explicitly
+approves their final pixels with an ISO review date; source-image
+ownership/usage rights must also be confirmed before public use.
 
 ## Palette and typography
 
@@ -28,5 +38,5 @@ before downloading font files into this refreshed repository.
 ## Application boundary
 
 No standalone house symbol, public export, or application template may be made
-in Stage 1. Artwork remains an exploration asset until all required clearance
-and explicit final-artwork approval are recorded.
+in Stage 1. Artwork remains proposed until all required clearance and explicit
+final-artwork approval are recorded.

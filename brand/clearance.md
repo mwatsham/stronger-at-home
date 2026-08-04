@@ -14,4 +14,6 @@ unresolved entry is not permission to publish.
 | Source Serif 4 and Atkinson Hyperlegible Next files | provenance confirmed | Action-time approval and 2026-08-03 official Google Fonts download; paired SIL Open Font License 1.1 files, source URLs and SHA-256 hashes recorded in `brand/fonts/README.md` | Local editable artwork and review only; not a clearance of the public name, credentials, or final artwork. |
 | Owned source artwork | provenance confirmed | Source path, acquisition date, ownership statement and SHA-256 recorded with asset work | Keep source evidence read-only. |
 | Supplied PNG `6d066dbeff88023aece19346a1d0a9a1d3f4577f7846545e359ad59fab24f889` | unresolved | Explicit ownership/usage-rights confirmation for this exact supplied image | Do not use publicly until the exact image's rights are confirmed. |
-| Final hybrid artwork | proposed | Explicit approval by Melanie Watsham with ISO review date | Do not export or use publicly. |
+| Supplied v2 PNG `41267865711ca55f9225df8370c50bca823f68ca966b8fc216852e65a36d0ef1` | unresolved | Explicit ownership/usage-rights confirmation for this exact supplied image | Do not use publicly until the exact image's rights are confirmed. |
+| `brand/assets/source/logo-primary-raster-2048.png` exact raster artwork | proposed | Explicit approval by Melanie Watsham with ISO review date | Do not export or use publicly. |
+| `brand/assets/source/logo-primary-raster-512.png` exact raster artwork | proposed | Explicit approval by Melanie Watsham with ISO review date | Do not export or use publicly. |
