@@ -1,0 +1,4 @@
+# Preserve the verified upstream OFL files while excluding their original
+# trailing spaces from Git's whitespace-error checks.
+brand/fonts/OFL-source-serif.txt whitespace=-trailing-space
+brand/fonts/OFL-atkinson.txt whitespace=-trailing-space
