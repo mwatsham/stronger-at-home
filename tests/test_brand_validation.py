@@ -4,6 +4,8 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
 
+from PIL import Image
+
 from scripts.validate_brand import contrast_ratio, validate_project
 
 
@@ -44,6 +46,45 @@ def write_asset_project(
                 "status": status,
                 "sha256": sha256
                 or hashlib.sha256(asset_path.read_bytes()).hexdigest(),
+                "reviewed_by": reviewed_by,
+                "reviewed_on": reviewed_on,
+            }
+        ],
+    }
+    manifest_path = root / "brand/assets/manifest.json"
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+
+def write_raster_asset(
+    root: Path,
+    *,
+    role: str = "primary_raster_logo_2048",
+    size: tuple[int, int] = (2048, 640),
+    mode: str = "RGB",
+    transparency: tuple[int, int, int] | None = None,
+    status: str = "proposed",
+    reviewed_by: str | None = None,
+    reviewed_on: str | None = None,
+) -> None:
+    filename = "logo-primary-raster-2048.png"
+    asset_path = root / "brand/assets/source" / filename
+    asset_path.parent.mkdir(parents=True, exist_ok=True)
+    colour = (249, 244, 242, 255) if mode == "RGBA" else (249, 244, 242)
+    image = Image.new(mode, size, colour)
+    if transparency is None:
+        image.save(asset_path)
+    else:
+        image.save(asset_path, transparency=transparency)
+    manifest = {
+        "schema_version": "1.0",
+        "assets": [
+            {
+                "id": "logo_primary_raster_2048",
+                "role": role,
+                "path": f"brand/assets/source/{filename}",
+                "status": status,
+                "sha256": hashlib.sha256(asset_path.read_bytes()).hexdigest(),
                 "reviewed_by": reviewed_by,
                 "reviewed_on": reviewed_on,
             }
@@ -275,4 +316,89 @@ class BrandValidationTests(unittest.TestCase):
         )
         self.assertNotIn(
             "Approved asset logo_primary_hybrid must have an ISO review date", errors
+        )
+
+    def test_primary_raster_requires_exact_dimensions(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_raster_asset(root, size=(2047, 640))
+            errors = validate_project(root)
+        self.assertIn(
+            "Raster logo primary_raster_logo_2048 must be 2048 × 640 pixels",
+            errors,
+        )
+
+    def test_primary_raster_must_be_opaque_rgb_png(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_raster_asset(root, mode="RGBA")
+            errors = validate_project(root)
+        self.assertIn(
+            "Raster logo primary_raster_logo_2048 must use opaque RGB mode",
+            errors,
+        )
+
+    def test_primary_raster_rejects_png_transparency(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_raster_asset(root, transparency=(1, 2, 3))
+            errors = validate_project(root)
+        self.assertIn(
+            "Raster logo primary_raster_logo_2048 must use opaque RGB mode",
+            errors,
+        )
+
+    def test_primary_raster_does_not_use_svg_validation(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_raster_asset(root)
+            errors = validate_project(root)
+        self.assertFalse(
+            [error for error in errors if error.startswith("Invalid hybrid logo SVG:")]
+        )
+
+    def test_active_primary_svg_is_rejected(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_asset_project(root, status="proposed")
+            errors = validate_project(root)
+        self.assertIn(
+            "Active primary logo must not be SVG: "
+            "brand/assets/source/logo-primary-hybrid.svg",
+            errors,
+        )
+
+    def test_immutable_raster_source_is_required(self):
+        with TemporaryDirectory() as directory:
+            errors = validate_project(Path(directory))
+        self.assertIn(
+            "Missing immutable raster source: "
+            "docs/superpowers/specs/assets/"
+            "home-physiotherapy-logo-approved-concept-v2.png",
+            errors,
+        )
+
+    def test_deprecated_primary_svg_is_retained_as_history(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_asset_project(root, status="deprecated")
+            errors = validate_project(root)
+        self.assertNotIn(
+            "Active primary logo must not be SVG: "
+            "brand/assets/source/logo-primary-hybrid.svg",
+            errors,
+        )
+
+    def test_approved_raster_requires_melanie_and_iso_date(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_raster_asset(root, status="approved")
+            errors = validate_project(root)
+        self.assertIn(
+            "Approved asset logo_primary_raster_2048 must be reviewed by Melanie Watsham",
+            errors,
+        )
+        self.assertIn(
+            "Approved asset logo_primary_raster_2048 must have an ISO review date",
+            errors,
         )

@@ -8,6 +8,8 @@ import re
 import sys
 import xml.etree.ElementTree as ET
 
+from PIL import Image, UnidentifiedImageError
+
 try:
     from scripts.generate_brand_tokens import render_css
 except ImportError:
@@ -47,6 +49,18 @@ CSS_PAINT_DECLARATION = re.compile(
     r"(?<![\w-])(?:color|fill|flood-color|stop-color|stroke)\s*:\s*([^;}]+)",
     re.IGNORECASE,
 )
+IMMUTABLE_RASTER_SOURCE = Path(
+    "docs/superpowers/specs/assets/"
+    "home-physiotherapy-logo-approved-concept-v2.png"
+)
+IMMUTABLE_RASTER_SOURCE_SHA256 = (
+    "41267865711ca55f9225df8370c50bca823f68ca966b8fc216852e65a36d0ef1"
+)
+PRIMARY_RASTER_SIZES = {
+    "primary_raster_logo_2048": (2048, 640),
+    "primary_raster_logo_512": (512, 160),
+}
+PRIMARY_LOGO_ROLES = set(PRIMARY_RASTER_SIZES) | {"primary_hybrid_logo"}
 
 
 def _relative_luminance(hex_colour: str) -> float:
@@ -154,6 +168,30 @@ def _is_iso_date(value: object) -> bool:
     return True
 
 
+def _validate_raster_logo(path: Path, role: str) -> list[str]:
+    expected_size = PRIMARY_RASTER_SIZES[role]
+    try:
+        with Image.open(path) as image:
+            image.load()
+            image_format = image.format
+            size = image.size
+            mode = image.mode
+            transparency = image.info.get("transparency")
+    except (OSError, UnidentifiedImageError) as error:
+        return [f"Invalid raster logo {role}: {error}"]
+    errors = []
+    if image_format != "PNG":
+        errors.append(f"Raster logo {role} must be PNG")
+    if size != expected_size:
+        errors.append(
+            f"Raster logo {role} must be "
+            f"{expected_size[0]} × {expected_size[1]} pixels"
+        )
+    if mode != "RGB" or transparency is not None:
+        errors.append(f"Raster logo {role} must use opaque RGB mode")
+    return errors
+
+
 def _validate_asset_manifest(root: Path, manifest: object) -> list[str]:
     if not isinstance(manifest, dict):
         return ["Asset manifest must be a JSON object"]
@@ -188,7 +226,18 @@ def _validate_asset_manifest(root: Path, manifest: object) -> list[str]:
         status = asset.get("status")
         if status not in ALLOWED_STATUSES:
             errors.append(f"Asset {asset_id or '<unknown>'} has invalid status: {status}")
-        if asset.get("role") == "primary_hybrid_logo":
+        role = asset.get("role")
+        if (
+            role in PRIMARY_LOGO_ROLES
+            and asset_path.suffix.lower() == ".svg"
+            and status != "deprecated"
+        ):
+            errors.append(f"Active primary logo must not be SVG: {relative_path}")
+        if role in PRIMARY_RASTER_SIZES:
+            errors.extend(_validate_raster_logo(asset_path, role))
+        if role == "primary_hybrid_logo":
+            errors.extend(_validate_hybrid_logo(asset_path))
+        if role in PRIMARY_LOGO_ROLES:
             if status == "approved":
                 if asset.get("reviewed_by") != "Melanie Watsham":
                     errors.append(
@@ -205,12 +254,20 @@ def _validate_asset_manifest(root: Path, manifest: object) -> list[str]:
                 errors.append(
                     f"Proposed asset {asset_id or '<unknown>'} must not have review metadata"
                 )
-            errors.extend(_validate_hybrid_logo(asset_path))
     return errors
 
 
 def validate_project(root: Path) -> list[str]:
     errors = [f"Missing required file: {path}" for path in REQUIRED_FILES if not (root / path).is_file()]
+    source_path = root / IMMUTABLE_RASTER_SOURCE
+    if not source_path.is_file():
+        errors.append(f"Missing immutable raster source: {IMMUTABLE_RASTER_SOURCE}")
+    else:
+        actual_source_hash = hashlib.sha256(source_path.read_bytes()).hexdigest()
+        if actual_source_hash != IMMUTABLE_RASTER_SOURCE_SHA256:
+            errors.append(
+                f"Immutable raster source hash mismatch: {IMMUTABLE_RASTER_SOURCE}"
+            )
     for font, licence in FONT_LICENCE_PAIRS.items():
         if (root / font).is_file() and not (root / licence).is_file():
             errors.append(f"Missing font licence: {licence}")

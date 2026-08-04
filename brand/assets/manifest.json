@@ -2,11 +2,29 @@
   "schema_version": "1.0",
   "assets": [
     {
-      "id": "logo_primary_hybrid",
+      "id": "logo_primary_hybrid_historical",
       "role": "primary_hybrid_logo",
       "path": "brand/assets/source/logo-primary-hybrid.svg",
-      "status": "proposed",
+      "status": "deprecated",
       "sha256": "f4453fdf1d92974be1d5ce2dfb40e9a7e472bbe858a8440a321428abcd46f9e4",
+      "reviewed_by": null,
+      "reviewed_on": null
+    },
+    {
+      "id": "logo_primary_raster_2048",
+      "role": "primary_raster_logo_2048",
+      "path": "brand/assets/source/logo-primary-raster-2048.png",
+      "status": "proposed",
+      "sha256": "108c7bf9175868c4dffe15be6b2e4433346093d1f9d692752851a4b9d9bd5864",
+      "reviewed_by": null,
+      "reviewed_on": null
+    },
+    {
+      "id": "logo_primary_raster_512",
+      "role": "primary_raster_logo_512",
+      "path": "brand/assets/source/logo-primary-raster-512.png",
+      "status": "proposed",
+      "sha256": "153f964143d1fadae66595871c6bbef5d3a336260bf28f6229043eaf91a23afd",
       "reviewed_by": null,
       "reviewed_on": null
     }
