@@ -83,6 +83,26 @@ REQUIRED_ASSET_PATHS = {
     "historical_raster_logo_2048": "brand/assets/source/logo-primary-raster-2048.png",
     "historical_raster_logo_512": "brand/assets/source/logo-primary-raster-512.png",
 }
+CURRENT_PRIMARY_RASTER_RECORDS = {
+    "primary_raster_logo_2048": {
+        "sha256": "4e8988e571269353aed86697468e0a60b838bc1e121c8e590f974d5124df3683",
+        "reviewed_on": "2026-08-05",
+    },
+    "primary_raster_logo_512": {
+        "sha256": "d557a0e8fd05efc86fcca2b3f63d807ad33f29527062697705a8e05616c6db39",
+        "reviewed_on": "2026-08-05",
+    },
+}
+HISTORICAL_RASTER_RECORDS = {
+    "historical_raster_logo_2048": {
+        "sha256": "108c7bf9175868c4dffe15be6b2e4433346093d1f9d692752851a4b9d9bd5864",
+        "reviewed_on": "2026-08-04",
+    },
+    "historical_raster_logo_512": {
+        "sha256": "153f964143d1fadae66595871c6bbef5d3a336260bf28f6229043eaf91a23afd",
+        "reviewed_on": "2026-08-04",
+    },
+}
 
 
 def _relative_luminance(hex_colour: str) -> float:
@@ -214,6 +234,41 @@ def _validate_raster_logo(path: Path, role: str) -> list[str]:
     return errors
 
 
+def _validate_raster_approval_record(asset: dict[str, object]) -> list[str]:
+    role = asset.get("role")
+    asset_id = asset.get("id") or "<unknown>"
+    if role in CURRENT_PRIMARY_RASTER_RECORDS:
+        record = CURRENT_PRIMARY_RASTER_RECORDS[role]
+        label = f"Current primary raster asset {asset_id}"
+        expected_status = "approved"
+        hash_label = "approved"
+    elif role in HISTORICAL_RASTER_RECORDS:
+        record = HISTORICAL_RASTER_RECORDS[role]
+        label = f"Historical raster asset {asset_id}"
+        expected_status = "deprecated"
+        hash_label = "original"
+    else:
+        return []
+
+    errors = []
+    if asset.get("status") != expected_status:
+        if role in HISTORICAL_RASTER_RECORDS:
+            errors.append(f"{label} must be deprecated")
+        else:
+            errors.append(f"{label} must have status approved")
+    if asset.get("reviewed_by") != "Melanie Watsham":
+        errors.append(f"{label} must be reviewed by Melanie Watsham")
+    if asset.get("reviewed_on") != record["reviewed_on"]:
+        errors.append(
+            f"{label} must have approval date {record['reviewed_on']}"
+        )
+    if asset.get("sha256") != record["sha256"]:
+        errors.append(
+            f"{label} must have {hash_label} SHA-256 {record['sha256']}"
+        )
+    return errors
+
+
 def _validate_asset_manifest(root: Path, manifest: object) -> list[str]:
     if not isinstance(manifest, dict):
         return ["Asset manifest must be a JSON object"]
@@ -309,11 +364,9 @@ def _validate_asset_manifest(root: Path, manifest: object) -> list[str]:
             errors.extend(_validate_raster_logo(asset_path, role))
         if role == "primary_hybrid_logo":
             errors.extend(_validate_hybrid_logo(asset_path))
-        if role in HISTORICAL_RASTER_ROLES and status != "deprecated":
-            errors.append(
-                f"Historical raster asset {asset_id or '<unknown>'} must be deprecated"
-            )
-        if role in PRIMARY_LOGO_ROLES:
+        if role in RASTER_SIZES:
+            errors.extend(_validate_raster_approval_record(asset))
+        elif role in PRIMARY_LOGO_ROLES:
             if status == "approved":
                 if asset.get("reviewed_by") != "Melanie Watsham":
                     errors.append(

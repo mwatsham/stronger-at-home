@@ -36,6 +36,12 @@ APPROVED_MASTER_OUTPUT = Path("brand/assets/source/logo-primary-raster-2048.png"
 APPROVED_SMALL_OUTPUT = Path("brand/assets/source/logo-primary-raster-512.png")
 CANDIDATE_MASTER_OUTPUT = Path("brand/assets/source/logo-primary-raster-v2-2048.png")
 CANDIDATE_SMALL_OUTPUT = Path("brand/assets/source/logo-primary-raster-v2-512.png")
+CANDIDATE_MASTER_SHA256 = (
+    "4e8988e571269353aed86697468e0a60b838bc1e121c8e590f974d5124df3683"
+)
+CANDIDATE_SMALL_SHA256 = (
+    "d557a0e8fd05efc86fcca2b3f63d807ad33f29527062697705a8e05616c6db39"
+)
 MASTER_OUTPUT = APPROVED_MASTER_OUTPUT
 SMALL_OUTPUT = APPROVED_SMALL_OUTPUT
 APPROVED_WORDMARK_LINES = (

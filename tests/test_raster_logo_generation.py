@@ -11,7 +11,9 @@ from scripts.generate_raster_logo import (
     APPROVED_MASTER_OUTPUT,
     APPROVED_SMALL_OUTPUT,
     CANDIDATE_MASTER_OUTPUT,
+    CANDIDATE_MASTER_SHA256,
     CANDIDATE_SMALL_OUTPUT,
+    CANDIDATE_SMALL_SHA256,
     CANDIDATE_WORDMARK_LINES,
     MASTER_SIZE,
     SMALL_SIZE,
@@ -84,6 +86,23 @@ class RasterLogoGenerationTests(unittest.TestCase):
                 for path in generate_candidate(root)
             )
             self.assertEqual(second, first)
+
+    def test_generate_candidate_matches_exact_approved_hashes(self):
+        expected_hashes = (
+            "4e8988e571269353aed86697468e0a60b838bc1e121c8e590f974d5124df3683",
+            "d557a0e8fd05efc86fcca2b3f63d807ad33f29527062697705a8e05616c6db39",
+        )
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            self._copy_inputs(root)
+            paths = generate_candidate(root)
+            actual_hashes = tuple(
+                hashlib.sha256(path.read_bytes()).hexdigest() for path in paths
+            )
+        self.assertEqual(
+            (CANDIDATE_MASTER_SHA256, CANDIDATE_SMALL_SHA256), expected_hashes
+        )
+        self.assertEqual(actual_hashes, expected_hashes)
 
     def test_immutable_source_matches_approved_hash(self):
         source = PROJECT_ROOT / (

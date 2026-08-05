@@ -1,4 +1,5 @@
 import hashlib
+from html.parser import HTMLParser
 import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -15,6 +16,31 @@ from scripts.validate_brand import (
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+
+class PreviewMetadataParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self._in_title = False
+        self.title = ""
+        self.image_alts: dict[str, str] = {}
+
+    def handle_starttag(
+        self, tag: str, attrs: list[tuple[str, str | None]]
+    ) -> None:
+        attributes = dict(attrs)
+        if tag == "title":
+            self._in_title = True
+        elif tag == "img" and attributes.get("src"):
+            self.image_alts[attributes["src"]] = attributes.get("alt", "")
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag == "title":
+            self._in_title = False
+
+    def handle_data(self, data: str) -> None:
+        if self._in_title:
+            self.title += data
 
 
 VALID_HYBRID_SVG = """\
@@ -68,20 +94,23 @@ def _write_default_rasters(root: Path) -> list[dict[str, object]]:
     for role, configuration in RASTER_ASSETS.items():
         asset_path = root / "brand/assets/source" / configuration["filename"]
         asset_path.parent.mkdir(parents=True, exist_ok=True)
-        Image.new("RGB", configuration["size"], (249, 244, 242)).save(asset_path)
+        asset_path.write_bytes(
+            (
+                PROJECT_ROOT
+                / "brand/assets/source"
+                / configuration["filename"]
+            ).read_bytes()
+        )
+        is_historical = role in HISTORICAL_RASTER_SIZES
         assets.append(
             {
                 "id": configuration["id"],
                 "role": role,
                 "path": f"brand/assets/source/{configuration['filename']}",
-                "status": (
-                    "deprecated"
-                    if role in HISTORICAL_RASTER_SIZES
-                    else "proposed"
-                ),
+                "status": "deprecated" if is_historical else "approved",
                 "sha256": hashlib.sha256(asset_path.read_bytes()).hexdigest(),
-                "reviewed_by": None,
-                "reviewed_on": None,
+                "reviewed_by": "Melanie Watsham",
+                "reviewed_on": "2026-08-04" if is_historical else "2026-08-05",
             }
         )
     return assets
@@ -147,33 +176,36 @@ def write_raster_asset(
         filename = current_configuration["filename"]
         asset_path = source_directory / filename
         is_target = current_role == role
-        image_mode = mode if is_target else "RGB"
-        image_size = (
-            size if is_target and size is not None else current_configuration["size"]
+        asset_path.write_bytes(
+            (PROJECT_ROOT / "brand/assets/source" / filename).read_bytes()
         )
-        colour = (
-            (249, 244, 242, 255)
-            if image_mode == "RGBA"
-            else (249, 244, 242)
-        )
-        image = Image.new(image_mode, image_size, colour)
-        if is_target and transparency is not None:
-            image.save(asset_path, transparency=transparency)
-        else:
-            image.save(asset_path)
+        if is_target and (size is not None or mode != "RGB" or transparency):
+            image_mode = mode
+            image_size = size or current_configuration["size"]
+            colour = (
+                (249, 244, 242, 255)
+                if image_mode == "RGBA"
+                else (249, 244, 242)
+            )
+            image = Image.new(image_mode, image_size, colour)
+            if transparency is not None:
+                image.save(asset_path, transparency=transparency)
+            else:
+                image.save(asset_path)
+        is_historical = current_role in HISTORICAL_RASTER_SIZES
+        default_status = "deprecated" if is_historical else "approved"
+        default_reviewed_on = "2026-08-04" if is_historical else "2026-08-05"
         assets.append(
             {
                 "id": current_configuration["id"],
                 "role": current_role,
                 "path": f"brand/assets/source/{filename}",
-                "status": status if is_target else (
-                    "deprecated"
-                    if current_role in HISTORICAL_RASTER_SIZES
-                    else "proposed"
-                ),
+                "status": status if is_target else default_status,
                 "sha256": hashlib.sha256(asset_path.read_bytes()).hexdigest(),
-                "reviewed_by": reviewed_by if is_target else None,
-                "reviewed_on": reviewed_on if is_target else None,
+                "reviewed_by": (
+                    reviewed_by if is_target else "Melanie Watsham"
+                ),
+                "reviewed_on": reviewed_on if is_target else default_reviewed_on,
             }
         )
     _write_manifest(root, assets)
@@ -186,10 +218,54 @@ class BrandValidationTests(unittest.TestCase):
         )
         self.assertEqual(context["brand_name"], "Stronger at Home Physiotherapy")
         self.assertEqual(context["display_wordmark"], "Stronger@Home")
+        self.assertEqual(context["brand_name_status"], "proposed")
         self.assertEqual(context["business_structure"], "sole trader")
         self.assertEqual(
             context["official_identity"],
             "Melanie Watsham trading as Stronger at Home Physiotherapy",
+        )
+        self.assertEqual(context["preferred_domain"], "stronger-at-home.co.uk")
+        self.assertEqual(
+            context["preferred_domain_status"],
+            "unregistered when checked 2026-08-04; registration and control unverified",
+        )
+        self.assertEqual(
+            context["identity_architecture"]["current_primary_assets"],
+            [
+                "brand/assets/source/logo-primary-raster-v2-2048.png",
+                "brand/assets/source/logo-primary-raster-v2-512.png",
+            ],
+        )
+        self.assertEqual(
+            context["identity_architecture"]["exact_artwork_reviewed_on"],
+            "2026-08-05",
+        )
+        self.assertIn("public use before clearance", context["prohibitions"])
+
+    def test_review_preview_spells_out_accessible_and_metadata_name(self):
+        parser = PreviewMetadataParser()
+        parser.feed(
+            (PROJECT_ROOT / "brand/assets/review/logo-raster-v2-preview.html")
+            .read_text(encoding="utf-8")
+        )
+        self.assertEqual(
+            parser.title,
+            "Stronger at Home Physiotherapy exact raster approval record",
+        )
+        expected_alt = (
+            "Approved Stronger at Home Physiotherapy by Melanie Watsham logo"
+        )
+        self.assertEqual(
+            parser.image_alts[
+                "../source/logo-primary-raster-v2-2048.png"
+            ],
+            expected_alt,
+        )
+        self.assertEqual(
+            parser.image_alts[
+                "../source/logo-primary-raster-v2-512.png"
+            ],
+            expected_alt,
         )
 
     def test_current_primary_roles_use_v2_paths(self):
@@ -460,6 +536,100 @@ class BrandValidationTests(unittest.TestCase):
             errors,
         )
 
+    def test_current_primary_raster_rejects_status_downgrade(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_raster_asset(
+                root,
+                role="primary_raster_logo_2048",
+                status="proposed",
+            )
+            errors = validate_project(root)
+        self.assertIn(
+            "Current primary raster asset logo_primary_raster_v2_2048 must have status approved",
+            errors,
+        )
+
+    def test_current_primary_raster_rejects_approval_date_drift(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_raster_asset(
+                root,
+                role="primary_raster_logo_512",
+                status="approved",
+                reviewed_by="Melanie Watsham",
+                reviewed_on="2026-08-04",
+            )
+            errors = validate_project(root)
+        self.assertIn(
+            "Current primary raster asset logo_primary_raster_v2_512 must have approval date 2026-08-05",
+            errors,
+        )
+
+    def test_current_primary_raster_rejects_approved_hash_drift(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_raster_asset(
+                root,
+                role="primary_raster_logo_2048",
+                status="approved",
+                reviewed_by="Melanie Watsham",
+                reviewed_on="2026-08-05",
+            )
+            asset_path = (
+                root / "brand/assets/source/logo-primary-raster-v2-2048.png"
+            )
+            Image.new("RGB", (2048, 640), (249, 244, 242)).save(asset_path)
+            manifest_path = root / "brand/assets/manifest.json"
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            entry = next(
+                asset
+                for asset in manifest["assets"]
+                if asset["role"] == "primary_raster_logo_2048"
+            )
+            entry["sha256"] = hashlib.sha256(asset_path.read_bytes()).hexdigest()
+            _write_manifest(root, manifest["assets"])
+            errors = validate_project(root)
+        self.assertIn(
+            "Current primary raster asset logo_primary_raster_v2_2048 must have approved SHA-256 4e8988e571269353aed86697468e0a60b838bc1e121c8e590f974d5124df3683",
+            errors,
+        )
+
+    def test_historical_raster_rejects_review_metadata_drift(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_raster_asset(
+                root,
+                role="historical_raster_logo_512",
+                status="deprecated",
+                reviewed_by="Project sponsor",
+                reviewed_on="2026-08-05",
+            )
+            asset_path = root / "brand/assets/source/logo-primary-raster-512.png"
+            Image.new("RGB", (512, 160), (249, 244, 242)).save(asset_path)
+            manifest_path = root / "brand/assets/manifest.json"
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            entry = next(
+                asset
+                for asset in manifest["assets"]
+                if asset["role"] == "historical_raster_logo_512"
+            )
+            entry["sha256"] = hashlib.sha256(asset_path.read_bytes()).hexdigest()
+            _write_manifest(root, manifest["assets"])
+            errors = validate_project(root)
+        self.assertIn(
+            "Historical raster asset logo_primary_raster_512 must be reviewed by Melanie Watsham",
+            errors,
+        )
+        self.assertIn(
+            "Historical raster asset logo_primary_raster_512 must have approval date 2026-08-04",
+            errors,
+        )
+        self.assertIn(
+            "Historical raster asset logo_primary_raster_512 must have original SHA-256 153f964143d1fadae66595871c6bbef5d3a336260bf28f6229043eaf91a23afd",
+            errors,
+        )
+
     def test_each_primary_raster_role_requires_its_exact_dimensions(self):
         cases = {
             "primary_raster_logo_2048": ((2047, 640), "2048 × 640"),
@@ -547,7 +717,7 @@ class BrandValidationTests(unittest.TestCase):
             errors,
         )
 
-    def test_each_approved_raster_requires_melanie_and_iso_date(self):
+    def test_each_approved_raster_requires_exact_reviewer_and_date(self):
         for role in ("primary_raster_logo_2048", "primary_raster_logo_512"):
             configuration = RASTER_ASSETS[role]
             with self.subTest(role=role), TemporaryDirectory() as directory:
@@ -556,11 +726,11 @@ class BrandValidationTests(unittest.TestCase):
                 errors = validate_project(root)
             asset_id = configuration["id"]
             self.assertIn(
-                f"Approved asset {asset_id} must be reviewed by Melanie Watsham",
+                f"Current primary raster asset {asset_id} must be reviewed by Melanie Watsham",
                 errors,
             )
             self.assertIn(
-                f"Approved asset {asset_id} must have an ISO review date",
+                f"Current primary raster asset {asset_id} must have approval date 2026-08-05",
                 errors,
             )
 
@@ -574,7 +744,7 @@ class BrandValidationTests(unittest.TestCase):
                     role=role,
                     status="approved",
                     reviewed_by="Melanie Watsham",
-                    reviewed_on="2026-08-04",
+                    reviewed_on="2026-08-05",
                 )
                 errors = validate_project(root)
             asset_id = configuration["id"]
