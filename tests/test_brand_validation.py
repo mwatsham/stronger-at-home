@@ -246,15 +246,16 @@ class BrandValidationTests(unittest.TestCase):
                 "website": "www.stronger-at-home.co.uk",
                 "email_mailbox_status": (
                     "external Titan mailbox existence confirmed; "
-                    "send/receive delivery and DKIM unverified"
+                    "webadmin two-way delivery verified; public melanie "
+                    "mailbox delivery unverified"
                 ),
                 "email_dns_status": (
-                    "Titan MX and SPF propagated; MX priorities 0/10 differ "
-                    "from Titan's published 10/20 defaults; DKIM unverified"
+                    "authoritative GoDaddy DNS routes mail through "
+                    "SecureServer; Gmail verified SPF and aligned DKIM pass"
                 ),
                 "email_dmarc_status": (
-                    "published with p=quarantine; aggregate reports route "
-                    "to dmarc_rua@onsecureserver.net"
+                    "Gmail verified pass with p=quarantine; aggregate reports "
+                    "route to dmarc_rua@onsecureserver.net"
                 ),
             },
         )

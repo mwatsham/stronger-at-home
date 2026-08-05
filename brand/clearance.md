@@ -11,7 +11,7 @@ unresolved entry is not permission to publish.
 | CSP wording | verification-gated | Dated credential verification | Do not publish as verified. |
 | AGILE wording | verification-gated | Dated credential verification | Do not publish as verified. |
 | ATOCP wording | verification-gated | Dated credential verification | Do not publish as verified. |
-| Public contact fields | approved; Titan mailbox, MX and SPF confirmed; website content, email delivery and DKIM unverified | Approved by project sponsor on 2026-08-05: mobile `+447843497871`; email `melanie@stronger-at-home.co.uk`; address `11 Mospey Crescent, Epsom, Surrey, KT17 4LZ`; preferred method email; website `www.stronger-at-home.co.uk`; external Titan mailbox existence confirmed; Titan MX and SPF propagated | Do not publish the email or website until Titan send/receive delivery, custom DKIM and website content are operationally verified. |
+| Public contact fields | approved; Titan mailbox exists; webadmin two-way delivery and authentication verified; public mailbox and website content unverified | Approved by project sponsor on 2026-08-05: mobile `+447843497871`; email `melanie@stronger-at-home.co.uk`; address `11 Mospey Crescent, Epsom, Surrey, KT17 4LZ`; preferred method email; website `www.stronger-at-home.co.uk`; external Titan mailbox existence confirmed; two-way webadmin test passed SPF, aligned DKIM and DMARC at Gmail | Do not publish the public email or website until `melanie` delivery and website content are operationally verified. |
 | Source Serif 4 and Atkinson Hyperlegible Next files | provenance confirmed | Action-time approval and 2026-08-03 official Google Fonts download; paired SIL Open Font License 1.1 files, source URLs and SHA-256 hashes recorded in `brand/fonts/README.md` | Local editable artwork and review only; not a clearance of the public name, credentials, or final artwork. |
 | Owned source artwork | provenance confirmed | Source path, acquisition date, ownership statement and SHA-256 recorded with asset work | Keep source evidence read-only. |
 | Supplied PNG `6d066dbeff88023aece19346a1d0a9a1d3f4577f7846545e359ad59fab24f889` | sole usage rights confirmed | Project sponsor confirmed sole usage rights for this exact supplied image on 2026-08-05 | Evidence applies only to this exact file; the artwork remains deprecated and must not replace the current primary assets. |
@@ -42,9 +42,12 @@ mail. The account does not expose cPanel's `emailauth` feature, so cPanel-based
 DKIM, SPF and DMARC validation was unavailable. No mutation was attempted.
 The project sponsor then confirmed that the `melanie` mailbox exists in Titan
 Email. This confirms existence, not successful send/receive delivery or DKIM.
-The project sponsor updated authoritative GoDaddy DNS. A live check then
-confirmed Titan MX and SPF records. MX priorities `0` and `10` preserve Titan's
-preferred-server order but differ from its published `10` and `20` defaults.
-DMARC remains at `p=quarantine`, with aggregate reports routed to
-`dmarc_rua@onsecureserver.net`. Custom DKIM and send/receive delivery remain
-unverified. The cPanel DNS zone is not authoritative for these mail records.
+A transient recursive lookup showed generic Titan MX and SPF records, but both
+authoritative GoDaddy nameservers continued to return SecureServer records. A
+two-way `webadmin@stronger-at-home.co.uk` delivery test then succeeded. Gmail's
+received-message headers recorded SPF pass, aligned DKIM pass for
+`stronger-at-home.co.uk`, an additional DKIM pass for `secureserver.net`, and
+DMARC pass at `p=quarantine`. The reply used a Titan message identifier and
+SecureServer delivery infrastructure. This verifies the operational path for
+`webadmin`; the public `melanie` mailbox still requires its own delivery test.
+The cPanel DNS zone is not authoritative for these mail records.

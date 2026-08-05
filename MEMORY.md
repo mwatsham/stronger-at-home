@@ -33,14 +33,17 @@ cPanel.
 The project sponsor subsequently confirmed on 2026-08-05 that
 `melanie@stronger-at-home.co.uk` exists in Titan Email. Titan's official setup
 requires `mx1.titan.email`, `mx2.titan.email` and an SPF include for
-`spf.titan.email`. The project sponsor then updated authoritative DNS. A live
-check confirmed both Titan MX hosts and the Titan SPF include. The MX priorities
-are `0` for `mx1.titan.email` and `10` for `mx2.titan.email`, preserving the
-published preferred-server order but differing from Titan's documented `10`
-and `20` defaults. DMARC remains `p=quarantine`; aggregate reports route to
-`dmarc_rua@onsecureserver.net`. Send/receive delivery and custom DKIM remain
-unverified. GoDaddy remains authoritative for DNS; cPanel is not authoritative
-for these mail records.
+`spf.titan.email`. A transient recursive lookup later showed those generic Titan
+records, but both authoritative GoDaddy nameservers continued to return
+SecureServer MX and SPF records. A two-way test through
+`webadmin@stronger-at-home.co.uk` then succeeded on 2026-08-05. The reply used a
+Titan message identifier and SecureServer delivery infrastructure; Gmail
+reported SPF pass, DKIM pass for both `secureserver.net` and aligned
+`stronger-at-home.co.uk`, and DMARC pass. DMARC remains `p=quarantine`, with
+aggregate reports routed to `dmarc_rua@onsecureserver.net`. This message-level
+evidence supersedes the generic Titan-DNS assumption. Delivery for the public
+`melanie` address remains unverified. GoDaddy remains authoritative for DNS;
+cPanel is not authoritative for these mail records.
 
 The project sponsor approved these public contacts: mobile `+447843497871`,
 email `melanie@stronger-at-home.co.uk`, address `11 Mospey Crescent, Epsom,
