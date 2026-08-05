@@ -227,7 +227,7 @@ class BrandValidationTests(unittest.TestCase):
         self.assertEqual(context["preferred_domain"], "stronger-at-home.co.uk")
         self.assertEqual(
             context["preferred_domain_status"],
-            "registered; cPanel account attachment and control unverified",
+            "registered; production and staging attached to test-123reg; DNS and HTTPS verified; website content and mailbox delivery pending",
         )
         self.assertEqual(
             context["public_contact"],

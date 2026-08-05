@@ -20,22 +20,27 @@ display wordmark. Official paperwork must identify `Melanie Watsham trading as
 Stronger at Home Physiotherapy` and must not imply that the business is
 incorporated.
 
-The preferred domain `stronger-at-home.co.uk` is registered, but it is not
-attached to the configured cPanel account and control remains unverified. The
-public contact details approved on 2026-08-05 are mobile `+447843497871`, email
+The preferred domain `stronger-at-home.co.uk` and staging host
+`staging.stronger-at-home.co.uk` are attached to the configured `test-123reg`
+cPanel account with separate document roots. Public DNS and HTTPS were verified
+on 2026-08-05, but all three website URLs returned HTTP 403 because no public
+site content is available yet. The public contact details approved on
+2026-08-05 are mobile `+447843497871`, email
 `melanie@stronger-at-home.co.uk`, address `11 Mospey Crescent, Epsom, Surrey,
 KT17 4LZ`, preferred contact method email, and website
-`www.stronger-at-home.co.uk`. Do not publish the domain-based contact details
-until the domain and mailbox are operationally verified.
+`www.stronger-at-home.co.uk`. Public MX, SPF and DMARC records exist through
+GoDaddy/SecureServer mail, but mailbox delivery remains unverified and the
+mailbox is not hosted in this cPanel account. Do not publish the email or
+website until delivery and website content are operationally verified.
 
 Melanie Watsham approved both exact current v2 raster-only primary artwork files
 without changes on 2026-08-05. The project sponsor confirmed usage rights for
 their immutable supplied-v2 source image on 2026-08-04 and sole usage rights
 for the older supplied PNG on 2026-08-05. Professional credential wording
 remains to be confirmed. Public use remains blocked until the trademark/name,
-domain-control and applicable credential requirements in `brand/clearance.md`
-are resolved. No patient, referral, website, social, uniform, vehicle or
-signage templates are included in this stage.
+website/mailbox and applicable credential requirements in `brand/clearance.md`
+are resolved. No patient, referral, website, social, uniform, vehicle or signage
+templates are included in this stage.
 
 Start with [strategy](brand/strategy.md), [messaging](brand/messaging.md),
 [identity](brand/identity.md), [clearance](brand/clearance.md), and the

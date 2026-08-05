@@ -20,3 +20,4 @@
 | D-20 | Public contact details approved: mobile, email, Epsom address, email as preferred method, and `www.stronger-at-home.co.uk`; domain-based delivery remains operationally gated. | approved | Project sponsor | 2026-08-05 |
 | D-21 | Sole usage rights confirmed for supplied PNG `6d066dbeff88023aece19346a1d0a9a1d3f4577f7846545e359ad59fab24f889`. | approved | Project sponsor | 2026-08-05 |
 | D-22 | `stronger-at-home.co.uk` registration confirmed; cPanel attachment and operational control remain unverified. | proposed | Project sponsor | 2026-08-05 |
+| D-23 | Use the existing `test-123reg` cPanel account for separate production and staging hosts. Attachment, public DNS and HTTPS are verified; website content and external mailbox delivery remain launch gates. | approved | Project sponsor | 2026-08-05 |

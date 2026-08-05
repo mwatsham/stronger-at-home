@@ -19,12 +19,22 @@ registered. A read-only check of the only configured cPanel profile did not
 find the domain or the `melanie@stronger-at-home.co.uk` mailbox, so attachment
 and operational control remain unverified. No cPanel change was made.
 
+After the project sponsor attached the production and staging domains, a second
+read-only check on 2026-08-05 verified both in the `test-123reg` profile. They
+use separate document roots. Public DNS resolves both hosts to the cPanel
+server, and valid HTTPS coverage is installed for production, `www` and
+staging. Each public website URL returned HTTP 403 because public site content
+is not yet available. Public mail uses GoDaddy/SecureServer MX and SPF records
+and has a DMARC quarantine policy. The `melanie` mailbox is not present in
+cPanel; because mail is routed externally, delivery must be verified with the
+external mail service rather than inferred from cPanel.
+
 The project sponsor approved these public contacts: mobile `+447843497871`,
 email `melanie@stronger-at-home.co.uk`, address `11 Mospey Crescent, Epsom,
 Surrey, KT17 4LZ`, email as the preferred contact method, and website
-`www.stronger-at-home.co.uk`. Domain-based contacts must not be published until
-their operation is verified. HCPC, CSP, AGILE and ATOCP wording remains to be
-confirmed.
+`www.stronger-at-home.co.uk`. The email and website must not be published until
+mail delivery and public website content are verified. HCPC, CSP, AGILE and
+ATOCP wording remains to be confirmed.
 
 Melanie Watsham approved both exact current v2 files without changes on
 2026-08-05:
@@ -38,7 +48,7 @@ supplied-v2 source image with SHA-256
 The project sponsor separately confirmed sole usage rights on 2026-08-05 for
 the older supplied PNG with SHA-256
 `6d066dbeff88023aece19346a1d0a9a1d3f4577f7846545e359ad59fab24f889`.
-Trademark/name clearance, cPanel domain attachment and control, and
+Trademark/name clearance, public website content, mailbox delivery, and
 HCPC/CSP/AGILE/ATOCP wording verification continue to block public use.
 
 ## 2026-08-04 — raster-only primary artwork

@@ -25,7 +25,9 @@ text, search metadata, ordinary prose and spoken usage must spell out `at`.
 The business is a sole trader. Official paperwork must identify `Melanie
 Watsham trading as Stronger at Home Physiotherapy` and must not imply a limited
 company. The preferred domain `stronger-at-home.co.uk` is registered, but it is
-not attached to the configured cPanel account and control remains unverified.
+attached to the configured cPanel account with separate production and staging
+document roots. DNS and HTTPS are verified; public website content and mailbox
+delivery remain unverified.
 
 The approved public contacts are:
 
@@ -36,5 +38,5 @@ The approved public contacts are:
 - Website: `www.stronger-at-home.co.uk`
 
 Do not use the name publicly before trademark/name clearance. Do not publish
-the domain-based email or website until domain attachment, mailbox existence
-and operational control have been verified.
+the domain-based email or website until external mailbox delivery and public
+website content have been verified.
