@@ -11,7 +11,7 @@ unresolved entry is not permission to publish.
 | CSP wording | verification-gated | Dated credential verification | Do not publish as verified. |
 | AGILE wording | verification-gated | Dated credential verification | Do not publish as verified. |
 | ATOCP wording | verification-gated | Dated credential verification | Do not publish as verified. |
-| Public contact fields | approved; external mailbox existence confirmed; website content, email delivery and DKIM unverified | Approved by project sponsor on 2026-08-05: mobile `+447843497871`; email `melanie@stronger-at-home.co.uk`; address `11 Mospey Crescent, Epsom, Surrey, KT17 4LZ`; preferred method email; website `www.stronger-at-home.co.uk`; external GoDaddy mailbox existence confirmed | Do not publish the email or website until mail delivery and website content are operationally verified. |
+| Public contact fields | approved; Titan mailbox existence confirmed; website content, email delivery and DKIM unverified | Approved by project sponsor on 2026-08-05: mobile `+447843497871`; email `melanie@stronger-at-home.co.uk`; address `11 Mospey Crescent, Epsom, Surrey, KT17 4LZ`; preferred method email; website `www.stronger-at-home.co.uk`; external Titan mailbox existence confirmed; live MX and SPF still point to SecureServer | Do not publish the email or website until Titan DNS, mail delivery and website content are operationally verified. |
 | Source Serif 4 and Atkinson Hyperlegible Next files | provenance confirmed | Action-time approval and 2026-08-03 official Google Fonts download; paired SIL Open Font License 1.1 files, source URLs and SHA-256 hashes recorded in `brand/fonts/README.md` | Local editable artwork and review only; not a clearance of the public name, credentials, or final artwork. |
 | Owned source artwork | provenance confirmed | Source path, acquisition date, ownership statement and SHA-256 recorded with asset work | Keep source evidence read-only. |
 | Supplied PNG `6d066dbeff88023aece19346a1d0a9a1d3f4577f7846545e359ad59fab24f889` | sole usage rights confirmed | Project sponsor confirmed sole usage rights for this exact supplied image on 2026-08-05 | Evidence applies only to this exact file; the artwork remains deprecated and must not replace the current primary assets. |
@@ -40,6 +40,8 @@ policy. No `melanie` mailbox exists in cPanel, which is consistent with external
 mail routing but does not verify that the external mailbox exists or receives
 mail. The account does not expose cPanel's `emailauth` feature, so cPanel-based
 DKIM, SPF and DMARC validation was unavailable. No mutation was attempted.
-The project sponsor then confirmed that the `melanie` mailbox exists in the
-external GoDaddy email service; this confirms existence, not successful
-send/receive delivery or DKIM.
+The project sponsor then confirmed that the `melanie` mailbox exists in Titan
+Email. This confirms existence, not successful send/receive delivery or DKIM.
+Authoritative GoDaddy DNS still points MX and SPF to SecureServer rather than
+Titan's standard records, so mail-routing changes must be made and verified in
+the GoDaddy DNS control plane, not this non-authoritative cPanel zone.

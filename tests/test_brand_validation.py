@@ -245,8 +245,12 @@ class BrandValidationTests(unittest.TestCase):
                 "preferred_method": "email",
                 "website": "www.stronger-at-home.co.uk",
                 "email_mailbox_status": (
-                    "external GoDaddy mailbox existence confirmed; "
+                    "external Titan mailbox existence confirmed; "
                     "send/receive delivery and DKIM unverified"
+                ),
+                "email_dns_status": (
+                    "authoritative GoDaddy DNS points MX and SPF to "
+                    "SecureServer, not standard Titan records"
                 ),
             },
         )

@@ -27,8 +27,9 @@ Watsham trading as Stronger at Home Physiotherapy` and must not imply a limited
 company. The preferred domain `stronger-at-home.co.uk` is registered, but it is
 attached to the configured cPanel account with separate production and staging
 document roots. DNS and HTTPS are verified; public website content and mailbox
-delivery remain unverified. The external GoDaddy mailbox exists, but
-send/receive delivery and DKIM have not yet been verified.
+delivery remain unverified. The external Titan Email mailbox exists, but
+send/receive delivery and DKIM have not yet been verified. Authoritative DNS
+still points MX and SPF to SecureServer rather than Titan's standard records.
 
 The approved public contacts are:
 

@@ -24,14 +24,19 @@ read-only check on 2026-08-05 verified both in the `test-123reg` profile. They
 use separate document roots. Public DNS resolves both hosts to the cPanel
 server, and valid HTTPS coverage is installed for production, `www` and
 staging. Each public website URL returned HTTP 403 because public site content
-is not yet available. Public mail uses GoDaddy/SecureServer MX and SPF records
-and has a DMARC quarantine policy. The `melanie` mailbox is not present in
-cPanel; because mail is routed externally, delivery must be verified with the
-external mail service rather than inferred from cPanel.
+is not yet available. Public mail uses SecureServer MX and SPF records in the
+authoritative GoDaddy DNS zone and has a DMARC quarantine policy. The `melanie`
+mailbox is not present in cPanel; because mail is routed externally, delivery
+must be verified with the external mail service rather than inferred from
+cPanel.
 
 The project sponsor subsequently confirmed on 2026-08-05 that
-`melanie@stronger-at-home.co.uk` exists in the external GoDaddy email service.
-Send/receive delivery and DKIM remain unverified.
+`melanie@stronger-at-home.co.uk` exists in Titan Email. Titan's official setup
+requires `mx1.titan.email`, `mx2.titan.email` and an SPF include for
+`spf.titan.email`; the live zone instead points MX and SPF to SecureServer.
+Send/receive delivery and DKIM remain unverified. DNS must be reviewed in the
+authoritative GoDaddy control plane before any change because cPanel is not
+authoritative for mail records.
 
 The project sponsor approved these public contacts: mobile `+447843497871`,
 email `melanie@stronger-at-home.co.uk`, address `11 Mospey Crescent, Epsom,
