@@ -29,11 +29,14 @@ site content is available yet. The public contact details approved on
 `melanie@stronger-at-home.co.uk`, address `11 Mospey Crescent, Epsom, Surrey,
 KT17 4LZ`, preferred contact method email, and website
 `www.stronger-at-home.co.uk`. The project sponsor confirmed that the external
-Titan `melanie` mailbox exists. However, authoritative GoDaddy DNS still points
-MX and SPF to SecureServer rather than Titan's standard records. Send/receive
-delivery and DKIM therefore remain unverified; the mailbox is not hosted in
-this cPanel account. Do not publish the email or website until delivery and
-website content are operationally verified.
+Titan `melanie` mailbox exists. Authoritative GoDaddy DNS now points MX to
+Titan and SPF authorises Titan. The live MX priorities are `0` and `10`, which
+preserve Titan's preferred-server order but differ from its published `10` and
+`20` defaults. DMARC is active at `p=quarantine`, with reports still routed to
+an `onsecureserver.net` address. Send/receive delivery and custom DKIM remain
+unverified; the mailbox is not hosted in this cPanel account. Do not publish
+the email or website until delivery and website content are operationally
+verified.
 
 Melanie Watsham approved both exact current v2 raster-only primary artwork files
 without changes on 2026-08-05. The project sponsor confirmed usage rights for

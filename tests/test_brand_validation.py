@@ -249,8 +249,12 @@ class BrandValidationTests(unittest.TestCase):
                     "send/receive delivery and DKIM unverified"
                 ),
                 "email_dns_status": (
-                    "authoritative GoDaddy DNS points MX and SPF to "
-                    "SecureServer, not standard Titan records"
+                    "Titan MX and SPF propagated; MX priorities 0/10 differ "
+                    "from Titan's published 10/20 defaults; DKIM unverified"
+                ),
+                "email_dmarc_status": (
+                    "published with p=quarantine; aggregate reports route "
+                    "to dmarc_rua@onsecureserver.net"
                 ),
             },
         )
