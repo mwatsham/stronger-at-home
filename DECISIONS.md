@@ -16,3 +16,7 @@
 | D-16 | Exact 2048-pixel and 512-pixel raster artwork approved without changes. | approved | Melanie Watsham | 2026-08-04 |
 | D-17 | Approved naming architecture: formal trading name “Stronger at Home Physiotherapy”; styled wordmark “Stronger@Home” with “Physiotherapy”; sole-trader identity “Melanie Watsham trading as Stronger at Home Physiotherapy”; preferred domain “stronger-at-home.co.uk”. | approved | Project sponsor | 2026-08-05 |
 | D-18 | Exact v2 2048-pixel and 512-pixel raster wordmark files approved without changes. | approved | Melanie Watsham | 2026-08-05 |
+| D-19 | Melanie Watsham will operate as a sole trader using the formal name “Stronger at Home Physiotherapy” and display wordmark “Stronger@Home”. | approved | Project sponsor | 2026-08-05 |
+| D-20 | Public contact details approved: mobile, email, Epsom address, email as preferred method, and `www.stronger-at-home.co.uk`; domain-based delivery remains operationally gated. | approved | Project sponsor | 2026-08-05 |
+| D-21 | Sole usage rights confirmed for supplied PNG `6d066dbeff88023aece19346a1d0a9a1d3f4577f7846545e359ad59fab24f889`. | approved | Project sponsor | 2026-08-05 |
+| D-22 | `stronger-at-home.co.uk` registration confirmed; cPanel attachment and operational control remain unverified. | proposed | Project sponsor | 2026-08-05 |

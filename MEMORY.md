@@ -14,6 +14,18 @@ checked on 2026-08-04, but registration and control remain unverified. The
 public name remains proposed pending an official UKIPO exact and
 confusing-similarity trademark search in relevant service classes.
 
+Later on 2026-08-05, the project sponsor confirmed that the domain is
+registered. A read-only check of the only configured cPanel profile did not
+find the domain or the `melanie@stronger-at-home.co.uk` mailbox, so attachment
+and operational control remain unverified. No cPanel change was made.
+
+The project sponsor approved these public contacts: mobile `+447843497871`,
+email `melanie@stronger-at-home.co.uk`, address `11 Mospey Crescent, Epsom,
+Surrey, KT17 4LZ`, email as the preferred contact method, and website
+`www.stronger-at-home.co.uk`. Domain-based contacts must not be published until
+their operation is verified. HCPC, CSP, AGILE and ATOCP wording remains to be
+confirmed.
+
 Melanie Watsham approved both exact current v2 files without changes on
 2026-08-05:
 
@@ -23,11 +35,11 @@ Melanie Watsham approved both exact current v2 files without changes on
 The project sponsor confirmed usage rights on 2026-08-04 for the immutable
 supplied-v2 source image with SHA-256
 `41267865711ca55f9225df8370c50bca823f68ca966b8fc216852e65a36d0ef1`.
-That evidence does not resolve rights for the older supplied PNG with SHA-256
+The project sponsor separately confirmed sole usage rights on 2026-08-05 for
+the older supplied PNG with SHA-256
 `6d066dbeff88023aece19346a1d0a9a1d3f4577f7846545e359ad59fab24f889`.
-Trademark/name clearance, domain registration and control, HCPC/CSP/AGILE/ATOCP
-wording verification, approved public contact details and any remaining
-supplied-artwork rights evidence continue to block public use.
+Trademark/name clearance, cPanel domain attachment and control, and
+HCPC/CSP/AGILE/ATOCP wording verification continue to block public use.
 
 ## 2026-08-04 — raster-only primary artwork
 

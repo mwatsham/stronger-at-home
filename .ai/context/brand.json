@@ -8,14 +8,17 @@
   "business_structure": "sole trader",
   "official_identity": "Melanie Watsham trading as Stronger at Home Physiotherapy",
   "preferred_domain": "stronger-at-home.co.uk",
-  "preferred_domain_status": "unregistered when checked 2026-08-04; registration and control unverified",
+  "preferred_domain_status": "registered; cPanel account attachment and control unverified",
+  "public_contact": {"status": "approved", "approved_on": "2026-08-05", "mobile": "+447843497871", "email": "melanie@stronger-at-home.co.uk", "address": ["11 Mospey Crescent", "Epsom", "Surrey", "KT17 4LZ"], "preferred_method": "email", "website": "www.stronger-at-home.co.uk"},
   "audiences": {"primary": ["patients", "older adults"], "secondary": ["professional referrers"]},
   "services": {"focus": ["older-adult rehabilitation", "post-operative rehabilitation"], "radius": "10–15 miles around Epsom, Surrey"},
   "claims": {"approved": ["20+ years of NHS experience"], "verification_gated": ["HCPC", "CSP", "AGILE", "ATOCP"]},
+  "credentials_status": "to be confirmed",
   "personality": ["warm", "practical", "clinically credible"],
   "voice": ["reassuring", "hopeful", "empowering"],
   "identity_architecture": {"status": "approved", "type": "raster-only primary lockup", "current_primary_assets": ["brand/assets/source/logo-primary-raster-v2-2048.png", "brand/assets/source/logo-primary-raster-v2-512.png"], "exact_artwork_reviewed_by": "Melanie Watsham", "exact_artwork_reviewed_on": "2026-08-05", "standalone_symbol_allowed": false},
   "source_usage_rights": {"sha256": "41267865711ca55f9225df8370c50bca823f68ca966b8fc216852e65a36d0ef1", "status": "confirmed", "confirmed_by": "Project sponsor", "confirmed_on": "2026-08-04"},
+  "historical_supplied_png_usage_rights": {"sha256": "6d066dbeff88023aece19346a1d0a9a1d3f4577f7846545e359ad59fab24f889", "status": "sole usage rights confirmed", "confirmed_by": "Project sponsor", "confirmed_on": "2026-08-05"},
   "prohibitions": ["unverified claims", "guaranteed outcomes", "public use before clearance", "standalone symbol in Stage 1"],
   "approval_owner": "Melanie Watsham"
 }

@@ -227,7 +227,36 @@ class BrandValidationTests(unittest.TestCase):
         self.assertEqual(context["preferred_domain"], "stronger-at-home.co.uk")
         self.assertEqual(
             context["preferred_domain_status"],
-            "unregistered when checked 2026-08-04; registration and control unverified",
+            "registered; cPanel account attachment and control unverified",
+        )
+        self.assertEqual(
+            context["public_contact"],
+            {
+                "status": "approved",
+                "approved_on": "2026-08-05",
+                "mobile": "+447843497871",
+                "email": "melanie@stronger-at-home.co.uk",
+                "address": [
+                    "11 Mospey Crescent",
+                    "Epsom",
+                    "Surrey",
+                    "KT17 4LZ",
+                ],
+                "preferred_method": "email",
+                "website": "www.stronger-at-home.co.uk",
+            },
+        )
+        self.assertEqual(context["credentials_status"], "to be confirmed")
+        self.assertEqual(
+            context["historical_supplied_png_usage_rights"],
+            {
+                "sha256": (
+                    "6d066dbeff88023aece19346a1d0a9a1d3f4577f7846545e359ad59fab24f889"
+                ),
+                "status": "sole usage rights confirmed",
+                "confirmed_by": "Project sponsor",
+                "confirmed_on": "2026-08-05",
+            },
         )
         self.assertEqual(
             context["identity_architecture"]["current_primary_assets"],

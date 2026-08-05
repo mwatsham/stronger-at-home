@@ -12,10 +12,9 @@ patient-first message.
 ## Claims boundary
 
 The approved claim is 20+ years of NHS experience. Do not promise or imply
-guaranteed outcomes. HCPC, CSP, AGILE and ATOCP wording is verification-gated
+guaranteed outcomes. HCPC, CSP, AGILE and ATOCP wording remains to be confirmed
 and must not be presented as verified or public-facing until clearance records
-confirm it. Public contact fields are also unresolved and must not be invented
-or published.
+confirm it.
 
 The formal trading name is `Stronger at Home Physiotherapy`, and its public-name
 status remains proposed until trademark/name clearance is recorded.
@@ -25,7 +24,17 @@ text, search metadata, ordinary prose and spoken usage must spell out `at`.
 
 The business is a sole trader. Official paperwork must identify `Melanie
 Watsham trading as Stronger at Home Physiotherapy` and must not imply a limited
-company. The preferred domain is `stronger-at-home.co.uk`; it was unregistered
-when checked on 2026-08-04, and registration and control remain unverified. Do
-not use the name or domain publicly before their respective clearance gates are
-resolved.
+company. The preferred domain `stronger-at-home.co.uk` is registered, but it is
+not attached to the configured cPanel account and control remains unverified.
+
+The approved public contacts are:
+
+- Mobile: `+447843497871`
+- Email: `melanie@stronger-at-home.co.uk`
+- Address: `11 Mospey Crescent, Epsom, Surrey, KT17 4LZ`
+- Preferred contact method: email
+- Website: `www.stronger-at-home.co.uk`
+
+Do not use the name publicly before trademark/name clearance. Do not publish
+the domain-based email or website until domain attachment, mailbox existence
+and operational control have been verified.
