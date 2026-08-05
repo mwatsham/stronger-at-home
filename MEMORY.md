@@ -29,6 +29,10 @@ and has a DMARC quarantine policy. The `melanie` mailbox is not present in
 cPanel; because mail is routed externally, delivery must be verified with the
 external mail service rather than inferred from cPanel.
 
+The project sponsor subsequently confirmed on 2026-08-05 that
+`melanie@stronger-at-home.co.uk` exists in the external GoDaddy email service.
+Send/receive delivery and DKIM remain unverified.
+
 The project sponsor approved these public contacts: mobile `+447843497871`,
 email `melanie@stronger-at-home.co.uk`, address `11 Mospey Crescent, Epsom,
 Surrey, KT17 4LZ`, email as the preferred contact method, and website

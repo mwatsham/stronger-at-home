@@ -29,8 +29,9 @@ site content is available yet. The public contact details approved on
 `melanie@stronger-at-home.co.uk`, address `11 Mospey Crescent, Epsom, Surrey,
 KT17 4LZ`, preferred contact method email, and website
 `www.stronger-at-home.co.uk`. Public MX, SPF and DMARC records exist through
-GoDaddy/SecureServer mail, but mailbox delivery remains unverified and the
-mailbox is not hosted in this cPanel account. Do not publish the email or
+GoDaddy/SecureServer mail. The project sponsor confirmed that the external
+`melanie` mailbox exists, but send/receive delivery and DKIM remain unverified;
+the mailbox is not hosted in this cPanel account. Do not publish the email or
 website until delivery and website content are operationally verified.
 
 Melanie Watsham approved both exact current v2 raster-only primary artwork files

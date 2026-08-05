@@ -244,6 +244,10 @@ class BrandValidationTests(unittest.TestCase):
                 ],
                 "preferred_method": "email",
                 "website": "www.stronger-at-home.co.uk",
+                "email_mailbox_status": (
+                    "external GoDaddy mailbox existence confirmed; "
+                    "send/receive delivery and DKIM unverified"
+                ),
             },
         )
         self.assertEqual(context["credentials_status"], "to be confirmed")
