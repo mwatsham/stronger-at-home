@@ -14,6 +14,9 @@ from scripts.validate_brand import (
 )
 
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+
 VALID_HYBRID_SVG = """\
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1160 340">
   <title>Stronger at Home Physiotherapy by Melanie Watsham</title>
@@ -177,6 +180,18 @@ def write_raster_asset(
 
 
 class BrandValidationTests(unittest.TestCase):
+    def test_brand_context_uses_formal_and_display_names(self):
+        context = json.loads(
+            (PROJECT_ROOT / ".ai/context/brand.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(context["brand_name"], "Stronger at Home Physiotherapy")
+        self.assertEqual(context["display_wordmark"], "Stronger@Home")
+        self.assertEqual(context["business_structure"], "sole trader")
+        self.assertEqual(
+            context["official_identity"],
+            "Melanie Watsham trading as Stronger at Home Physiotherapy",
+        )
+
     def test_current_primary_roles_use_v2_paths(self):
         self.assertEqual(
             REQUIRED_ASSET_PATHS["primary_raster_logo_2048"],

@@ -2,26 +2,38 @@
 
 ## Status and architecture
 
-D-15 is the current approved design direction: use the exact immutable v2
-supplied PNG as the symbol in opaque raster-only primary lockups. The source is
-cropped only to `(300, 285, 954, 1023)` and placed on a fixed pale background
-of RGB `(249, 244, 242)` (`#F9F4F2`) so it has no visible seam. The approved
-exact outputs are:
+D-17 is the approved naming architecture. The formal trading name is `Stronger
+at Home Physiotherapy`; `Stronger@Home` is reserved for the display wordmark,
+with `Physiotherapy` as the service descriptor and `by Melanie Watsham` as the
+endorsement. Accessible text, search metadata, ordinary prose and spoken usage
+must spell out `at`. The business structure is sole trader, and official
+paperwork must identify `Melanie Watsham trading as Stronger at Home
+Physiotherapy`.
 
-- `brand/assets/source/logo-primary-raster-2048.png` at 2048 × 640 pixels.
-- `brand/assets/source/logo-primary-raster-512.png` at 512 × 160 pixels.
+D-15 remains the approved design direction: use the exact immutable v2 supplied
+PNG as the symbol in opaque raster-only primary lockups. The source is cropped
+only to `(300, 285, 954, 1023)` and placed on a fixed pale background of RGB
+`(249, 244, 242)` (`#F9F4F2`) so it has no visible seam. Under D-18, the approved
+exact current outputs are:
 
-The wordmark uses Source Serif 4 at 112 px for `Stronger at Home` and 82 px
+- `brand/assets/source/logo-primary-raster-v2-2048.png` at 2048 × 640 pixels.
+- `brand/assets/source/logo-primary-raster-v2-512.png` at 512 × 160 pixels.
+
+The wordmark uses Source Serif 4 at 112 px for `Stronger@Home` and 82 px
 for `Physiotherapy`; the endorsement uses Atkinson Hyperlegible Next at 44 px.
 All wordmark text is Deep Navy `#203E55`.
 
 Do not create SVG derivatives, transparent or monochrome variants, AI-redrawn
 versions, recoloured source artwork, background-removed versions, or altered
 source geometry. D-14 is deprecated historical vector-cleanup direction only.
-Both exact PNG files were approved without changes by Melanie Watsham on
-2026-08-04. That approval applies only to those exact output pixels;
-source-image ownership/usage rights and all other clearance requirements must
-also be confirmed before public use.
+Both exact current v2 PNG files were approved without changes by Melanie
+Watsham on 2026-08-05. That approval applies only to those exact output pixels.
+The project sponsor separately confirmed usage rights on 2026-08-04 for the
+immutable supplied-v2 source image with SHA-256
+`41267865711ca55f9225df8370c50bca823f68ca966b8fc216852e65a36d0ef1`.
+Trademark/name clearance, domain registration and control, credential wording,
+public contact details and any other supplied-artwork rights evidence remain
+separate requirements before public use.
 
 ## Palette and typography
 

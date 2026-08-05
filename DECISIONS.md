@@ -14,3 +14,5 @@
 | D-14 | Faithful production cleanup of the supplied house, moving person, steps and outlined hand reference. | deprecated | Project sponsor | 2026-08-03 |
 | D-15 | Use the exact v2 supplied PNG in opaque raster-only lockups with no SVG derivatives. | approved | Project sponsor | 2026-08-04 |
 | D-16 | Exact 2048-pixel and 512-pixel raster artwork approved without changes. | approved | Melanie Watsham | 2026-08-04 |
+| D-17 | Approved naming architecture: formal trading name “Stronger at Home Physiotherapy”; styled wordmark “Stronger@Home” with “Physiotherapy”; sole-trader identity “Melanie Watsham trading as Stronger at Home Physiotherapy”; preferred domain “stronger-at-home.co.uk”. | approved | Project sponsor | 2026-08-05 |
+| D-18 | Exact v2 2048-pixel and 512-pixel raster wordmark files approved without changes. | approved | Melanie Watsham | 2026-08-05 |
