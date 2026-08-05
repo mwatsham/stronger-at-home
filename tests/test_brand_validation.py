@@ -33,6 +33,16 @@ RASTER_ASSETS = {
         "filename": "logo-primary-raster-512.png",
         "size": (512, 160),
     },
+    "candidate_raster_logo_2048": {
+        "id": "logo_primary_raster_v2_2048",
+        "filename": "logo-primary-raster-v2-2048.png",
+        "size": (2048, 640),
+    },
+    "candidate_raster_logo_512": {
+        "id": "logo_primary_raster_v2_512",
+        "filename": "logo-primary-raster-v2-512.png",
+        "size": (512, 160),
+    },
 }
 
 
@@ -377,6 +387,41 @@ class BrandValidationTests(unittest.TestCase):
             "Approved asset logo_primary_hybrid must have an ISO review date", errors
         )
 
+    def test_candidate_roles_require_versioned_paths(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_raster_asset(root, role="candidate_raster_logo_2048")
+            manifest_path = root / "brand/assets/manifest.json"
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            candidate = next(
+                asset
+                for asset in manifest["assets"]
+                if asset["role"] == "candidate_raster_logo_2048"
+            )
+            candidate["path"] = "brand/assets/source/logo-primary-raster-2048.png"
+            _write_manifest(root, manifest["assets"])
+            errors = validate_project(root)
+        self.assertIn(
+            "Asset role candidate_raster_logo_2048 must use canonical path: brand/assets/source/logo-primary-raster-v2-2048.png",
+            errors,
+        )
+
+    def test_candidate_roles_must_remain_proposed_before_review(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_raster_asset(
+                root,
+                role="candidate_raster_logo_512",
+                status="approved",
+                reviewed_by="Melanie Watsham",
+                reviewed_on="2026-08-05",
+            )
+            errors = validate_project(root)
+        self.assertIn(
+            "Candidate asset logo_primary_raster_v2_512 must remain proposed before promotion",
+            errors,
+        )
+
     def test_each_primary_raster_role_requires_its_exact_dimensions(self):
         cases = {
             "primary_raster_logo_2048": ((2047, 640), "2048 × 640"),
@@ -481,7 +526,8 @@ class BrandValidationTests(unittest.TestCase):
             )
 
     def test_each_approved_raster_accepts_valid_approval_metadata(self):
-        for role, configuration in RASTER_ASSETS.items():
+        for role in ("primary_raster_logo_2048", "primary_raster_logo_512"):
+            configuration = RASTER_ASSETS[role]
             with self.subTest(role=role), TemporaryDirectory() as directory:
                 root = Path(directory)
                 write_raster_asset(
