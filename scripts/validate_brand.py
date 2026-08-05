@@ -69,27 +69,19 @@ PRIMARY_RASTER_SIZES = {
     "primary_raster_logo_2048": (2048, 640),
     "primary_raster_logo_512": (512, 160),
 }
-CANDIDATE_RASTER_SIZES = {
-    "candidate_raster_logo_2048": (2048, 640),
-    "candidate_raster_logo_512": (512, 160),
+HISTORICAL_RASTER_SIZES = {
+    "historical_raster_logo_2048": (2048, 640),
+    "historical_raster_logo_512": (512, 160),
 }
-RASTER_SIZES = PRIMARY_RASTER_SIZES | CANDIDATE_RASTER_SIZES
-CANDIDATE_LOGO_ROLES = set(CANDIDATE_RASTER_SIZES)
-PRIMARY_LOGO_ROLES = (
-    set(PRIMARY_RASTER_SIZES) | CANDIDATE_LOGO_ROLES | {"primary_hybrid_logo"}
-)
+RASTER_SIZES = PRIMARY_RASTER_SIZES | HISTORICAL_RASTER_SIZES
+HISTORICAL_RASTER_ROLES = set(HISTORICAL_RASTER_SIZES)
+PRIMARY_LOGO_ROLES = set(PRIMARY_RASTER_SIZES) | {"primary_hybrid_logo"}
 REQUIRED_ASSET_PATHS = {
     "primary_hybrid_logo": "brand/assets/source/logo-primary-hybrid.svg",
-    "primary_raster_logo_2048": (
-        "brand/assets/source/logo-primary-raster-2048.png"
-    ),
-    "primary_raster_logo_512": "brand/assets/source/logo-primary-raster-512.png",
-    "candidate_raster_logo_2048": (
-        "brand/assets/source/logo-primary-raster-v2-2048.png"
-    ),
-    "candidate_raster_logo_512": (
-        "brand/assets/source/logo-primary-raster-v2-512.png"
-    ),
+    "primary_raster_logo_2048": "brand/assets/source/logo-primary-raster-v2-2048.png",
+    "primary_raster_logo_512": "brand/assets/source/logo-primary-raster-v2-512.png",
+    "historical_raster_logo_2048": "brand/assets/source/logo-primary-raster-2048.png",
+    "historical_raster_logo_512": "brand/assets/source/logo-primary-raster-512.png",
 }
 
 
@@ -317,11 +309,11 @@ def _validate_asset_manifest(root: Path, manifest: object) -> list[str]:
             errors.extend(_validate_raster_logo(asset_path, role))
         if role == "primary_hybrid_logo":
             errors.extend(_validate_hybrid_logo(asset_path))
+        if role in HISTORICAL_RASTER_ROLES and status != "deprecated":
+            errors.append(
+                f"Historical raster asset {asset_id or '<unknown>'} must be deprecated"
+            )
         if role in PRIMARY_LOGO_ROLES:
-            if role in CANDIDATE_LOGO_ROLES and status != "proposed":
-                errors.append(
-                    f"Candidate asset {asset_id or '<unknown>'} must remain proposed before promotion"
-                )
             if status == "approved":
                 if asset.get("reviewed_by") != "Melanie Watsham":
                     errors.append(

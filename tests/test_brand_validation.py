@@ -6,7 +6,12 @@ import unittest
 
 from PIL import Image
 
-from scripts.validate_brand import contrast_ratio, validate_project
+from scripts.validate_brand import (
+    HISTORICAL_RASTER_SIZES,
+    REQUIRED_ASSET_PATHS,
+    contrast_ratio,
+    validate_project,
+)
 
 
 VALID_HYBRID_SVG = """\
@@ -24,23 +29,23 @@ VALID_HYBRID_SVG = """\
 
 RASTER_ASSETS = {
     "primary_raster_logo_2048": {
-        "id": "logo_primary_raster_2048",
-        "filename": "logo-primary-raster-2048.png",
-        "size": (2048, 640),
-    },
-    "primary_raster_logo_512": {
-        "id": "logo_primary_raster_512",
-        "filename": "logo-primary-raster-512.png",
-        "size": (512, 160),
-    },
-    "candidate_raster_logo_2048": {
         "id": "logo_primary_raster_v2_2048",
         "filename": "logo-primary-raster-v2-2048.png",
         "size": (2048, 640),
     },
-    "candidate_raster_logo_512": {
+    "primary_raster_logo_512": {
         "id": "logo_primary_raster_v2_512",
         "filename": "logo-primary-raster-v2-512.png",
+        "size": (512, 160),
+    },
+    "historical_raster_logo_2048": {
+        "id": "logo_primary_raster_2048",
+        "filename": "logo-primary-raster-2048.png",
+        "size": (2048, 640),
+    },
+    "historical_raster_logo_512": {
+        "id": "logo_primary_raster_512",
+        "filename": "logo-primary-raster-512.png",
         "size": (512, 160),
     },
 }
@@ -66,7 +71,11 @@ def _write_default_rasters(root: Path) -> list[dict[str, object]]:
                 "id": configuration["id"],
                 "role": role,
                 "path": f"brand/assets/source/{configuration['filename']}",
-                "status": "proposed",
+                "status": (
+                    "deprecated"
+                    if role in HISTORICAL_RASTER_SIZES
+                    else "proposed"
+                ),
                 "sha256": hashlib.sha256(asset_path.read_bytes()).hexdigest(),
                 "reviewed_by": None,
                 "reviewed_on": None,
@@ -154,7 +163,11 @@ def write_raster_asset(
                 "id": current_configuration["id"],
                 "role": current_role,
                 "path": f"brand/assets/source/{filename}",
-                "status": status if is_target else "proposed",
+                "status": status if is_target else (
+                    "deprecated"
+                    if current_role in HISTORICAL_RASTER_SIZES
+                    else "proposed"
+                ),
                 "sha256": hashlib.sha256(asset_path.read_bytes()).hexdigest(),
                 "reviewed_by": reviewed_by if is_target else None,
                 "reviewed_on": reviewed_on if is_target else None,
@@ -164,6 +177,16 @@ def write_raster_asset(
 
 
 class BrandValidationTests(unittest.TestCase):
+    def test_current_primary_roles_use_v2_paths(self):
+        self.assertEqual(
+            REQUIRED_ASSET_PATHS["primary_raster_logo_2048"],
+            "brand/assets/source/logo-primary-raster-v2-2048.png",
+        )
+        self.assertEqual(
+            REQUIRED_ASSET_PATHS["primary_raster_logo_512"],
+            "brand/assets/source/logo-primary-raster-v2-512.png",
+        )
+
     def test_approved_primary_pairs_exceed_wcag_aa(self):
         self.assertGreaterEqual(contrast_ratio("#203E55", "#E8F1F6"), 4.5)
         self.assertGreaterEqual(contrast_ratio("#F7F2E8", "#203E55"), 4.5)
@@ -387,38 +410,38 @@ class BrandValidationTests(unittest.TestCase):
             "Approved asset logo_primary_hybrid must have an ISO review date", errors
         )
 
-    def test_candidate_roles_require_versioned_paths(self):
+    def test_historical_roles_require_original_paths(self):
         with TemporaryDirectory() as directory:
             root = Path(directory)
-            write_raster_asset(root, role="candidate_raster_logo_2048")
+            write_raster_asset(root, role="historical_raster_logo_2048")
             manifest_path = root / "brand/assets/manifest.json"
             manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-            candidate = next(
+            historical = next(
                 asset
                 for asset in manifest["assets"]
-                if asset["role"] == "candidate_raster_logo_2048"
+                if asset["role"] == "historical_raster_logo_2048"
             )
-            candidate["path"] = "brand/assets/source/logo-primary-raster-2048.png"
+            historical["path"] = "brand/assets/source/logo-primary-raster-v2-2048.png"
             _write_manifest(root, manifest["assets"])
             errors = validate_project(root)
         self.assertIn(
-            "Asset role candidate_raster_logo_2048 must use canonical path: brand/assets/source/logo-primary-raster-v2-2048.png",
+            "Asset role historical_raster_logo_2048 must use canonical path: brand/assets/source/logo-primary-raster-2048.png",
             errors,
         )
 
-    def test_candidate_roles_must_remain_proposed_before_review(self):
+    def test_historical_roles_must_remain_deprecated(self):
         with TemporaryDirectory() as directory:
             root = Path(directory)
             write_raster_asset(
                 root,
-                role="candidate_raster_logo_512",
+                role="historical_raster_logo_512",
                 status="approved",
                 reviewed_by="Melanie Watsham",
                 reviewed_on="2026-08-05",
             )
             errors = validate_project(root)
         self.assertIn(
-            "Candidate asset logo_primary_raster_v2_512 must remain proposed before promotion",
+            "Historical raster asset logo_primary_raster_512 must be deprecated",
             errors,
         )
 
@@ -510,7 +533,8 @@ class BrandValidationTests(unittest.TestCase):
         )
 
     def test_each_approved_raster_requires_melanie_and_iso_date(self):
-        for role, configuration in RASTER_ASSETS.items():
+        for role in ("primary_raster_logo_2048", "primary_raster_logo_512"):
+            configuration = RASTER_ASSETS[role]
             with self.subTest(role=role), TemporaryDirectory() as directory:
                 root = Path(directory)
                 write_raster_asset(root, role=role, status="approved")
@@ -544,11 +568,7 @@ class BrandValidationTests(unittest.TestCase):
             )
 
     def test_manifest_requires_exactly_one_canonical_entry_for_each_logo_role(self):
-        for missing_role in (
-            "primary_hybrid_logo",
-            "primary_raster_logo_2048",
-            "primary_raster_logo_512",
-        ):
+        for missing_role in REQUIRED_ASSET_PATHS:
             with self.subTest(missing_role=missing_role), TemporaryDirectory() as directory:
                 root = Path(directory)
                 write_raster_asset(root)
@@ -571,11 +591,7 @@ class BrandValidationTests(unittest.TestCase):
             root = Path(directory)
             _write_manifest(root, [])
             errors = validate_project(root)
-        for role in (
-            "primary_hybrid_logo",
-            "primary_raster_logo_2048",
-            "primary_raster_logo_512",
-        ):
+        for role in REQUIRED_ASSET_PATHS:
             self.assertIn(
                 f"Asset manifest must contain exactly one {role} entry", errors
             )
@@ -618,8 +634,10 @@ class BrandValidationTests(unittest.TestCase):
     def test_required_roles_reject_noncanonical_paths(self):
         expected_paths = {
             "primary_hybrid_logo": "brand/assets/source/logo-primary-hybrid.svg",
-            "primary_raster_logo_2048": "brand/assets/source/logo-primary-raster-2048.png",
-            "primary_raster_logo_512": "brand/assets/source/logo-primary-raster-512.png",
+            "primary_raster_logo_2048": "brand/assets/source/logo-primary-raster-v2-2048.png",
+            "primary_raster_logo_512": "brand/assets/source/logo-primary-raster-v2-512.png",
+            "historical_raster_logo_2048": "brand/assets/source/logo-primary-raster-2048.png",
+            "historical_raster_logo_512": "brand/assets/source/logo-primary-raster-512.png",
         }
         for role, expected_path in expected_paths.items():
             with self.subTest(role=role), TemporaryDirectory() as directory:
@@ -645,11 +663,11 @@ class BrandValidationTests(unittest.TestCase):
         with TemporaryDirectory() as directory:
             root = Path(directory)
             write_raster_asset(root, role="primary_raster_logo_512")
-            missing_path = root / "brand/assets/source/logo-primary-raster-512.png"
+            missing_path = root / "brand/assets/source/logo-primary-raster-v2-512.png"
             missing_path.unlink()
             errors = validate_project(root)
         self.assertIn(
-            "Asset path does not exist: brand/assets/source/logo-primary-raster-512.png",
+            "Asset path does not exist: brand/assets/source/logo-primary-raster-v2-512.png",
             errors,
         )
 
