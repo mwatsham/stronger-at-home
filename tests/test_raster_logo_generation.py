@@ -8,10 +8,16 @@ from PIL import Image
 import PIL
 
 from scripts.generate_raster_logo import (
+    APPROVED_MASTER_OUTPUT,
+    APPROVED_SMALL_OUTPUT,
+    CANDIDATE_MASTER_OUTPUT,
+    CANDIDATE_SMALL_OUTPUT,
+    CANDIDATE_WORDMARK_LINES,
     MASTER_SIZE,
     SMALL_SIZE,
     SOURCE_SHA256,
     generate,
+    generate_candidate,
 )
 
 
@@ -19,6 +25,66 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
 class RasterLogoGenerationTests(unittest.TestCase):
+    def test_candidate_uses_approved_display_wording(self):
+        self.assertEqual(
+            CANDIDATE_WORDMARK_LINES,
+            ("Stronger@Home", "Physiotherapy", "by Melanie Watsham"),
+        )
+
+    def test_generate_candidate_writes_versioned_opaque_pngs(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            self._copy_inputs(root)
+            master_path, small_path = generate_candidate(root)
+            self.assertEqual(master_path, root / CANDIDATE_MASTER_OUTPUT)
+            self.assertEqual(small_path, root / CANDIDATE_SMALL_OUTPUT)
+            with Image.open(master_path) as master:
+                self.assertEqual(
+                    (master.size, master.mode, master.format),
+                    (MASTER_SIZE, "RGB", "PNG"),
+                )
+            with Image.open(small_path) as small:
+                self.assertEqual(
+                    (small.size, small.mode, small.format),
+                    (SMALL_SIZE, "RGB", "PNG"),
+                )
+
+    def test_generate_candidate_does_not_modify_approved_outputs(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            self._copy_inputs(root)
+            approved_paths = (
+                root / APPROVED_MASTER_OUTPUT,
+                root / APPROVED_SMALL_OUTPUT,
+            )
+            approved_paths[0].parent.mkdir(parents=True, exist_ok=True)
+            approved_paths[0].write_bytes(b"approved master evidence")
+            approved_paths[1].write_bytes(b"approved small evidence")
+            before = tuple(
+                hashlib.sha256(path.read_bytes()).hexdigest()
+                for path in approved_paths
+            )
+            generate_candidate(root)
+            after = tuple(
+                hashlib.sha256(path.read_bytes()).hexdigest()
+                for path in approved_paths
+            )
+            self.assertEqual(after, before)
+
+    def test_generate_candidate_is_byte_deterministic(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            self._copy_inputs(root)
+            first = tuple(
+                hashlib.sha256(path.read_bytes()).hexdigest()
+                for path in generate_candidate(root)
+            )
+            second = tuple(
+                hashlib.sha256(path.read_bytes()).hexdigest()
+                for path in generate_candidate(root)
+            )
+            self.assertEqual(second, first)
+
     def test_immutable_source_matches_approved_hash(self):
         source = PROJECT_ROOT / (
             "docs/superpowers/specs/assets/"

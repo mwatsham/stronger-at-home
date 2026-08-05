@@ -32,8 +32,22 @@ BACKGROUND = (249, 244, 242)
 DEEP_NAVY = (32, 62, 85)
 SOURCE_SERIF = Path("brand/fonts/source-serif-4.ttf")
 ATKINSON = Path("brand/fonts/atkinson-hyperlegible-next.ttf")
-MASTER_OUTPUT = Path("brand/assets/source/logo-primary-raster-2048.png")
-SMALL_OUTPUT = Path("brand/assets/source/logo-primary-raster-512.png")
+APPROVED_MASTER_OUTPUT = Path("brand/assets/source/logo-primary-raster-2048.png")
+APPROVED_SMALL_OUTPUT = Path("brand/assets/source/logo-primary-raster-512.png")
+CANDIDATE_MASTER_OUTPUT = Path("brand/assets/source/logo-primary-raster-v2-2048.png")
+CANDIDATE_SMALL_OUTPUT = Path("brand/assets/source/logo-primary-raster-v2-512.png")
+MASTER_OUTPUT = APPROVED_MASTER_OUTPUT
+SMALL_OUTPUT = APPROVED_SMALL_OUTPUT
+APPROVED_WORDMARK_LINES = (
+    "Stronger at Home",
+    "Physiotherapy",
+    "by Melanie Watsham",
+)
+CANDIDATE_WORDMARK_LINES = (
+    "Stronger@Home",
+    "Physiotherapy",
+    "by Melanie Watsham",
+)
 REQUIRED_PILLOW_VERSION = "12.3.0"
 
 
@@ -64,7 +78,7 @@ def _verified_source(root: Path) -> Image.Image:
     return image
 
 
-def render_master(root: Path) -> Image.Image:
+def _render_master(root: Path, wordmark_lines: tuple[str, str, str]) -> Image.Image:
     _require_pinned_pillow()
     source = _verified_source(root)
     symbol = source.crop(CROP_BOX)
@@ -73,31 +87,23 @@ def render_master(root: Path) -> Image.Image:
     canvas = Image.new("RGB", MASTER_SIZE, BACKGROUND)
     canvas.paste(symbol, SYMBOL_POSITION)
     draw = ImageDraw.Draw(canvas)
-    source_serif_primary = ImageFont.truetype(root / SOURCE_SERIF, 112)
-    source_serif_descriptor = ImageFont.truetype(root / SOURCE_SERIF, 82)
-    atkinson_endorsement = ImageFont.truetype(root / ATKINSON, 44)
-    draw.text(
-        (640, 130),
-        "Stronger at Home",
-        font=source_serif_primary,
-        fill=DEEP_NAVY,
-        anchor="lt",
+    fonts = (
+        ImageFont.truetype(root / SOURCE_SERIF, 112),
+        ImageFont.truetype(root / SOURCE_SERIF, 82),
+        ImageFont.truetype(root / ATKINSON, 44),
     )
-    draw.text(
-        (640, 270),
-        "Physiotherapy",
-        font=source_serif_descriptor,
-        fill=DEEP_NAVY,
-        anchor="lt",
-    )
-    draw.text(
-        (640, 390),
-        "by Melanie Watsham",
-        font=atkinson_endorsement,
-        fill=DEEP_NAVY,
-        anchor="lt",
-    )
+    positions = ((640, 130), (640, 270), (640, 390))
+    for text, font, position in zip(wordmark_lines, fonts, positions, strict=True):
+        draw.text(position, text, font=font, fill=DEEP_NAVY, anchor="lt")
     return canvas
+
+
+def render_master(root: Path) -> Image.Image:
+    return _render_master(root, APPROVED_WORDMARK_LINES)
+
+
+def render_candidate_master(root: Path) -> Image.Image:
+    return _render_master(root, CANDIDATE_WORDMARK_LINES)
 
 
 def _save_png(image: Image.Image, path: Path) -> None:
@@ -115,8 +121,18 @@ def generate(root: Path) -> tuple[Path, Path]:
     return master_path, small_path
 
 
+def generate_candidate(root: Path) -> tuple[Path, Path]:
+    master = render_candidate_master(root)
+    small = master.resize(SMALL_SIZE, Image.Resampling.LANCZOS)
+    master_path = root / CANDIDATE_MASTER_OUTPUT
+    small_path = root / CANDIDATE_SMALL_OUTPUT
+    _save_png(master, master_path)
+    _save_png(small, small_path)
+    return master_path, small_path
+
+
 def main() -> None:
-    master_path, small_path = generate(Path.cwd())
+    master_path, small_path = generate_candidate(Path.cwd())
     print(master_path)
     print(small_path)
 
