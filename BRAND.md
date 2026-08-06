@@ -8,8 +8,11 @@ Experienced care. Personal progress. At home.
 ## Adoption boundary
 
 This repository is the Stage 1 source of truth for the brand system. The public
-name `Stronger at Home Physiotherapy` remains proposed pending trademark/name
-clearance. `Stronger@Home` is reserved for the display wordmark, with
+name `Stronger at Home Physiotherapy` remains proposed. A preliminary UKIPO
+screen on 2026-08-06 found no exact live match, but identified the registered
+Class 44 marks `STRONGER` and `Everyday Stronger`; professional trade mark
+review is required before public use or filing. `Stronger@Home` is reserved for
+the display wordmark, with
 `Physiotherapy` as the service descriptor and `by Melanie Watsham` as the
 endorsement. Accessible text, search metadata, ordinary prose and spoken usage
 must spell out `at`.
@@ -50,4 +53,5 @@ templates are included in this stage.
 
 Start with [strategy](brand/strategy.md), [messaging](brand/messaging.md),
 [identity](brand/identity.md), [clearance](brand/clearance.md), and the
-[decision ledger](DECISIONS.md).
+[trade mark screen](brand/trademark-screening.md), then consult the [decision
+ledger](DECISIONS.md).

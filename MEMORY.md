@@ -11,8 +11,18 @@ usage spell out `at`.
 
 The preferred domain is `stronger-at-home.co.uk`. It was unregistered when
 checked on 2026-08-04, but registration and control remain unverified. The
-public name remains proposed pending an official UKIPO exact and
-confusing-similarity trademark search in relevant service classes.
+public name was then still proposed pending an official UKIPO exact and
+confusing-similarity trade mark search in relevant service classes.
+
+On 2026-08-06, an official UKIPO preliminary word-mark screen found no exact
+live match for `Stronger at Home` or `Stronger@Home`. A broader live Class 44
+screen found registered `STRONGER` mark UK00003586606 for mental-health
+services and registered `Everyday Stronger` mark UK00003957710, whose terms
+include home healthcare, healthcare in domestic homes and health advice for
+elderly people. Because the latter services materially overlap the proposed
+offer, the public name is not cleared. UK trade mark attorney review is required
+before public use or filing. The detailed evidence and limitations are recorded
+in `brand/trademark-screening.md`.
 
 Later on 2026-08-05, the project sponsor confirmed that the domain is
 registered. A read-only check of the only configured cPanel profile did not

@@ -219,6 +219,21 @@ class BrandValidationTests(unittest.TestCase):
         self.assertEqual(context["brand_name"], "Stronger at Home Physiotherapy")
         self.assertEqual(context["display_wordmark"], "Stronger@Home")
         self.assertEqual(context["brand_name_status"], "proposed")
+        self.assertEqual(
+            context["name_clearance"],
+            {
+                "status": "preliminary UKIPO screen completed; not cleared",
+                "screened_on": "2026-08-06",
+                "exact_live_matches": [],
+                "material_similar_marks": [
+                    "UK00003586606",
+                    "UK00003957710",
+                ],
+                "next_action": (
+                    "UK trade mark attorney review before public use or filing"
+                ),
+            },
+        )
         self.assertEqual(context["business_structure"], "sole trader")
         self.assertEqual(
             context["official_identity"],

@@ -5,7 +5,7 @@ unresolved entry is not permission to publish.
 
 | Item | Status | Required evidence | Public-use boundary |
 |---|---|---|---|
-| `Stronger at Home Physiotherapy` formal trading name and `Stronger@Home` display wordmark | sole-trader use confirmed; trademark clearance pending | Project sponsor confirmed intended use on 2026-08-05; official UKIPO exact and confusing-similarity trademark search remains required | Do not use publicly before trademark/name clearance. Treat `@` as equivalent to `at` during clearance. |
+| `Stronger at Home Physiotherapy` formal trading name and `Stronger@Home` display wordmark | sole-trader use confirmed; preliminary UKIPO screen completed; not cleared | Project sponsor confirmed intended use on 2026-08-05. The 2026-08-06 preliminary screen found no exact live match but identified `STRONGER` UK00003586606 and `Everyday Stronger` UK00003957710 in Class 44. UK trade mark attorney review remains required. See `brand/trademark-screening.md`. | Do not use publicly or file an application before professional review. Treat `@` as equivalent to `at` during clearance. |
 | `stronger-at-home.co.uk` preferred domain | registered; cPanel attachment, DNS and HTTPS verified; website content pending | Read-only cPanel and public network checks on 2026-08-05 verified production, `www` and staging; each public website URL currently returns HTTP 403 | Domain-control gate resolved. Do not publish the website until content is deployed and reviewed. Domain status is not trademark clearance. |
 | HCPC wording | verification-gated | Dated credential verification | Do not publish as verified. |
 | CSP wording | verification-gated | Dated credential verification | Do not publish as verified. |
