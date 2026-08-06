@@ -45,12 +45,17 @@ evidence supersedes the generic Titan-DNS assumption. Delivery for the public
 `melanie` address remains unverified. GoDaddy remains authoritative for DNS;
 cPanel is not authoritative for these mail records.
 
+On 2026-08-06, the public `melanie@stronger-at-home.co.uk` address completed a
+separate two-way delivery test. Gmail recorded SPF pass, aligned DKIM pass for
+`stronger-at-home.co.uk`, an additional DKIM pass for `secureserver.net`, and
+DMARC pass at `p=quarantine`. This resolves the public-email operational gate.
+
 The project sponsor approved these public contacts: mobile `+447843497871`,
 email `melanie@stronger-at-home.co.uk`, address `11 Mospey Crescent, Epsom,
 Surrey, KT17 4LZ`, email as the preferred contact method, and website
-`www.stronger-at-home.co.uk`. The email and website must not be published until
-mail delivery and public website content are verified. HCPC, CSP, AGILE and
-ATOCP wording remains to be confirmed.
+`www.stronger-at-home.co.uk`. Public email delivery is verified. The website
+must not be published until its content is verified. HCPC, CSP, AGILE and ATOCP
+wording remains to be confirmed.
 
 Melanie Watsham approved both exact current v2 files without changes on
 2026-08-05:
@@ -64,8 +69,8 @@ supplied-v2 source image with SHA-256
 The project sponsor separately confirmed sole usage rights on 2026-08-05 for
 the older supplied PNG with SHA-256
 `6d066dbeff88023aece19346a1d0a9a1d3f4577f7846545e359ad59fab24f889`.
-Trademark/name clearance, public website content, mailbox delivery, and
-HCPC/CSP/AGILE/ATOCP wording verification continue to block public use.
+Trademark/name clearance, public website content, and HCPC/CSP/AGILE/ATOCP
+wording verification continue to block public use.
 
 ## 2026-08-04 — raster-only primary artwork
 

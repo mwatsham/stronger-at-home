@@ -27,10 +27,11 @@ Watsham trading as Stronger at Home Physiotherapy` and must not imply a limited
 company. The preferred domain `stronger-at-home.co.uk` is registered, but it is
 attached to the configured cPanel account with separate production and staging
 document roots. DNS and HTTPS are verified; public website content and mailbox
-delivery remain unverified. The external Titan Email mailbox exists. A
+delivery were initially unverified. The external Titan Email mailbox exists. A
 two-way test through `webadmin@stronger-at-home.co.uk` passed SPF, aligned DKIM
-and DMARC at Gmail; the public `melanie` address still needs its own delivery
-test.
+and DMARC at Gmail. On 2026-08-06, the public `melanie` address separately
+passed two-way delivery, SPF, aligned DKIM and DMARC checks at Gmail. The email
+operational gate is resolved; website content remains unverified.
 
 The approved public contacts are:
 
@@ -41,5 +42,4 @@ The approved public contacts are:
 - Website: `www.stronger-at-home.co.uk`
 
 Do not use the name publicly before trademark/name clearance. Do not publish
-the domain-based email or website until external mailbox delivery and public
-website content have been verified.
+the website until its public content has been verified.

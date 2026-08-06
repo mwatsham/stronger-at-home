@@ -34,17 +34,18 @@ SecureServer infrastructure. A two-way test using
 `webadmin@stronger-at-home.co.uk` succeeded on 2026-08-05; Gmail verified SPF,
 aligned DKIM and DMARC as passing. DMARC is active at `p=quarantine`, with
 reports routed to an `onsecureserver.net` address. The public `melanie` mailbox
-still needs its own delivery test, and the mailbox is not hosted in this cPanel
-account. Do not publish the email or website until the public mailbox and
-website content are operationally verified.
+passed its own two-way delivery test on 2026-08-06; Gmail verified SPF, aligned
+DKIM and DMARC as passing. The mailbox is not hosted in this cPanel account.
+The email operational gate is resolved. Do not publish the website until its
+content is operationally verified.
 
 Melanie Watsham approved both exact current v2 raster-only primary artwork files
 without changes on 2026-08-05. The project sponsor confirmed usage rights for
 their immutable supplied-v2 source image on 2026-08-04 and sole usage rights
 for the older supplied PNG on 2026-08-05. Professional credential wording
 remains to be confirmed. Public use remains blocked until the trademark/name,
-website/mailbox and applicable credential requirements in `brand/clearance.md`
-are resolved. No patient, referral, website, social, uniform, vehicle or signage
+website and applicable credential requirements in `brand/clearance.md` are
+resolved. No patient, referral, website, social, uniform, vehicle or signage
 templates are included in this stage.
 
 Start with [strategy](brand/strategy.md), [messaging](brand/messaging.md),

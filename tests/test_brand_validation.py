@@ -227,7 +227,7 @@ class BrandValidationTests(unittest.TestCase):
         self.assertEqual(context["preferred_domain"], "stronger-at-home.co.uk")
         self.assertEqual(
             context["preferred_domain_status"],
-            "registered; production and staging attached to test-123reg; DNS and HTTPS verified; website content and mailbox delivery pending",
+            "registered; production and staging attached to test-123reg; DNS and HTTPS verified; public email delivery authenticated; website content pending",
         )
         self.assertEqual(
             context["public_contact"],
@@ -245,9 +245,8 @@ class BrandValidationTests(unittest.TestCase):
                 "preferred_method": "email",
                 "website": "www.stronger-at-home.co.uk",
                 "email_mailbox_status": (
-                    "external Titan mailbox existence confirmed; "
-                    "webadmin two-way delivery verified; public melanie "
-                    "mailbox delivery unverified"
+                    "Titan melanie two-way delivery verified on 2026-08-06; "
+                    "SPF, aligned DKIM and DMARC passed at Gmail"
                 ),
                 "email_dns_status": (
                     "authoritative GoDaddy DNS routes mail through "
