@@ -1,5 +1,21 @@
 # Durable project memory
 
+## 2026-08-17 — sole-trader name adoption
+
+The project sponsor decided to proceed as a sole trader using `Stronger at
+Home Physiotherapy` and the `Stronger@Home` display wordmark without applying
+for a UK registered trade mark at this stage. The physiotherapy focus is
+accepted as sufficient practical differentiation for the current business.
+
+This is a commercial risk decision, not legal clearance. The preliminary
+UKIPO evidence from 2026-08-06 remains valid and registration is deferred. The
+business must not use the `®` symbol or claim registered trade-mark rights. The
+decision must be reviewed if an objection is received, the offer materially
+expands beyond physiotherapy, the brand is licensed, ownership changes, or the
+business decides to seek registration. Trade-mark review no longer blocks use
+of the name. Website publication and unverified credential claims remain
+separately gated.
+
 ## 2026-08-05 — naming architecture and current v2 artwork
 
 The project sponsor approved the naming architecture: the formal trading name

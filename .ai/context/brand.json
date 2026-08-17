@@ -1,8 +1,8 @@
 {
   "schema_version": "1.0",
   "brand_name": "Stronger at Home Physiotherapy",
-  "brand_name_status": "proposed",
-  "name_clearance": {"status": "preliminary UKIPO screen completed; not cleared", "screened_on": "2026-08-06", "exact_live_matches": [], "material_similar_marks": ["UK00003586606", "UK00003957710"], "next_action": "UK trade mark attorney review before public use or filing"},
+  "brand_name_status": "approved for sole-trader physiotherapy use",
+  "name_clearance": {"status": "commercial risk accepted; UKIPO registration deferred", "screened_on": "2026-08-06", "accepted_on": "2026-08-17", "exact_live_matches": [], "material_similar_marks": ["UK00003586606", "UK00003957710"], "basis": "physiotherapy focus accepted as sufficient practical differentiation", "review_trigger": "objection, material expansion beyond physiotherapy, licensing, ownership change, or decision to seek registration"},
   "display_wordmark": "Stronger@Home",
   "service_descriptor": "Physiotherapy",
   "endorsement": "by Melanie Watsham",
@@ -20,6 +20,6 @@
   "identity_architecture": {"status": "approved", "type": "raster-only primary lockup", "current_primary_assets": ["brand/assets/source/logo-primary-raster-v2-2048.png", "brand/assets/source/logo-primary-raster-v2-512.png"], "exact_artwork_reviewed_by": "Melanie Watsham", "exact_artwork_reviewed_on": "2026-08-05", "standalone_symbol_allowed": false},
   "source_usage_rights": {"sha256": "41267865711ca55f9225df8370c50bca823f68ca966b8fc216852e65a36d0ef1", "status": "confirmed", "confirmed_by": "Project sponsor", "confirmed_on": "2026-08-04"},
   "historical_supplied_png_usage_rights": {"sha256": "6d066dbeff88023aece19346a1d0a9a1d3f4577f7846545e359ad59fab24f889", "status": "sole usage rights confirmed", "confirmed_by": "Project sponsor", "confirmed_on": "2026-08-05"},
-  "prohibitions": ["unverified claims", "guaranteed outcomes", "public use before clearance", "standalone symbol in Stage 1"],
+  "prohibitions": ["unverified claims", "guaranteed outcomes", "use of registered trade mark symbol without registration", "standalone symbol in Stage 1"],
   "approval_owner": "Melanie Watsham"
 }

@@ -1,7 +1,7 @@
 # Preliminary UKIPO trade mark screening
 
-Status: preliminary word-mark screen completed; not legal clearance  
-Screened: 2026-08-06  
+Status: preliminary word-mark screen completed; commercial risk accepted; not legal clearance
+Screened: 2026-08-06
 Names screened: `Stronger at Home`, `Stronger@Home` and close word variants
 
 ## Scope
@@ -62,15 +62,14 @@ publish or file a trade mark application.
 
 [Stronger for Longer record](https://trademarks.ipo.gov.uk/ipo-tmcase/page/Results/1/UK00004174564)
 
-## Assessment and next action
+## Assessment
 
 No exact live word mark was found for the proposed name. That is favourable but
 does not amount to clearance. The registered Class 44 marks `STRONGER` and
 `Everyday Stronger`, especially the latter's domestic-home and elderly-health
 terms, create a material similarity question.
 
-Keep the public name at `proposed`. Before public use or filing an application,
-obtain advice from a UK trade mark attorney on:
+Before filing an application, obtain advice from a UK trade mark attorney on:
 
 - likelihood of confusion with UK00003586606 and UK00003957710;
 - the distinctiveness and registrability of `Stronger at Home Physiotherapy`;
@@ -80,3 +79,16 @@ obtain advice from a UK trade mark attorney on:
 The screen does not cover unregistered passing-off rights, business and company
 names, trading-name use, later applications, domains, social handles or a full
 device/image similarity search.
+
+## Commercial decision — 2026-08-17
+
+The project sponsor accepted the physiotherapy focus as sufficient practical
+differentiation for the current business and approved the name for sole-trader
+physiotherapy use. UKIPO registration is deferred and the residual legal risk
+is accepted.
+
+This decision does not convert the preliminary screen into legal clearance or
+registered protection. The business must not use the `®` symbol or claim
+registered trade-mark rights. Review the decision after an objection, material
+expansion beyond physiotherapy, brand licensing, an ownership change, or a
+decision to seek registration.

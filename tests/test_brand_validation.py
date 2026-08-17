@@ -218,19 +218,28 @@ class BrandValidationTests(unittest.TestCase):
         )
         self.assertEqual(context["brand_name"], "Stronger at Home Physiotherapy")
         self.assertEqual(context["display_wordmark"], "Stronger@Home")
-        self.assertEqual(context["brand_name_status"], "proposed")
+        self.assertEqual(
+            context["brand_name_status"],
+            "approved for sole-trader physiotherapy use",
+        )
         self.assertEqual(
             context["name_clearance"],
             {
-                "status": "preliminary UKIPO screen completed; not cleared",
+                "status": "commercial risk accepted; UKIPO registration deferred",
                 "screened_on": "2026-08-06",
+                "accepted_on": "2026-08-17",
                 "exact_live_matches": [],
                 "material_similar_marks": [
                     "UK00003586606",
                     "UK00003957710",
                 ],
-                "next_action": (
-                    "UK trade mark attorney review before public use or filing"
+                "basis": (
+                    "physiotherapy focus accepted as sufficient practical "
+                    "differentiation"
+                ),
+                "review_trigger": (
+                    "objection, material expansion beyond physiotherapy, licensing, "
+                    "ownership change, or decision to seek registration"
                 ),
             },
         )
@@ -296,7 +305,11 @@ class BrandValidationTests(unittest.TestCase):
             context["identity_architecture"]["exact_artwork_reviewed_on"],
             "2026-08-05",
         )
-        self.assertIn("public use before clearance", context["prohibitions"])
+        self.assertNotIn("public use before clearance", context["prohibitions"])
+        self.assertIn(
+            "use of registered trade mark symbol without registration",
+            context["prohibitions"],
+        )
 
     def test_review_preview_spells_out_accessible_and_metadata_name(self):
         parser = PreviewMetadataParser()

@@ -12,8 +12,10 @@ warm, practical and clinically credible.
 
 ## Governance and scope
 
-The public name is proposed until clearance is recorded. `sources/` is
-read-only reference material, and the user-owned source artwork in
+The public name is approved for sole-trader physiotherapy use under D-27.
+UKIPO registration is deferred and residual legal risk is accepted; this is
+not legal clearance or a registered trade mark. `sources/` is read-only
+reference material, and the user-owned source artwork in
 `/Users/mwatsham/Documents/Codex/2026-08-03/i/outputs` is read-only. Its full
 ownership was confirmed on 2026-08-03.
 

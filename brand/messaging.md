@@ -16,9 +16,10 @@ guaranteed outcomes. HCPC, CSP, AGILE and ATOCP wording remains to be confirmed
 and must not be presented as verified or public-facing until clearance records
 confirm it.
 
-The formal trading name is `Stronger at Home Physiotherapy`, and its public-name
-status remains proposed until trademark/name clearance is recorded.
-`Stronger@Home` is reserved for the display wordmark, with `Physiotherapy` as
+The formal trading name `Stronger at Home Physiotherapy` is approved for
+sole-trader physiotherapy use under D-27. UKIPO registration is deferred; do
+not describe the name as registered or use the `®` symbol. `Stronger@Home` is
+reserved for the display wordmark, with `Physiotherapy` as
 the service descriptor and `by Melanie Watsham` as the endorsement. Accessible
 text, search metadata, ordinary prose and spoken usage must spell out `at`.
 
@@ -41,5 +42,6 @@ The approved public contacts are:
 - Preferred contact method: email
 - Website: `www.stronger-at-home.co.uk`
 
-Do not use the name publicly before trademark/name clearance. Do not publish
-the website until its public content has been verified.
+Public use of the name is permitted within the current physiotherapy offer.
+Do not publish the website until its public content has been verified, and do
+not publish professional credential claims until their wording is verified.

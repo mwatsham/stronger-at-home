@@ -31,9 +31,11 @@ Watsham on 2026-08-05. That approval applies only to those exact output pixels.
 The project sponsor separately confirmed usage rights on 2026-08-04 for the
 immutable supplied-v2 source image with SHA-256
 `41267865711ca55f9225df8370c50bca823f68ca966b8fc216852e65a36d0ef1`.
-Trademark/name clearance, domain registration and control, credential wording,
-public contact details and any other supplied-artwork rights evidence remain
-separate requirements before public use.
+The public name is approved for sole-trader physiotherapy use under D-27, with
+UKIPO registration deferred and the residual legal risk accepted. Domain
+control, credential wording, public contact details and any other
+supplied-artwork rights evidence remain separate requirements for their
+respective uses.
 
 ## Palette and typography
 
@@ -50,6 +52,7 @@ before downloading font files into this refreshed repository.
 
 ## Application boundary
 
-No standalone house symbol, public export, or application template may be made
-in Stage 1. The approved exact artwork may not be used publicly until every
-separate clearance requirement is recorded.
+No standalone house symbol, new public export, or application template may be
+made in Stage 1. The approved exact artwork may be used with the approved name,
+subject to the website-publication and credential-claim boundaries recorded in
+`brand/clearance.md`.

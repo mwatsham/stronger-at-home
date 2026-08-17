@@ -1,6 +1,6 @@
 # Stronger at Home Physiotherapy
 
-Status: approved strategy, naming architecture and exact raster-only primary artwork; proposed public name; public use blocked
+Status: approved strategy, sole-trader public name and exact raster-only primary artwork; website publication blocked
 Approval owner: Melanie Watsham
 
 Experienced care. Personal progress. At home.
@@ -8,11 +8,11 @@ Experienced care. Personal progress. At home.
 ## Adoption boundary
 
 This repository is the Stage 1 source of truth for the brand system. The public
-name `Stronger at Home Physiotherapy` remains proposed. A preliminary UKIPO
-screen on 2026-08-06 found no exact live match, but identified the registered
-Class 44 marks `STRONGER` and `Everyday Stronger`; professional trade mark
-review is required before public use or filing. `Stronger@Home` is reserved for
-the display wordmark, with
+name `Stronger at Home Physiotherapy` is approved for sole-trader physiotherapy
+use. The project sponsor accepted the residual risk identified by the
+preliminary UKIPO screen and deferred registration on 2026-08-17. This is a
+commercial decision, not legal clearance or a registered trade mark. Do not use
+the `®` symbol. `Stronger@Home` is reserved for the display wordmark, with
 `Physiotherapy` as the service descriptor and `by Melanie Watsham` as the
 endorsement. Accessible text, search metadata, ordinary prose and spoken usage
 must spell out `at`.
@@ -46,10 +46,11 @@ Melanie Watsham approved both exact current v2 raster-only primary artwork files
 without changes on 2026-08-05. The project sponsor confirmed usage rights for
 their immutable supplied-v2 source image on 2026-08-04 and sole usage rights
 for the older supplied PNG on 2026-08-05. Professional credential wording
-remains to be confirmed. Public use remains blocked until the trademark/name,
-website and applicable credential requirements in `brand/clearance.md` are
-resolved. No patient, referral, website, social, uniform, vehicle or signage
-templates are included in this stage.
+remains to be confirmed. Name use is no longer blocked by trade-mark review.
+Website publication remains blocked until its content is operationally
+verified, and professional credentials must not be claimed until their
+wording is verified in `brand/clearance.md`. No patient, referral, website,
+social, uniform, vehicle or signage templates are included in this stage.
 
 Start with [strategy](brand/strategy.md), [messaging](brand/messaging.md),
 [identity](brand/identity.md), [clearance](brand/clearance.md), and the
