@@ -9,6 +9,22 @@ clinically credible reassurance for patients and older adults; adapt the
 supporting detail for professional referrers without displacing the
 patient-first message.
 
+## Approved service facts
+
+The service is for adults only. Use clear, need-led language rather than an
+exhaustive list of diagnoses. Melanie provides home physiotherapy for adults
+who:
+
+- are recovering after surgery;
+- need rehabilitation following a hospital admission;
+- have experienced a decline in mobility or physical function;
+- need rehabilitation following a fall or are concerned about falling; or
+- want to improve their mobility, balance and confidence at home.
+
+Initial assessments last 60 minutes and follow-up appointments last 45
+minutes. Home visits are available within approximately 10 miles of Epsom and
+surrounding areas. Availability must be confirmed using the patient's address.
+
 ## Claims boundary
 
 The approved claim is 20+ years of NHS experience. Do not promise or imply

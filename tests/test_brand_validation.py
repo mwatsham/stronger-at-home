@@ -212,6 +212,33 @@ def write_raster_asset(
 
 
 class BrandValidationTests(unittest.TestCase):
+    def test_brand_context_records_approved_adult_home_visit_offer(self):
+        context = json.loads(
+            (PROJECT_ROOT / ".ai/context/brand.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(context["audiences"]["primary"], ["adult patients"])
+        self.assertEqual(
+            context["services"],
+            {
+                "patient_group": "adults only",
+                "needs": [
+                    "recovery after surgery",
+                    "rehabilitation following hospital admission",
+                    "decline in mobility or physical function",
+                    "rehabilitation following a fall",
+                    "falls prevention",
+                    "mobility and balance improvement",
+                ],
+                "visit_format": "home visits",
+                "radius": "approximately 10 miles around Epsom, Surrey",
+                "appointment_duration_minutes": {
+                    "initial_assessment": 60,
+                    "follow_up": 45,
+                },
+                "approved_on": "2026-09-02",
+            },
+        )
+
     def test_brand_context_uses_formal_and_display_names(self):
         context = json.loads(
             (PROJECT_ROOT / ".ai/context/brand.json").read_text(encoding="utf-8")

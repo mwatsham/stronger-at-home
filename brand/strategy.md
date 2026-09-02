@@ -2,10 +2,13 @@
 
 ## Positioning
 
-Stronger at Home Physiotherapy is positioned around patient-first,
-home-based rehabilitation. Patients and older adults are the primary audience;
-professional referrers are secondary. The service focus is older-adult and
-post-operative rehabilitation within a 10–15 mile radius around Epsom, Surrey.
+Stronger at Home Physiotherapy is positioned around patient-first, home-based
+rehabilitation for adults. Adult patients are the primary audience;
+professional referrers are secondary. The service supports recovery after
+surgery or hospital admission, rehabilitation following a fall, declines in
+mobility or physical function, falls prevention, and improvements in mobility
+and balance. Home visits are available within approximately 10 miles of Epsom,
+Surrey, subject to confirmation using the patient's address.
 
 The approved proof point is 20+ years of NHS experience. The personality is
 warm, practical and clinically credible.

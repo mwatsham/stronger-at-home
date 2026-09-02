@@ -1,5 +1,17 @@
 # Durable project memory
 
+## 2026-09-02 — adult service offer and visit format
+
+The project sponsor approved an adults-only home physiotherapy offer. It covers
+recovery after surgery, rehabilitation following hospital admission or a fall,
+declines in mobility or physical function, falls prevention, and improvements
+in mobility and balance. Initial assessments last 60 minutes and follow-up
+appointments last 45 minutes.
+
+The approved service area is approximately 10 miles around Epsom and
+surrounding areas, replacing the earlier 10–15-mile radius. Availability is
+confirmed using the patient's address.
+
 ## 2026-08-17 — sole-trader name adoption
 
 The project sponsor decided to proceed as a sole trader using `Stronger at
