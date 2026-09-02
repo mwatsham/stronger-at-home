@@ -15,6 +15,7 @@
   "services": {"patient_group": "adults only", "needs": ["recovery after surgery", "rehabilitation following hospital admission", "decline in mobility or physical function", "rehabilitation following a fall", "falls prevention", "mobility and balance improvement"], "visit_format": "home visits", "radius": "approximately 10 miles around Epsom, Surrey", "appointment_duration_minutes": {"initial_assessment": 60, "follow_up": 45}, "approved_on": "2026-09-02"},
   "pricing": {"model": "individual fixed quote", "variable_by": "patient location and travel requirements", "quote_input": "patient postcode or address", "agreement_timing": "fixed price confirmed and agreed before booking", "applies_to": ["initial assessments", "follow-up visits"], "public_price_list": false, "approved_on": "2026-09-02"},
   "payment": {"methods": ["cash", "bank transfer"], "approved_on": "2026-09-02"},
+  "booking": {"availability": "flexible appointment hours, subject to availability", "channels": ["email", "phone", "website enquiry"], "confirmation": "Melanie confirms appointments directly", "approved_on": "2026-09-02"},
   "claims": {"approved": ["20+ years of NHS experience"], "verification_gated": ["HCPC", "CSP", "AGILE", "ATOCP"]},
   "credentials_status": "to be confirmed",
   "personality": ["warm", "practical", "clinically credible"],

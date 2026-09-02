@@ -1,5 +1,12 @@
 # Durable project memory
 
+## 2026-09-02 — appointment enquiries
+
+The project sponsor approved flexible appointment hours, subject to
+availability. Patients may request an appointment by email, phone or a website
+enquiry. Melanie confirms appointments directly; submitting an enquiry does
+not create an instant confirmed booking.
+
 ## 2026-09-02 — payment methods
 
 The project sponsor approved cash and bank transfer as the accepted payment

@@ -37,6 +37,16 @@ patient's location has been provided and the individual price has been agreed.
 
 Payment can be made by cash or bank transfer.
 
+## Approved appointment wording
+
+> Appointments are arranged flexibly, subject to availability. To enquire
+> about or request an appointment, contact Melanie by email or phone, or
+> submit an enquiry through the website. Melanie will confirm the appointment
+> directly.
+
+Website enquiries are appointment requests, not instant confirmed bookings.
+Do not publish fixed opening hours unless they are separately approved.
+
 ## Claims boundary
 
 The approved claim is 20+ years of NHS experience. Do not promise or imply

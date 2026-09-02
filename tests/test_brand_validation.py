@@ -212,6 +212,20 @@ def write_raster_asset(
 
 
 class BrandValidationTests(unittest.TestCase):
+    def test_brand_context_records_approved_appointment_enquiry_process(self):
+        context = json.loads(
+            (PROJECT_ROOT / ".ai/context/brand.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(
+            context.get("booking"),
+            {
+                "availability": "flexible appointment hours, subject to availability",
+                "channels": ["email", "phone", "website enquiry"],
+                "confirmation": "Melanie confirms appointments directly",
+                "approved_on": "2026-09-02",
+            },
+        )
+
     def test_brand_context_records_only_approved_payment_methods(self):
         context = json.loads(
             (PROJECT_ROOT / ".ai/context/brand.json").read_text(encoding="utf-8")
