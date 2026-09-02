@@ -1,5 +1,10 @@
 # Durable project memory
 
+## 2026-09-02 — payment methods
+
+The project sponsor approved cash and bank transfer as the accepted payment
+methods.
+
 ## 2026-09-02 — location-based pricing
 
 The project sponsor approved individual fixed quotations instead of a standard

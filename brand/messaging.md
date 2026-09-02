@@ -35,6 +35,8 @@ Do not publish a standard price list. This quotation model applies to initial
 assessments and follow-up visits. Do not describe the fee as fixed until the
 patient's location has been provided and the individual price has been agreed.
 
+Payment can be made by cash or bank transfer.
+
 ## Claims boundary
 
 The approved claim is 20+ years of NHS experience. Do not promise or imply

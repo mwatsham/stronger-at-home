@@ -212,6 +212,18 @@ def write_raster_asset(
 
 
 class BrandValidationTests(unittest.TestCase):
+    def test_brand_context_records_only_approved_payment_methods(self):
+        context = json.loads(
+            (PROJECT_ROOT / ".ai/context/brand.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(
+            context.get("payment"),
+            {
+                "methods": ["cash", "bank transfer"],
+                "approved_on": "2026-09-02",
+            },
+        )
+
     def test_brand_context_records_approved_location_based_pricing(self):
         context = json.loads(
             (PROJECT_ROOT / ".ai/context/brand.json").read_text(encoding="utf-8")
