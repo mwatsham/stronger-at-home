@@ -25,6 +25,16 @@ Initial assessments last 60 minutes and follow-up appointments last 45
 minutes. Home visits are available within approximately 10 miles of Epsom and
 surrounding areas. Availability must be confirmed using the patient's address.
 
+## Approved pricing wording
+
+> Fees are quoted individually because travel requirements vary by location.
+> Please provide the patient's postcode or address when enquiring. A fixed
+> price will be confirmed and agreed before the appointment is booked.
+
+Do not publish a standard price list. This quotation model applies to initial
+assessments and follow-up visits. Do not describe the fee as fixed until the
+patient's location has been provided and the individual price has been agreed.
+
 ## Claims boundary
 
 The approved claim is 20+ years of NHS experience. Do not promise or imply

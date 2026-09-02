@@ -212,6 +212,23 @@ def write_raster_asset(
 
 
 class BrandValidationTests(unittest.TestCase):
+    def test_brand_context_records_approved_location_based_pricing(self):
+        context = json.loads(
+            (PROJECT_ROOT / ".ai/context/brand.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(
+            context.get("pricing"),
+            {
+                "model": "individual fixed quote",
+                "variable_by": "patient location and travel requirements",
+                "quote_input": "patient postcode or address",
+                "agreement_timing": "fixed price confirmed and agreed before booking",
+                "applies_to": ["initial assessments", "follow-up visits"],
+                "public_price_list": False,
+                "approved_on": "2026-09-02",
+            },
+        )
+
     def test_brand_context_records_approved_adult_home_visit_offer(self):
         context = json.loads(
             (PROJECT_ROOT / ".ai/context/brand.json").read_text(encoding="utf-8")

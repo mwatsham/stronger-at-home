@@ -1,5 +1,14 @@
 # Durable project memory
 
+## 2026-09-02 — location-based pricing
+
+The project sponsor approved individual fixed quotations instead of a standard
+public price list. Fees may vary according to the patient's location and the
+associated travel requirements. The patient provides a postcode or address
+when enquiring, and a fixed price is confirmed and agreed before the
+appointment is booked. This model applies to initial assessments and follow-up
+visits. Payment methods remain undecided.
+
 ## 2026-09-02 — adult service offer and visit format
 
 The project sponsor approved an adults-only home physiotherapy offer. It covers
