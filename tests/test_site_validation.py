@@ -28,6 +28,29 @@ class LandmarkParser(HTMLParser):
 
 
 class SiteValidationTests(unittest.TestCase):
+    def test_homepage_uses_approved_patient_first_content_order(self):
+        html = (ROOT / "site/index.html").read_text(encoding="utf-8")
+        ids = [
+            "introduction",
+            "how-i-can-help",
+            "benefits-at-home",
+            "meet-melanie",
+            "appointments",
+            "area-and-fees",
+            "request-an-appointment",
+        ]
+
+        positions = [html.index(f'id="{section_id}"') for section_id in ids]
+        self.assertEqual(positions, sorted(positions))
+        self.assertIn("Physiotherapy to help you feel stronger at home", html)
+        self.assertIn("20+ years of NHS experience", html)
+
+    def test_development_portrait_is_a_production_blocker(self):
+        html = (ROOT / "site/index.html").read_text(encoding="utf-8")
+
+        self.assertIn('data-production-blocker="portrait"', html)
+        self.assertIn("Professional portrait to be supplied", html)
+
     def test_mobile_menu_is_a_javascript_enhancement_with_an_accurate_disclosure_control(self):
         stylesheet = (ROOT / "site/assets/css/site.css").read_text(encoding="utf-8")
 
