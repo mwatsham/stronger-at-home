@@ -1,58 +1,76 @@
-# Reversible staging deployment runbook
+# Guarded Git staging deployment runbook
 
 ## Authority boundary
 
-This runbook prepares a cPanel-only staging release. It does not authorise a
-staging mutation by itself, and it never authorises production. Stop before the
-first cPanel write until the project sponsor explicitly approves the exact
-archive and staging target. Do not change DNS, mailbox settings, the production
-document root or any production file.
+This runbook activates an already reviewed `deploy-staging` commit in the
+individual cPanel account. It does not authorise a mutation by itself and never
+authorises production. Stop before each cPanel mutation until the project
+sponsor approves its exact dry-run plan. Do not change DNS, mailbox settings,
+the production repository, the production document root, or any production
+file.
 
-Target host: `staging.stronger-at-home.co.uk`
+- Source branch: `develop`
+- Generated deployment branch: `deploy-staging`
+- Target host: `staging.stronger-at-home.co.uk`
+- Repository root:
+  `/home/v0398ees6dry/repositories/stronger-at-home-staging`
+- Document root:
+  `/home/v0398ees6dry/public_html/staging.stronger-at-home.co.uk`
+- External configuration:
+  `/home/v0398ees6dry/private/stronger-at-home/staging/site.php`
+- Required cPanel runtime: PHP 8.4
+- Guarded profile: `test-123reg`
+- Protected audit file: `/private/tmp/sah-cpanel-audit.jsonl`
 
-Exact document root: `/home/v0398ees6dry/public_html/staging.stronger-at-home.co.uk`
+The generated deployment branch is the only deployable input. Do not edit it,
+the cPanel checkout, or the document root by hand. The previously published
+manual package stays live until a Git deployment succeeds and all staging
+checks pass.
 
-Required cPanel runtime: PHP 8.4
+## 1. Verify the reviewed deployment commit
 
-Expected archive: `output/site-package/stronger-at-home-staging.zip`
+In GitHub, open the exact `deploy-staging` tip produced from the accepted
+`develop` commit. Read `release.json` directly from that commit and record the
+deployment commit identifier and these required values:
 
-Approved SHA-256: use the exact final-commit rebuild hash in the Task 8 handoff
-report. A hash from an earlier commit or rebuild does not authorise upload.
+- `environment` is `staging`;
+- `sourceBranch` is `develop`;
+- `sourceSha` equals the accepted `develop` commit;
+- `deploymentBranch` is `deploy-staging`;
+- `hostname` is `staging.stronger-at-home.co.uk`; and
+- `buildTimestamp` is the expected UTC build time.
 
-## 1. Fresh local release gate
+Require the branch tree to contain only `.cpanel.yml`, `deploy.sh`,
+`release.json`, `public/`, and `vendor/`. Stop if the source SHA is unexpected,
+the branch moved during review, a secret or private configuration is present,
+or the artifact contains any production environment binding.
 
-Run from the repository root and stop on any non-zero exit:
+Record this protected source definition in an owner-readable operator file
+outside Git and outside any public directory:
 
-```bash
-composer install --no-dev --no-interaction --prefer-dist
-for test_file in tests/php/*Test.php; do php "$test_file" || exit 1; done
-for php_file in $(find site tests/php config -type f -name '*.php' | sort); do php -l "$php_file" || exit 1; done
-/opt/homebrew/bin/python3 -m unittest discover -s tests -q
-/opt/homebrew/bin/python3 scripts/validate_site.py --mode development
-/opt/homebrew/bin/python3 scripts/validate_site.py --mode staging
-/opt/homebrew/bin/python3 scripts/validate_brand.py
-node --check site/assets/js/site.js
-/opt/homebrew/bin/python3 scripts/package_site.py --environment staging --destination output/site-package
-sha256sum output/site-package/stronger-at-home-staging.zip
+```json
+{
+  "url": "git@github.com:mwatsham/stronger-at-home.git",
+  "branch": "deploy-staging"
+}
 ```
 
-Require all tests and validators to pass, the archive hash to equal the Task 8
-handoff value, exactly 115 regular archive entries, and `public/robots.txt` to
-contain:
+This definition records the approved remote and branch; it is not the update
+descriptor accepted by the reviewed CLI. Create a separate owner-readable
+`/exact/operator/path/stronger-at-home-staging-update.json` containing exactly:
 
-```text
-User-agent: *
-Disallow: /
+```json
+{"remote_name": "origin"}
 ```
 
-Build a second time into a fresh local destination and require identical hashes
-before continuing. Inspect the archive names and stop if any root other than
-`public/` or `vendor/` appears, or if configuration, a secret, a test, cache or
-repository metadata is present.
+Set both operator files to mode `0600`. Do not put a repository credential,
+deploy key, token, or private key in either file. cPanel repository access must
+already be configured through its provider-supported read-only credential.
 
 ## 2. Read-only cPanel preflight
 
-Use only the named individual-account profile and cPanel HTTPS port 2083:
+Use only the named individual-account profile over verified TLS on cPanel port
+2083. These commands are reads and do not approve either later mutation:
 
 ```bash
 cpanel-admin profiles show test-123reg
@@ -64,14 +82,16 @@ cpanel-admin --profile test-123reg diagnostics has-feature --name multiphp_ini_e
 cpanel-admin --profile test-123reg diagnostics has-feature --name filemanager
 cpanel-admin --profile test-123reg diagnostics has-feature --name backup
 cpanel-admin --profile test-123reg diagnostics quota
+cpanel-admin --profile test-123reg --audit-file /private/tmp/sah-cpanel-audit.jsonl --pretty runtime version-control
+cpanel-admin --profile test-123reg --audit-file /private/tmp/sah-cpanel-audit.jsonl --pretty runtime deployments
 ```
 
-These exact reads were exercised against `test-123reg` on 2026-09-03. The
-profile and domain reads succeeded and returned account user `v0398ees6dry`,
-port 2083 and the exact document root above. The feature probes succeeded with
-CloudLinux PHP Selector, PHP 8.4, File Manager and Backup enabled; MultiPHP and
-MultiPHP INI Editor were disabled. The quota read succeeded and reported the
-account below both storage and inode limits.
+Require account user `v0398ees6dry`, the exact host and document root above,
+sufficient storage and inodes, exactly one Stronger@Home staging mapping at the
+exact repository root, remote `origin`, and branch `deploy-staging`. Stop for a
+path conflict, unexpected mapping, changed branch or remote, an active
+deployment task, or any nonzero command exit. Do not expose profile data or
+credentials in the deployment record.
 
 Do not run `runtime php-*` for this account: those reads require the disabled
 MultiPHP or MultiPHP INI Editor capabilities. Do not use `files inspect` or
@@ -81,183 +101,194 @@ Those known failures are not runtime or target evidence.
 An authorised human must use the enabled cPanel interfaces without changing
 anything: open **Software > Select PHP Version** (CloudLinux PHP Selector) and
 record that the current account runtime is PHP 8.4. In its **Options** view,
-record that `display_errors` is **Off** without changing it. Then open **File
-Manager** and list the exact staging document root to record its current
-metadata. Do not use MultiPHP Manager. Stop if Select PHP Version is absent,
-does not show 8.4, cannot be shown to govern the staging host, or shows
-`display_errors` On; stop if File Manager shows a different target. Record the
-free quota and archive byte count without profile data or credentials. Browser
-automation is not permitted for either cPanel check.
+record that `display_errors` is **Off**. Then open **File Manager** only to
+record current metadata for the exact staging document root and existing
+external configuration; do not change either. Do not use MultiPHP Manager.
+Stop if Select PHP Version is absent, does not show 8.4, cannot be shown to
+govern the staging host, or shows `display_errors` On. Browser automation is not
+permitted for these cPanel checks.
 
-## 3. Create and verify recovery material in cPanel
+## 3. Verify the external staging configuration
 
-Before overwriting anything, use cPanel File Manager to compress the exact
-directory
-`/home/v0398ees6dry/public_html/staging.stronger-at-home.co.uk` into a uniquely
-dated ZIP under `/home/v0398ees6dry/staging-backups/`. If
-`/home/v0398ees6dry/public_html/vendor` already exists, back it up separately
-because it is the required sibling dependency directory. Record paths, sizes
-and UTC creation time.
+The file
+`/home/v0398ees6dry/private/stronger-at-home/staging/site.php` must already be
+outside the document root, owned only by the cPanel account, mode `0600`, and
+not a symlink. The private directory and rate-limit directory must also be
+owner-only and not symlinks. Never print, log, commit, or screenshot values.
 
-Inspect both backup archives in File Manager and extract each into a new
-temporary verification directory. Confirm that the expected top-level entries
-can be listed, then remove only those temporary verification copies. Do not test
-a restore over the live target. Stop if either backup is missing, unreadable or
-incomplete, or if quota cannot hold the backup plus the new release.
+An authorised operator must verify without revealing values that:
 
-## 4. Prepare external staging configuration
+- `environment` is exactly `staging`;
+- `allowed_origin` is exactly
+  `https://staging.stronger-at-home.co.uk`;
+- the recipient is the sponsor-approved safe staging recipient and is not
+  `melanie@stronger-at-home.co.uk`;
+- authenticated SMTP settings come from the protected operator source;
+- a strong independent rate-limit secret is configured; and
+- `rate_limit_directory` is
+  `/home/v0398ees6dry/private/stronger-at-home/staging/rate-limit`.
 
-Use cPanel account facilities to create an owner-readable configuration outside
-the staging document root at:
+The staging deployment artifact's `.htaccess` must bind
+`STRONGER_HOME_CONFIG` to that exact file and `STRONGER_HOME_AUTOLOAD` to the
+source-SHA release directory under
+`/home/v0398ees6dry/stronger-at-home-releases/staging/`. Do not add a fallback
+or override either generated binding. Confirm the configuration, release,
+vendor, Git metadata, and audit paths cannot be retrieved over HTTPS.
 
-`/home/v0398ees6dry/private/stronger-at-home/staging/site.php`
+## 4. Review and execute `runtime git-update`
 
-Bind `STRONGER_HOME_CONFIG` to that exact path through a cPanel-supported PHP
-environment setting. Runtime writes are not available through the guarded
-`cpanel-admin` interface, so this is a recorded human cPanel action. If the
-account cannot provide that binding, stop; never put the file or its values in
-the archive or staging document root.
-
-Build the file from `config/site.example.php` without committing, logging or
-screenshooting values. Require:
-
-- `environment` exactly `staging`;
-- `allowed_origin` exactly `https://staging.stronger-at-home.co.uk`;
-- a controlled staging-only safe recipient selected by the project sponsor,
-  never the live Melanie address;
-- authenticated SMTP values supplied through the operator's secret source;
-- a strong independent rate-limit secret; and
-- `rate_limit_directory` under
-  `/home/v0398ees6dry/private/stronger-at-home/staging/rate-limit`, outside the
-  document root, owner-only and not a symlink.
-
-Set the private directory to owner-only access and the PHP file to mode `0600`.
-Verify that neither path is reachable over HTTPS. Do not print or record any
-value from the file.
-
-## 5. Upload and stage the archive without touching the live target
-
-Use a unique holding directory under the account home. The archive is below the
-guarded uploader's 10 MiB limit. In cPanel File Manager, first create the empty
-directory `/home/v0398ees6dry/staging-releases/task8-20260903` and verify that it
-contains no prior archive or extracted files. First run the exact upload as a
-dry run:
+Re-read the recorded GitHub deployment commit immediately before the dry run.
+Use the reviewed CLI update descriptor containing only `remote_name`; pass the
+reviewed branch separately:
 
 ```bash
-cpanel-admin --profile test-123reg files upload \
-  --directory staging-releases/task8-20260903 \
-  --source output/site-package/stronger-at-home-staging.zip \
+cpanel-admin --profile test-123reg \
+  --audit-file /private/tmp/sah-cpanel-audit.jsonl --pretty \
+  runtime git-update \
+  --repository-root /home/v0398ees6dry/repositories/stronger-at-home-staging \
+  --name stronger-at-home-staging \
+  --branch deploy-staging \
+  --source-repository /exact/operator/path/stronger-at-home-staging-update.json \
   --dry-run
 ```
 
-Review the normalized profile, path, local hash, remote preflight, impact and
-recovery guidance. File upload is treated as destructive because a same-named
-remote file could be overwritten. Obtain immediate approval for that exact
-plan, then replace `--dry-run` with its unexpired `--confirm DIGEST` and
-`--expires-at TIMESTAMP`. If any parameter or preflight changes, discard the
-plan and repeat the dry run.
+Review the normalized profile, exact repository root, name, branch, source
+descriptor fingerprint, impact, recovery, digest, and expiry. Stop if they do
+not exactly match this runbook. Obtain explicit staging activation approval,
+then repeat the identical command with `--dry-run` replaced by the returned,
+unexpired `--confirm DIGEST --expires-at TIMESTAMP`. Never reuse a digest or
+execute after any parameter, descriptor, preflight state, or branch tip changes.
 
-The guarded CLI does not extract or rename archives. A human operator must use
-cPanel File Manager to extract the uploaded ZIP inside its unique holding
-directory and confirm that it yields only `public/` and `vendor/`. Never use
-SSH, FTP, a raw cPanel request or a shell fallback.
+After a zero exit, run `runtime version-control` again. Require the exact
+repository mapping, branch `deploy-staging`, and checked-out identifier to equal
+the GitHub deployment commit reviewed in section 1. Stop before deployment if
+the identifier is absent, stale, or different.
 
-Before the swap, confirm that `/home/v0398ees6dry/public_html/vendor` is not
-served by another host and is not shared with another application. Stop if it
-is exposed or shared. In File Manager:
+## 5. Review and execute `runtime deployment-create`
 
-1. Rename the existing staging document root to a unique `.previous-UTC`
-   sibling; do not delete it.
-2. Rename the extracted `public/` directory to the exact staging document-root
-   path.
-3. If an existing sibling `vendor/` is present, rename it to a unique
-   `.previous-UTC` sibling; do not delete it.
-4. Move the extracted `vendor/` into
-   `/home/v0398ees6dry/public_html/vendor`.
-5. Confirm that no configuration file, upload archive or backup is below the
-   staging document root.
+Run `runtime deployments` and require no active task for this repository. Then
+prepare the separate deployment mutation:
 
-Record every rename and final path. Keep the previous directories and backup
-archives until staging acceptance is complete.
+```bash
+cpanel-admin --profile test-123reg \
+  --audit-file /private/tmp/sah-cpanel-audit.jsonl --pretty \
+  runtime deployment-create \
+  --repository-root /home/v0398ees6dry/repositories/stronger-at-home-staging \
+  --dry-run
+```
+
+Review the exact repository root, impact, recovery, digest, and expiry. Obtain
+separate explicit approval, then repeat the identical command with `--dry-run`
+replaced by its own unexpired `--confirm DIGEST --expires-at TIMESTAMP`. The
+git-update confirmation does not authorise deployment and must never be reused.
+
+Poll only the read command below; never start a second task while one is active:
+
+```bash
+cpanel-admin --profile test-123reg \
+  --audit-file /private/tmp/sah-cpanel-audit.jsonl --pretty \
+  runtime deployments
+```
+
+Require the new task's deployment status to be successful for the exact
+repository root and record its deployment ID. A cPanel success is necessary but
+is not acceptance. In File Manager, read only
+`/home/v0398ees6dry/stronger-at-home-releases/staging/<sourceSha>/deployed-source-sha`
+and require its single 40-character value to equal `release.json`'s `sourceSha`.
+Do not expose the release directory publicly. Stop and begin the Git rollback
+procedure for a failed task, missing marker, or mismatch.
+
+The generated script preserves the previous public tree inside the new release
+directory and restores it automatically if the atomic public-tree swap fails.
+Do not manually rename, copy, patch, or delete either tree.
 
 ## 6. Staging smoke, security and accessibility checks
 
-Stop and roll back on the first failed smoke check.
+Stop and begin rollback on the first failed check. Use fictitious details and a
+message containing no health or private information for every form test.
 
 - Request the HTTPS homepage and require a valid certificate, no mixed content,
-  status 200 and no redirect to production.
-- Request `/robots.txt` and require the exact two-line deny-all response. Check
-  that the staging host is not present in the production sitemap and that all
-  page canonicals still name the production canonical URL.
-- Require `X-Robots-Tag: noindex, nofollow` on staging page responses. Stop if
-  it is missing, duplicated or has a weaker value. This header is inserted only
-  in the staging archive; it must not be added to the production source
-  `.htaccess`.
+  status 200, the staging host, and no redirect to production.
+- Request `/robots.txt` and require the exact deny-all response:
+
+  ```text
+  User-agent: *
+  Disallow: /
+  ```
+
+  Confirm staging is absent from the production sitemap and each page retains
+  its intended production canonical URL.
+- Require `X-Robots-Tag: noindex, nofollow` exactly once on staging page
+  responses. It is inserted only in the staging deployment artifact and must
+  not appear in a production artifact.
 - Require `X-Content-Type-Options: nosniff`,
   `Referrer-Policy: strict-origin-when-cross-origin`, the approved
   `Permissions-Policy`, and the approved Content Security Policy.
-- Check Home, About Melanie, How I can help, Appointments and fees, Contact,
-  Privacy, Accessibility and an unknown URL. Require correct pages, assets,
-  navigation and the custom noindex 404 response.
-- At 390×844, 768×1024 and 1440×1000, check the five primary pages for readable
-  layout, no horizontal overflow and the visibly non-final portrait label.
+- Check all routes and assets: Home, About Melanie, How I can help,
+  Appointments and fees, Contact, Privacy, Accessibility, styles, scripts,
+  images, and an unknown URL. Require correct navigation, no missing asset, and
+  the custom noindex 404 response.
+- Request likely private paths including `/vendor/autoload.php`, `/.git/`,
+  `/.cpanel.yml`, `/release.json`, `/deploy.sh`, and the external configuration
+  path translated under the host. Require no private content and no directory
+  listing.
+- At 390×844, 768×1024, and 1440×1000, check the five primary pages for readable
+  layout, no horizontal overflow, and the visibly non-final portrait label.
 - Use keyboard only to expose the skip link, traverse every menu item, operate
-  the mobile disclosure and reach each form control. Require a clearly visible
-  focus indicator and accurate `aria-expanded` state.
-- At 200% browser zoom, require content to reflow without loss, overlap or
-  two-dimensional page scrolling. With reduced motion enabled, require no
-  meaningful animation or smooth scrolling.
-- Submit an invalid form and require clear field-level errors without a network
-  delivery attempt. Require the redirected page to target `#form-feedback` and
-  move focus to the first invalid field; success, rate and delivery feedback
-  must move focus to the generic status message without exposing submitted
-  details.
-- Fill the honeypot through browser developer tools and require the silent
-  anti-spam response with no message sent and no visible success claim.
-- With the SMTP host deliberately set to a non-routable test value, submit five
-  valid synthetic requests and require generic delivery-failure feedback with
-  no provider detail; the sixth request from the same test address must show the
-  generic rate-limit response. Restore the reviewed configuration and clear
-  only the exact staging counter through cPanel File Manager after recording
-  the test.
+  the mobile disclosure, and reach each form control. Require visible focus and
+  accurate `aria-expanded` state.
+- At 200% browser zoom, require reflow without loss, overlap, or two-dimensional
+  page scrolling. With reduced motion enabled, require no meaningful animation
+  or smooth scrolling.
+- Submit an invalid form and require clear field-level errors without a delivery
+  attempt. Require focus to move to the first invalid field; success, rate, and
+  delivery feedback must focus the generic status without exposing input.
+- Fill the honeypot through developer tools and require the silent anti-spam
+  response with no delivery and no visible success claim.
+- In an explicitly approved test window, use the reviewed safe staging recipient
+  and controlled non-routable SMTP setting to require generic delivery-failure
+  feedback without provider detail. Five valid failures may consume the limit;
+  the sixth request from the same test address must return the generic rate
+  response. Restore the reviewed configuration and clear only that exact
+  staging counter after recording the result.
 
-Use fictitious details and a message containing no health or private
-information for every form test.
+## 7. Controlled safe-recipient message — separate authority
 
-## 7. Controlled end-to-end message — separate later authority
+Do not send merely because deployment was approved. After every preceding check
+passes and the reviewed SMTP configuration is restored, obtain explicit
+authority for exactly one synthetic delivery to the named safe staging
+recipient. Never use Melanie's live address.
 
-Do not run this test during packaging or merely because staging deployment was
-approved. Obtain explicit authority for one delivery to the named safe staging
-recipient after the previous checks pass and the reviewed SMTP configuration is
-restored.
+Require the generic success message to mean only that the request was received.
+Verify exactly one message at the safe staging recipient and check its subject,
+from, reply-to, and body rendering. Confirm no credential, security token,
+provider debug output, patient detail, or private configuration appears. Record
+only UTC time, a non-sensitive recipient label, and pass/fail.
 
-Submit one synthetic request. Require the generic success message to mean only
-that the request was received, verify exactly one message at the safe staging
-recipient, check subject/from/reply-to/body rendering, and confirm that no
-credential, security token or provider debug output appears. Do not send to
-Melanie's live address. Record only time, recipient label and pass/fail; do not
-copy the message or address into the repository.
+## 8. Rollback verification
 
-## 8. Rollback criteria and procedure
+Rollback immediately for a wrong target or identifier, failed deployment task,
+failed HTTPS or security header, indexable staging response, missing route or
+asset, inaccessible navigation or form, exposed private content, unexpected
+recipient, form-security failure, duplicate delivery, or any other smoke-check
+failure. Production remains blocked.
 
-Rollback immediately for a wrong target/runtime, failed HTTPS or security
-header check, indexable staging response, missing/broken asset or route,
-horizontal overflow, inaccessible navigation/form, exposed configuration,
-unexpected recipient, form-security failure, duplicate/unexpected delivery or
-any smoke-check failure.
+Rollback is a new audited deployment:
 
-Using cPanel File Manager only:
+1. Identify the last accepted source SHA from the recorded `release.json` and
+   source history.
+2. Revert the faulty source change or prepare a new source commit on `develop`.
+3. Run the complete validation and staging build workflow so GitHub produces a
+   regenerated `deploy-staging` commit. Never edit the generated branch.
+4. Review its `release.json` and tree as in section 1.
+5. Perform a new reviewed `runtime git-update` with a fresh dry run and approval,
+   then verify the checked-out deployment identifier.
+6. Perform a new reviewed `runtime deployment-create` with a separate fresh dry
+   run and approval, then verify task success and `deployed-source-sha`.
+7. Repeat the complete staging smoke checks, accessibility checks, and authorised
+   safe-recipient verification before recording rollback acceptance.
 
-1. Rename the failed staging document root and failed sibling `vendor/` to
-   unique `.failed-UTC` names; do not overwrite evidence.
-2. Rename the recorded `.previous-UTC` document root and dependency directory
-   back to their exact original paths.
-3. If either previous directory is unusable, stop and have the authorised human
-   operator extract the verified cPanel backup into empty recovery paths; the
-   guarded integration does not execute restores.
-4. Re-run the HTTPS, deny-all robots, staging noindex header, security headers,
-   routes and asset checks.
-5. Record the failure and recovery evidence without secrets.
-
-Keep staging unavailable rather than improvise when recovery cannot be proved.
-No step in this runbook changes or authorises production.
+`runtime git-delete`, `runtime deployment-delete`, and deleting document-root
+files are not rollback mechanisms. Do not patch the live document root or
+restore a tree by hand. Preserve non-sensitive failure evidence and keep staging
+unavailable rather than improvising when recovery cannot be proved.
