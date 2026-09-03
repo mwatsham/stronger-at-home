@@ -50,15 +50,15 @@ EXPECTED_LOGO_SHA256 = "d557a0e8fd05efc86fcca2b3f63d807ad33f29527062697705a8e056
 # received content, behaviour and release review. Every regular file under
 # site/ belongs here, irrespective of its name or extension.
 APPROVED_PUBLIC_SOURCE_SHA256 = {
-    "site/.htaccess": "e1f0c7f3c79a0fd5551ba7139acc0384a9d90a5ce50676fc093f3c75c893adac",
+    "site/.htaccess": "14210b8b14861742ae2dd46317e7c9c40007ad70f778e8378a19e2a07060f6fb",
     "site/404.html": "3a5f600c98009883c9d2ea76cb5449978972352befc5f957e80b259b12f73cd8",
     "site/about/index.html": "e931bce94118bbdb07885ee2c222b4c48a86843cca9d389b428b1e6289abe65c",
     "site/accessibility/index.html": "8aa6edb4bcacb6ba770d495380723565a68c3b4ba28fe6916089c0f12b8edcce",
-    "site/api/enquiry.php": "fb619e650414ea32ca9861257e37e17f22efd1166ad0a0f04c501f7d3d82c18b",
-    "site/api/src/EnquiryController.php": "19b9cf247dd062e68f0bac255da4dba2b3b5144385260b913c76e457e1251f92",
+    "site/api/enquiry.php": "2dc3277bed3d49d9e16141abfde4d280bfc421ef59fbf46b83e58fe877e470f1",
+    "site/api/src/EnquiryController.php": "f58b674470922b4b741cc038ee7ce4efe8e021c5b53ca37a1cde7d5b21b56d06",
     "site/api/src/EnquiryMessage.php": "715d322e3bbe1d02c117e9ed698798c27bd2622ee603789d844b6a3b4d5fffc9",
-    "site/api/src/EnquiryValidator.php": "7eb31c54d0e09ded863fc81af4184797ca2799ebc26a8e28c268483590c3d368",
-    "site/api/src/FileRateLimiter.php": "2256d62d94069ebb8416020c73c61d419cead3be31fb203986c239140d533956",
+    "site/api/src/EnquiryValidator.php": "e490d6c2257e3d6b23bba898d9887fc7507636f17649511f2699b02409026076",
+    "site/api/src/FileRateLimiter.php": "582eef482c4d8f0677760e708589bf38b57e53e260da1d780d822402ac444348",
     "site/api/src/MailTransport.php": "215635fb7295bd51f9865e5559cb2b649f49249771e54902c44eb05415ac825b",
     "site/api/src/PhpMailerTransport.php": "891bd63401873ca013464a727dcaf988fea4702ad71fa38c899c1db8868dab02",
     "site/api/src/RateLimit.php": "2e1f975f955d86222f2474b66ecaaa2074279a30ce445a8401b2a6b4753aff7a",
@@ -68,11 +68,13 @@ APPROVED_PUBLIC_SOURCE_SHA256 = {
     "site/assets/css/brand-tokens.css": "9945f6e139a26124a0755d46e0bb4dc93f3e867d87278b0ff4988d0f92d40450",
     "site/assets/css/site.css": "bb3502e55df18c4250f0e07656b2c401072b2a52e014528de6943fa9b7719d66",
     "site/assets/fonts/atkinson-hyperlegible-next.ttf": "5a455d1cfa099b601ab70751bb9673e8fe1854dc4500c80e1a220d0d75e31745",
+    "site/assets/fonts/OFL-atkinson.txt": "09636801ed3e868736cc359bb1c819c5ef76529cbb41473cb1f602ef166dad0a",
+    "site/assets/fonts/OFL-source-serif.txt": "0fd8b796c1c6220a559a5682cfd00d1c8488b428369f7cb70deb671888cef85f",
     "site/assets/fonts/source-serif-4.ttf": "97b2d4da6e3cb494b5a1e66ae176914d852ccabef49e0c02c0df25f3e39aca0b",
     "site/assets/images/portrait-placeholder.svg": "ebb4e3a1644ae864495f6b540b282426d7bf0c41f0089c9798b0d65b151d96a5",
     "site/assets/images/stronger-at-home-logo.png": EXPECTED_LOGO_SHA256,
-    "site/assets/js/site.js": "fb0cb0e8b1637d0d170b90ac6ffeedf8aafdac8c193ae41ed86f735ddfc22025",
-    "site/contact/index.php": "f60d5f0d2e8bcad5a0d288755a96d6cc70f1caa1dec999843defec1ef6aa11da",
+    "site/assets/js/site.js": "3719a73b082b915082cc65fd4369e9e970e48629912377f52b9e44467ad42b07",
+    "site/contact/index.php": "a08d203bcfa1162932f562e68fe40d9d6206fa603f7cdf5759d61fec15e97f0a",
     "site/how-i-can-help/index.html": "b2f3910b4b3e7dd751ba98fde53ee9f47c0b96fd1b2e5c1dcc2e0a2d13c8b264",
     "site/index.html": "a1c21cfeedba232a6224cfd4793b09fa2bb217e4635ed1b63a3cd16886b559c7",
     "site/privacy/index.html": "a87bba67ed9864a6dfee6c5aaf0c21d236a390255dd045e40206d3ebcbd99597",
@@ -142,10 +144,13 @@ EXPECTED_HTACCESS = (
     "Options -Indexes\n"
     "ErrorDocument 404 /404.html\n"
     "RewriteEngine On\n"
-    "RewriteCond %{HTTPS} !=on\n"
-    "RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [R=301,L]\n"
+    "RewriteCond %{HTTP_HOST} !^(?:stronger-at-home\\.co\\.uk|www\\.stronger-at-home\\.co\\.uk|staging\\.stronger-at-home\\.co\\.uk)$ [NC]\n"
+    "RewriteRule ^ - [R=400,L]\n"
     "RewriteCond %{HTTP_HOST} ^www\\.stronger-at-home\\.co\\.uk$ [NC]\n"
     "RewriteRule ^ https://stronger-at-home.co.uk%{REQUEST_URI} [R=301,L]\n"
+    "RewriteCond %{HTTPS} !=on\n"
+    "RewriteCond %{HTTP_HOST} ^(?:stronger-at-home\\.co\\.uk|staging\\.stronger-at-home\\.co\\.uk)$ [NC]\n"
+    "RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]\n"
     'Header always set X-Content-Type-Options "nosniff"\n'
     'Header always set Referrer-Policy "strict-origin-when-cross-origin"\n'
     'Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"\n'
@@ -519,6 +524,8 @@ def _validate_exact_asset_copies(root: Path, errors: list[str]) -> None:
         Path("site/assets/css/brand-tokens.css"): Path("brand/generated/tokens.css"),
         Path("site/assets/fonts/source-serif-4.ttf"): Path("brand/fonts/source-serif-4.ttf"),
         Path("site/assets/fonts/atkinson-hyperlegible-next.ttf"): Path("brand/fonts/atkinson-hyperlegible-next.ttf"),
+        Path("site/assets/fonts/OFL-source-serif.txt"): Path("brand/fonts/OFL-source-serif.txt"),
+        Path("site/assets/fonts/OFL-atkinson.txt"): Path("brand/fonts/OFL-atkinson.txt"),
     }
     for site_asset, brand_asset in pairs.items():
         site_path, brand_path = root / site_asset, root / brand_asset

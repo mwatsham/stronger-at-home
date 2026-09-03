@@ -12,7 +12,7 @@ or authorise publication.
 
 ## Exact public source and asset boundary
 
-- [ ] Approve the complete 29-file `site/` tree fingerprinted by
+- [ ] Approve the complete 31-file `site/` tree fingerprinted by
   `APPROVED_PUBLIC_SOURCE_SHA256` in `scripts/validate_site.py`. An added,
   removed, renamed or byte-changed public file requires review and makes the
   validator fail.
@@ -24,14 +24,16 @@ or authorise publication.
 - [ ] Approve the public logo as the exact approved raster asset copied to
   `site/assets/images/stronger-at-home-logo.png`; no active SVG logo derivative
   is present.
-- [ ] Approve the two bundled font files, generated brand-token stylesheet,
-  site stylesheet and site script under `site/assets/` as the complete public
-  front-end asset set.
+- [ ] Approve the two bundled font files, their two exact SIL Open Font License
+  text files, generated brand-token stylesheet, site stylesheet and site script
+  under `site/assets/` as the complete public front-end asset set.
 - [ ] Confirm that `site/assets/images/portrait-placeholder.svg` is visibly
   labelled `Professional portrait to be supplied`, is non-final, and remains a
   production blocker.
 - [ ] Confirm that staging replaces `public/robots.txt` with the exact deny-all
-  content `User-agent: *` followed by `Disallow: /`.
+  content `User-agent: *` followed by `Disallow: /`, and adds the staging-only
+  response header `X-Robots-Tag: noindex, nofollow` without changing the
+  production `.htaccess` source.
 
 ## Shared identity, contact and appointment facts
 

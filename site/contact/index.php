@@ -102,7 +102,7 @@ $escape = static fn(string $value): string => htmlspecialchars($value, ENT_QUOTE
       <form id="appointment-request" class="appointment-form" method="post" action="/api/enquiry.php" novalidate>
         <p>Use this form to request an appointment. Melanie will contact you directly to confirm availability.</p>
         <p class="notice">Please do not include detailed or urgent medical information.</p>
-        <div class="form-status" data-form-status role="status" aria-live="polite" tabindex="-1"><?= $escape($statusMessage) ?></div>
+        <div id="form-feedback" class="form-status" data-form-status data-flash-kind="<?= $escape($kind) ?>" role="status" aria-live="polite" tabindex="-1"><?= $escape($statusMessage) ?></div>
 
         <div class="form-field">
           <label for="name">Name <span aria-hidden="true">(required)</span></label>

@@ -6,7 +6,15 @@ use StrongerAtHome\Enquiry\EnquiryValidator;
 use StrongerAtHome\Enquiry\FileRateLimiter;
 use StrongerAtHome\Enquiry\PhpMailerTransport;
 
-require dirname(__DIR__, 2) . '/vendor/autoload.php';
+ini_set('display_errors', '0');
+
+try {
+$autoloadPath = dirname(__DIR__, 2) . '/vendor/autoload.php';
+if (!is_file($autoloadPath) || !is_readable($autoloadPath)) {
+    http_response_code(500);
+    exit;
+}
+require $autoloadPath;
 
 $publicRoot = realpath(dirname(__DIR__));
 $configPath = getenv('STRONGER_HOME_CONFIG') ?: dirname(__DIR__, 2) . '/config/site.php';
@@ -63,8 +71,9 @@ if ($rateLimitDirectory === $publicRoot || str_starts_with($rateLimitDirectory, 
 }
 $config['rate_limit_directory'] = $rateLimitDirectory;
 
-if ($config['environment'] === 'production'
-    && strtolower($config['recipient']) !== 'melanie@stronger-at-home.co.uk'
+$recipient = strtolower(trim($config['recipient']));
+if (($config['environment'] === 'production' && $recipient !== 'melanie@stronger-at-home.co.uk')
+    || ($config['environment'] === 'staging' && $recipient === 'melanie@stronger-at-home.co.uk')
 ) {
     http_response_code(500);
     exit;
@@ -109,3 +118,10 @@ foreach ($response->headers as $name => $value) {
     header($name . ': ' . $value);
 }
 exit;
+} catch (\Throwable) {
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        session_write_close();
+    }
+    http_response_code(500);
+    exit;
+}

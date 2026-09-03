@@ -17,6 +17,13 @@ if (form) {
   const preferredContact = form.querySelector('#preferred-contact');
   const status = form.querySelector('[data-form-status]');
 
+  if (status.dataset.flashKind) {
+    const feedbackTarget = status.dataset.flashKind === 'validation'
+      ? form.querySelector('[aria-invalid="true"]') || status
+      : status;
+    feedbackTarget.focus();
+  }
+
   const updateContactRequirements = () => {
     const prefersEmail = preferredContact.value === 'email';
     const prefersPhone = preferredContact.value === 'phone';

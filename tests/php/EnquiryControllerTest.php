@@ -80,7 +80,7 @@ $session = ['csrf_token' => 'known-token'];
 [$controller, $transport, $rateLimit] = controller_with();
 $response = $controller->handle($server, $post, $session);
 assert_same(303, $response->status, 'success redirects');
-assert_same('/contact/?sent=1', $response->headers['Location'], 'success target');
+assert_same('/contact/?sent=1#form-feedback', $response->headers['Location'], 'success target');
 assert_same(['kind' => 'success'], $response->flash, 'success sets generic flash state');
 assert_same(1, count($transport->sent), 'one message sent');
 assert_same('192.0.2.10', $rateLimit->lastClientAddress, 'rate limiter receives the client address');
@@ -130,7 +130,7 @@ $honeypotPost['website'] = 'bot.example';
 unset($honeypotPost['csrf_token']);
 $honeypotResponse = $controller->handle($server, $honeypotPost, []);
 assert_same(303, $honeypotResponse->status, 'honeypot receives a silent redirect');
-assert_same('/contact/?sent=1', $honeypotResponse->headers['Location'], 'honeypot receives the success target');
+assert_same('/contact/?sent=1#form-feedback', $honeypotResponse->headers['Location'], 'honeypot receives the success target');
 assert_same([], $honeypotResponse->flash, 'honeypot receives no visible success state');
 assert_same(0, count($transport->sent), 'honeypot does not send mail');
 assert_same(0, $honeypotRateLimit->calls, 'honeypot does not consume rate allowance');
@@ -142,7 +142,7 @@ $invalidPost['email'] = 'not-an-email';
 $invalidPost['message'] = 'short';
 $invalidResponse = $controller->handle($server, $invalidPost, $session);
 assert_same(303, $invalidResponse->status, 'validation failure redirects');
-assert_same('/contact/?error=validation', $invalidResponse->headers['Location'], 'validation failure target');
+assert_same('/contact/?error=validation#form-feedback', $invalidResponse->headers['Location'], 'validation failure target');
 assert_same('validation', $invalidResponse->flash['kind'], 'validation failure sets generic kind');
 assert_true(isset($invalidResponse->flash['errors']['email']), 'validation failure returns field feedback');
 assert_same(
@@ -163,7 +163,7 @@ assert_same('', $oversizedResponse->flash['values']['name'], 'oversized invalid 
 [$controller, $transport] = controller_with(false);
 $rateResponse = $controller->handle($server, $post, $session);
 assert_same(303, $rateResponse->status, 'rate limit redirects');
-assert_same('/contact/?error=rate', $rateResponse->headers['Location'], 'rate-limit target');
+assert_same('/contact/?error=rate#form-feedback', $rateResponse->headers['Location'], 'rate-limit target');
 assert_same(['kind' => 'rate'], $rateResponse->flash, 'rate limit has generic flash state only');
 assert_same(0, count($transport->sent), 'rate limit does not send mail');
 
@@ -171,7 +171,7 @@ assert_same(0, count($transport->sent), 'rate limit does not send mail');
 $transport->fail = true;
 $deliveryResponse = $controller->handle($server, $post, $session);
 assert_same(303, $deliveryResponse->status, 'delivery failure redirects');
-assert_same('/contact/?error=delivery', $deliveryResponse->headers['Location'], 'delivery failure target');
+assert_same('/contact/?error=delivery#form-feedback', $deliveryResponse->headers['Location'], 'delivery failure target');
 assert_same('delivery', $deliveryResponse->flash['kind'], 'delivery failure is generic');
 assert_true(!isset($deliveryResponse->flash['errors']), 'delivery failure exposes no provider details');
 assert_true(!isset($deliveryResponse->flash['values']['message']), 'delivery failure never preserves the message');
@@ -258,6 +258,7 @@ assert_true(str_contains($entryPointSource, "'secure' => true"), 'session cookie
 assert_true(str_contains($entryPointSource, "'httponly' => true"), 'session cookie is HttpOnly');
 assert_true(str_contains($entryPointSource, "'samesite' => 'Lax'"), 'session cookie uses SameSite=Lax');
 assert_true(str_contains($entryPointSource, "ini_set('session.use_strict_mode', '1')"), 'session strict mode is enabled');
+assert_true(str_contains($entryPointSource, "ini_set('display_errors', '0')"), 'entry point suppresses diagnostic output');
 assert_true(str_contains($entryPointSource, "unset(\$_SESSION['csrf_token'])"), 'accepted POST consumes its CSRF token');
 assert_true(!str_contains($entryPointSource, 'error_log'), 'entry point does not log enquiry data');
 
@@ -293,10 +294,17 @@ assert_true(str_contains($contactHtml, '&lt;script&gt;alert(&quot;error&quot;)&l
 assert_true(!str_contains($contactHtml, '<script>alert("name")</script>'), 'restored values cannot inject markup');
 assert_true(!str_contains($contactHtml, 'private message must not be rendered'), 'message is never restored');
 assert_true(str_contains($contactHtml, 'aria-invalid="true"'), 'invalid fields are identified accessibly');
+assert_true(str_contains($contactHtml, 'id="form-feedback"'), 'redirect fragment targets stable form feedback');
+assert_true(str_contains($contactHtml, 'data-flash-kind="validation"'), 'rendered flash state exposes only its generic kind to focus handling');
 assert_true(str_contains($contactHtml, 'value="phone" selected'), 'preferred contact is restored');
 assert_true(preg_match('/name="csrf_token" type="hidden" value="[a-f0-9]{64}"/', $contactHtml) === 1, 'contact page renders a 32-byte CSRF token');
 assert_true(!isset($_SESSION['form_flash']), 'flash state is consumed after one render');
 assert_true(isset($_SESSION['csrf_token']) && is_string($_SESSION['csrf_token']), 'new CSRF token is stored in the session');
+
+$siteScript = file_get_contents($projectRoot . '/site/assets/js/site.js');
+assert_true(is_string($siteScript), 'site script can be read');
+assert_true(str_contains($siteScript, "form.querySelector('[aria-invalid=\"true\"]')"), 'validation flash selects the first invalid field');
+assert_true(str_contains($siteScript, 'feedbackTarget.focus()'), 'flash feedback receives programmatic focus');
 
 session_write_close();
 foreach (glob($sessionDirectory . '/*') ?: [] as $sessionFile) {

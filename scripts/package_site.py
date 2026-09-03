@@ -14,9 +14,9 @@ from tempfile import TemporaryDirectory
 from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
 if __package__:
-    from .validate_site import validate_site
+    from .validate_site import APPROVED_PUBLIC_SOURCE_SHA256, validate_site
 else:
-    from validate_site import validate_site
+    from validate_site import APPROVED_PUBLIC_SOURCE_SHA256, validate_site
 
 
 ARCHIVE_TIMESTAMP = (2026, 1, 1, 0, 0, 0)
@@ -27,6 +27,7 @@ EXPECTED_VENDOR_FINGERPRINT = (
 )
 FORBIDDEN_COMPONENTS = {".git", "tests", "cache", "__pycache__", "secrets"}
 FORBIDDEN_FILENAMES = {"site.php", ".ds_store"}
+STAGING_X_ROBOTS_TAG = b'Header always set X-Robots-Tag "noindex, nofollow"\n'
 
 
 def _forbidden_reason(relative_path: Path) -> str | None:
@@ -39,13 +40,13 @@ def _forbidden_reason(relative_path: Path) -> str | None:
     return None
 
 
-def _collect_files(project_root: Path, source: Path, archive_root: str) -> list[tuple[str, Path]]:
+def _collect_files(project_root: Path, source: Path, archive_root: str) -> list[tuple[str, bytes]]:
     if not source.is_dir():
         raise ValueError(f"missing package source directory: {source.relative_to(project_root)}")
     if source.is_symlink():
         raise ValueError(f"package source is a symlink: {source.relative_to(project_root)}")
 
-    collected: list[tuple[str, Path]] = []
+    collected: list[tuple[str, bytes]] = []
     for directory, directory_names, filenames in os.walk(source, followlinks=False):
         current = Path(directory)
         for name in sorted(directory_names):
@@ -65,7 +66,7 @@ def _collect_files(project_root: Path, source: Path, archive_root: str) -> list[
             if not path.is_file():
                 raise ValueError(f"non-regular package entry rejected: {relative.as_posix()}")
             archive_name = PurePosixPath(archive_root, *path.relative_to(source).parts).as_posix()
-            collected.append((archive_name, path))
+            collected.append((archive_name, path.read_bytes()))
     return collected
 
 
@@ -112,7 +113,7 @@ def _normalise_vendor_fingerprint_content(archive_name: str, content: bytes) -> 
     return content.replace(repeated_references.pop(), b"0" * 40)
 
 
-def _validate_vendor_fingerprint(entries: list[tuple[str, Path]]) -> None:
+def _validate_vendor_fingerprint(entries: list[tuple[str, bytes]]) -> None:
     if len(entries) != EXPECTED_VENDOR_FILES:
         raise ValueError(
             "vendor boundary or fingerprint mismatch: "
@@ -120,9 +121,9 @@ def _validate_vendor_fingerprint(entries: list[tuple[str, Path]]) -> None:
         )
 
     fingerprint = hashlib.sha256()
-    for archive_name, source in sorted(entries, key=lambda item: item[0]):
+    for archive_name, content in sorted(entries, key=lambda item: item[0]):
         name = archive_name.encode("utf-8")
-        content = _normalise_vendor_fingerprint_content(archive_name, source.read_bytes())
+        content = _normalise_vendor_fingerprint_content(archive_name, content)
         fingerprint.update(len(name).to_bytes(4, "big"))
         fingerprint.update(name)
         fingerprint.update(len(content).to_bytes(8, "big"))
@@ -132,6 +133,28 @@ def _validate_vendor_fingerprint(entries: list[tuple[str, Path]]) -> None:
         raise ValueError(
             "vendor boundary or fingerprint mismatch: production tree is not approved"
         )
+
+
+def _validate_public_snapshot(entries: list[tuple[str, bytes]]) -> None:
+    expected = {
+        f"public/{Path(path).relative_to('site').as_posix()}": digest
+        for path, digest in APPROVED_PUBLIC_SOURCE_SHA256.items()
+    }
+    actual = {archive_name: content for archive_name, content in entries}
+    if set(actual) != set(expected):
+        raise ValueError("public snapshot approval drift: file boundary changed during packaging")
+    for archive_name, content in actual.items():
+        if hashlib.sha256(content).hexdigest() != expected[archive_name]:
+            raise ValueError(
+                f"public snapshot approval drift: changed {archive_name} during packaging"
+            )
+
+
+def _staging_htaccess(content: bytes) -> bytes:
+    if b"X-Robots-Tag" in content:
+        raise ValueError("production server directives unexpectedly contain X-Robots-Tag")
+    separator = b"" if content.endswith(b"\n") else b"\n"
+    return content + separator + STAGING_X_ROBOTS_TAG
 
 
 def _write_entry(package: ZipFile, archive_name: str, content: bytes) -> None:
@@ -153,29 +176,33 @@ def package_site(project_root: Path, destination: Path, environment: str) -> Pat
 
     entries = _collect_files(project_root, project_root / "site", "public")
     vendor_entries = _collect_files(project_root, project_root / "vendor", "vendor")
-    _validate_vendor_fingerprint(vendor_entries)
-    entries.extend(vendor_entries)
-    entries.sort(key=lambda item: item[0])
 
     validation_errors = validate_site(project_root, environment)
     if validation_errors:
         raise ValueError("Site validation failed: " + "; ".join(validation_errors))
 
-    staging_robots = project_root / "site/robots-staging.txt"
-    if environment == "staging" and staging_robots.is_symlink():
-        raise ValueError("symlink rejected: site/robots-staging.txt")
-    robots_content = staging_robots.read_bytes() if environment == "staging" else None
+    _validate_public_snapshot(entries)
+    _validate_vendor_fingerprint(vendor_entries)
+    entries.extend(vendor_entries)
+    entries.sort(key=lambda item: item[0])
+
+    snapshot = dict(entries)
+    robots_content = snapshot.get("public/robots-staging.txt") if environment == "staging" else None
+    if environment == "staging" and robots_content is None:
+        raise ValueError("staging robots snapshot is unavailable")
 
     destination.mkdir(parents=True, exist_ok=True)
     archive = destination / f"stronger-at-home-{environment}.zip"
     with TemporaryDirectory(prefix="site-package-", dir=destination) as temporary:
         temporary_archive = Path(temporary) / archive.name
         with ZipFile(temporary_archive, "w", compression=ZIP_DEFLATED, compresslevel=9) as package:
-            for archive_name, source in entries:
+            for archive_name, content in entries:
                 content = (
                     robots_content
                     if environment == "staging" and archive_name == "public/robots.txt"
-                    else source.read_bytes()
+                    else _staging_htaccess(content)
+                    if environment == "staging" and archive_name == "public/.htaccess"
+                    else content
                 )
                 _write_entry(package, archive_name, content)
         temporary_archive.replace(archive)

@@ -38,10 +38,10 @@ final class EnquiryValidator
         if ($data['preferred_contact'] === 'email' && $data['email'] === '') {
             $errors['email'] = 'Please provide an email address.';
         }
-        if (!$fields['phone']['valid'] || ($data['phone'] !== '' && !preg_match('/^[+0-9() .-]{7,30}$/', $data['phone']))) {
+        if (!$fields['phone']['valid'] || ($data['phone'] !== '' && !$this->isValidPhone($data['phone']))) {
             $errors['phone'] = 'Please enter a valid phone number.';
         }
-        if ($data['preferred_contact'] === 'phone' && !preg_match('/^[+0-9() .-]{7,30}$/', $data['phone'])) {
+        if ($data['preferred_contact'] === 'phone' && $fields['phone']['valid'] && $data['phone'] === '') {
             $errors['phone'] = 'Please provide a phone number.';
         }
         if (!$fields['postcode']['valid'] || !$this->isUkPostcode($data['postcode'])) {
@@ -81,6 +81,17 @@ final class EnquiryValidator
     private function hasHeaderControls(string $value): bool
     {
         return preg_match('/[\r\n]/', $value) === 1;
+    }
+
+    private function isValidPhone(string $phone): bool
+    {
+        if (preg_match('/^\+?[0-9() .-]{7,30}$/', $phone) !== 1) {
+            return false;
+        }
+
+        $digits = preg_replace('/\D/', '', $phone);
+
+        return is_string($digits) && strlen($digits) >= 7 && strlen($digits) <= 15;
     }
 
     private function isUkPostcode(string $postcode): bool

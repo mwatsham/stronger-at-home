@@ -380,6 +380,27 @@ class SiteValidationTests(unittest.TestCase):
 
             self.assertIn("Server directives must exactly match the approved configuration", errors)
 
+    def test_server_directives_allowlist_hosts_without_server_name_redirects(self):
+        htaccess = (ROOT / "site/.htaccess").read_text(encoding="utf-8")
+
+        self.assertNotIn("%{SERVER_NAME}", htaccess)
+        self.assertIn("staging\\.stronger-at-home\\.co\\.uk", htaccess)
+        self.assertIn("www\\.stronger-at-home\\.co\\.uk", htaccess)
+        self.assertIn("[R=400,L]", htaccess)
+
+    def test_validator_requires_public_font_license_copies(self):
+        with TemporaryDirectory() as directory:
+            copy = Path(directory) / "project"
+            shutil.copytree(ROOT, copy)
+            (copy / "site/assets/fonts/OFL-source-serif.txt").unlink()
+
+            errors = validate_site(copy, "development")
+
+            self.assertIn(
+                "Public content approval drift: removed site/assets/fonts/OFL-source-serif.txt",
+                errors,
+            )
+
     def test_validator_rejects_conflicting_server_directives(self):
         conflicting_directives = (
             "Options +Indexes",

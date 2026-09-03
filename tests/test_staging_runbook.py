@@ -49,6 +49,12 @@ class StagingRunbookTests(unittest.TestCase):
         self.assertIn("Do not use MultiPHP Manager.", normalized_runbook)
         self.assertIn("Browser automation is not permitted", normalized_runbook)
 
+    def test_preflight_and_smoke_checks_require_error_suppression_and_true_noindex(self):
+        self.assertIn("`display_errors` is **Off**", RUNBOOK)
+        self.assertIn("`display_errors` On", RUNBOOK)
+        self.assertIn("`X-Robots-Tag: noindex, nofollow`", RUNBOOK)
+        self.assertIn("inserted only\n  in the staging archive", RUNBOOK)
+
 
 if __name__ == "__main__":
     unittest.main()

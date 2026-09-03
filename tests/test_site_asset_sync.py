@@ -27,3 +27,8 @@ class SiteAssetSyncTests(unittest.TestCase):
                     (target / "assets/fonts" / filename).read_bytes(),
                     (ROOT / "brand/fonts" / filename).read_bytes(),
                 )
+            for filename in ("OFL-source-serif.txt", "OFL-atkinson.txt"):
+                self.assertEqual(
+                    (target / "assets/fonts" / filename).read_bytes(),
+                    (ROOT / "brand/fonts" / filename).read_bytes(),
+                )

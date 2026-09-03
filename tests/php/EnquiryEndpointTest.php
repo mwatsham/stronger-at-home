@@ -12,13 +12,16 @@ mkdir($temporaryDirectory . '/sessions', 0700);
 /**
  * @param array<string, mixed> $config
  */
-function endpoint_status(array $config, string $label, string $entryPoint, string $temporaryDirectory): int
+function endpoint_status(array $config, string $label, string $entryPoint, string $temporaryDirectory, bool $throwFromConfig = false): int
 {
     $safeLabel = preg_replace('/[^a-z0-9]+/', '-', strtolower($label));
     assert_true(is_string($safeLabel), $label . ' fixture label is valid');
     $configPath = $temporaryDirectory . '/' . $safeLabel . '-config.php';
     $runnerPath = $temporaryDirectory . '/' . $safeLabel . '-runner.php';
-    file_put_contents($configPath, "<?php\nreturn " . var_export($config, true) . ";\n");
+    $configSource = $throwFromConfig
+        ? "<?php\nthrow new RuntimeException('private configuration detail');\n"
+        : "<?php\nreturn " . var_export($config, true) . ";\n";
+    file_put_contents($configPath, $configSource);
     file_put_contents(
         $runnerPath,
         "<?php\n"
@@ -90,6 +93,14 @@ assert_same(
     'staging with a safe configured recipient reaches request handling',
 );
 
+$liveRecipientOnStaging = $validConfig;
+$liveRecipientOnStaging['recipient'] = '  MELANIE@stronger-at-home.co.uk ';
+assert_same(
+    500,
+    endpoint_status($liveRecipientOnStaging, 'live recipient on staging', $entryPoint, $temporaryDirectory),
+    'staging rejects Melanie live recipient after normalization',
+);
+
 $productionConfig = $validConfig;
 $productionConfig['environment'] = 'production';
 $productionConfig['recipient'] = 'melanie@stronger-at-home.co.uk';
@@ -105,6 +116,20 @@ assert_same(
     500,
     endpoint_status($wrongProductionRecipient, 'wrong production recipient', $entryPoint, $temporaryDirectory),
     'production rejects any other recipient',
+);
+
+$invalidTransportConfig = $validConfig;
+$invalidTransportConfig['smtp_port'] = 0;
+assert_same(
+    500,
+    endpoint_status($invalidTransportConfig, 'transport construction failure', $entryPoint, $temporaryDirectory),
+    'transport construction failure returns a blank generic 500',
+);
+
+assert_same(
+    500,
+    endpoint_status($validConfig, 'config exception', $entryPoint, $temporaryDirectory, true),
+    'configuration exception returns a blank generic 500',
 );
 
 $configSource = file_get_contents($projectRoot . '/config/site.example.php');

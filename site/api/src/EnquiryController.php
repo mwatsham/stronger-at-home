@@ -30,7 +30,7 @@ final class EnquiryController
         }
 
         if ($this->honeypotIsFilled($post)) {
-            return new Response(303, ['Location' => '/contact/?sent=1']);
+            return new Response(303, ['Location' => '/contact/?sent=1#form-feedback']);
         }
 
         if (!$this->hasValidCsrfToken($post, $session)) {
@@ -41,7 +41,7 @@ final class EnquiryController
         if (!$this->rateLimit->allow($clientAddress, time())) {
             return new Response(
                 303,
-                ['Location' => '/contact/?error=rate'],
+                ['Location' => '/contact/?error=rate#form-feedback'],
                 ['kind' => 'rate'],
             );
         }
@@ -52,7 +52,7 @@ final class EnquiryController
         if (!$result->isValid()) {
             return new Response(
                 303,
-                ['Location' => '/contact/?error=validation'],
+                ['Location' => '/contact/?error=validation#form-feedback'],
                 ['kind' => 'validation', 'errors' => $result->errors, 'values' => $safeValues],
             );
         }
@@ -62,14 +62,14 @@ final class EnquiryController
         } catch (\Throwable) {
             return new Response(
                 303,
-                ['Location' => '/contact/?error=delivery'],
+                ['Location' => '/contact/?error=delivery#form-feedback'],
                 ['kind' => 'delivery', 'values' => $safeValues],
             );
         }
 
         return new Response(
             303,
-            ['Location' => '/contact/?sent=1'],
+            ['Location' => '/contact/?sent=1#form-feedback'],
             ['kind' => 'success'],
         );
     }

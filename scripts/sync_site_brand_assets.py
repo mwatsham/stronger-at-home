@@ -9,6 +9,8 @@ def sync_site_brand_assets(project_root: Path, site_root: Path | None = None) ->
         project_root / "brand/assets/source/logo-primary-raster-v2-512.png": destination / "assets/images/stronger-at-home-logo.png",
         project_root / "brand/fonts/source-serif-4.ttf": destination / "assets/fonts/source-serif-4.ttf",
         project_root / "brand/fonts/atkinson-hyperlegible-next.ttf": destination / "assets/fonts/atkinson-hyperlegible-next.ttf",
+        project_root / "brand/fonts/OFL-source-serif.txt": destination / "assets/fonts/OFL-source-serif.txt",
+        project_root / "brand/fonts/OFL-atkinson.txt": destination / "assets/fonts/OFL-atkinson.txt",
     }
     for source, target in pairs.items():
         target.parent.mkdir(parents=True, exist_ok=True)

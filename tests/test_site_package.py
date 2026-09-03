@@ -5,8 +5,10 @@ import subprocess
 import sys
 from tempfile import TemporaryDirectory
 import unittest
+from unittest.mock import patch
 from zipfile import ZipFile
 
+import scripts.package_site as package_module
 from scripts.package_site import package_site
 
 
@@ -21,11 +23,25 @@ class SitePackageTests(unittest.TestCase):
 
             with ZipFile(archive) as package:
                 names = set(package.namelist())
+                self.assertEqual(len(names), 115)
+                self.assertEqual(sum(name.startswith("public/") for name in names), 31)
+                self.assertEqual(sum(name.startswith("vendor/") for name in names), 84)
                 self.assertIn("public/robots.txt", names)
                 self.assertIn("public/api/enquiry.php", names)
+                self.assertIn("public/assets/fonts/OFL-source-serif.txt", names)
+                self.assertIn("public/assets/fonts/OFL-atkinson.txt", names)
                 self.assertNotIn("config/site.php", names)
                 self.assertFalse(any(name.startswith("tests/") for name in names))
                 self.assertEqual(package.read("public/robots.txt"), STAGING_ROBOTS)
+                packaged_htaccess = package.read("public/.htaccess")
+                self.assertEqual(
+                    packaged_htaccess.count(b'Header always set X-Robots-Tag "noindex, nofollow"'),
+                    1,
+                )
+                self.assertNotIn(
+                    b'X-Robots-Tag',
+                    (ROOT / "site/.htaccess").read_bytes(),
+                )
 
     def test_package_contains_only_the_public_root_and_locked_production_vendor(self):
         with TemporaryDirectory() as directory:
@@ -63,6 +79,27 @@ class SitePackageTests(unittest.TestCase):
             second_archive = package_site(ROOT, Path(second), "staging")
 
             self.assertEqual(first_archive.read_bytes(), second_archive.read_bytes())
+
+    def test_packager_archives_the_validated_byte_snapshot_if_source_changes_during_write(self):
+        with TemporaryDirectory() as directory:
+            copy = Path(directory) / "project"
+            shutil.copytree(ROOT, copy, symlinks=True)
+            original_home = (copy / "site/index.html").read_bytes()
+            original_write_entry = package_module._write_entry
+            mutated = False
+
+            def mutate_after_snapshot(package, archive_name, content):
+                nonlocal mutated
+                if not mutated:
+                    mutated = True
+                    (copy / "site/index.html").write_bytes(b"changed after validation\n")
+                original_write_entry(package, archive_name, content)
+
+            with patch.object(package_module, "_write_entry", side_effect=mutate_after_snapshot):
+                archive = package_module.package_site(copy, Path(directory) / "output", "staging")
+
+            with ZipFile(archive) as package:
+                self.assertEqual(package.read("public/index.html"), original_home)
 
     def test_packager_rejects_symlinks_in_an_included_tree(self):
         with TemporaryDirectory() as directory:

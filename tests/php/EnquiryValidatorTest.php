@@ -42,6 +42,27 @@ $headerInjectedEmail = $valid;
 $headerInjectedEmail['email'] = "alex@example.com\r\nBcc: attacker@example.com";
 assert_true(isset((new EnquiryValidator())->validate($headerInjectedEmail)->errors['email']), 'email header controls are rejected');
 
+$punctuationPhone = $valid;
+$punctuationPhone['phone'] = '+() .---';
+assert_true(isset((new EnquiryValidator())->validate($punctuationPhone)->errors['phone']), 'punctuation-only phone is rejected');
+
+$shortPhone = $valid;
+$shortPhone['phone'] = '+44 (12)';
+assert_true(isset((new EnquiryValidator())->validate($shortPhone)->errors['phone']), 'phone with too few digits is rejected');
+
+$formattedPhone = $valid;
+$formattedPhone['phone'] = '+44 (0)7843 497-871';
+assert_true((new EnquiryValidator())->validate($formattedPhone)->isValid(), 'sensibly formatted phone is accepted');
+
+$preferredShortPhone = $valid;
+$preferredShortPhone['preferred_contact'] = 'phone';
+$preferredShortPhone['phone'] = '12-34';
+assert_same(
+    'Please enter a valid phone number.',
+    (new EnquiryValidator())->validate($preferredShortPhone)->errors['phone'],
+    'invalid preferred phone reports invalid rather than missing',
+);
+
 $tooLong = $valid;
 $tooLong['message'] = str_repeat('x', 1001);
 assert_true(isset((new EnquiryValidator())->validate($tooLong)->errors['message']), 'message is bounded');

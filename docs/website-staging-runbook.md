@@ -37,7 +37,7 @@ sha256sum output/site-package/stronger-at-home-staging.zip
 ```
 
 Require all tests and validators to pass, the archive hash to equal the Task 8
-handoff value, exactly 113 regular archive entries, and `public/robots.txt` to
+handoff value, exactly 115 regular archive entries, and `public/robots.txt` to
 contain:
 
 ```text
@@ -80,13 +80,14 @@ Those known failures are not runtime or target evidence.
 
 An authorised human must use the enabled cPanel interfaces without changing
 anything: open **Software > Select PHP Version** (CloudLinux PHP Selector) and
-record that the current account runtime is PHP 8.4; then open **File Manager**
-and list the exact staging document root to record its current metadata. Do not
-use MultiPHP Manager. Stop if Select PHP Version is absent, does not show 8.4,
-or cannot be shown to govern the staging host; stop if File Manager shows a
-different target. Record the free quota and archive byte count without profile
-data or credentials. Browser automation is not permitted for either cPanel
-check.
+record that the current account runtime is PHP 8.4. In its **Options** view,
+record that `display_errors` is **Off** without changing it. Then open **File
+Manager** and list the exact staging document root to record its current
+metadata. Do not use MultiPHP Manager. Stop if Select PHP Version is absent,
+does not show 8.4, cannot be shown to govern the staging host, or shows
+`display_errors` On; stop if File Manager shows a different target. Record the
+free quota and archive byte count without profile data or credentials. Browser
+automation is not permitted for either cPanel check.
 
 ## 3. Create and verify recovery material in cPanel
 
@@ -188,6 +189,10 @@ Stop and roll back on the first failed smoke check.
 - Request `/robots.txt` and require the exact two-line deny-all response. Check
   that the staging host is not present in the production sitemap and that all
   page canonicals still name the production canonical URL.
+- Require `X-Robots-Tag: noindex, nofollow` on staging page responses. Stop if
+  it is missing, duplicated or has a weaker value. This header is inserted only
+  in the staging archive; it must not be added to the production source
+  `.htaccess`.
 - Require `X-Content-Type-Options: nosniff`,
   `Referrer-Policy: strict-origin-when-cross-origin`, the approved
   `Permissions-Policy`, and the approved Content Security Policy.
@@ -203,7 +208,10 @@ Stop and roll back on the first failed smoke check.
   two-dimensional page scrolling. With reduced motion enabled, require no
   meaningful animation or smooth scrolling.
 - Submit an invalid form and require clear field-level errors without a network
-  delivery attempt.
+  delivery attempt. Require the redirected page to target `#form-feedback` and
+  move focus to the first invalid field; success, rate and delivery feedback
+  must move focus to the generic status message without exposing submitted
+  details.
 - Fill the honeypot through browser developer tools and require the silent
   anti-spam response with no message sent and no visible success claim.
 - With the SMTP host deliberately set to a non-routable test value, submit five
@@ -247,7 +255,8 @@ Using cPanel File Manager only:
 3. If either previous directory is unusable, stop and have the authorised human
    operator extract the verified cPanel backup into empty recovery paths; the
    guarded integration does not execute restores.
-4. Re-run the HTTPS, deny-all robots, headers, routes and asset checks.
+4. Re-run the HTTPS, deny-all robots, staging noindex header, security headers,
+   routes and asset checks.
 5. Record the failure and recovery evidence without secrets.
 
 Keep staging unavailable rather than improvise when recovery cannot be proved.

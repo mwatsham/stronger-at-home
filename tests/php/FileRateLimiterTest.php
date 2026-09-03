@@ -63,7 +63,39 @@ mkdir($unopenableStatePath, 0700);
 assert_true(!$limiter->allow('192.0.2.15', 5001), 'existing state that cannot be opened fails closed');
 rmdir($unopenableStatePath);
 
-foreach (glob($directory . '/*.json') ?: [] as $counterFile) {
-    unlink($counterFile);
+$cleanupDirectory = sys_get_temp_dir() . '/sah-rate-cleanup-' . bin2hex(random_bytes(6));
+mkdir($cleanupDirectory, 0700, true);
+for ($index = 0; $index < 25; $index++) {
+    $stalePath = $cleanupDirectory . '/' . hash('sha256', 'stale-' . $index) . '.json';
+    file_put_contents($stalePath, json_encode(['window_started' => 1, 'count' => 1]));
+    chmod($stalePath, 0600);
+    touch($stalePath, 1);
 }
-rmdir($directory);
+$cleanupLimiter = new FileRateLimiter($cleanupDirectory, 'cleanup-key', 2, 3600);
+assert_true($cleanupLimiter->allow('198.51.100.1', 100000), 'cleanup request is accepted');
+assert_true($cleanupLimiter->allow('198.51.100.1', 100001), 'second cleanup request is accepted');
+$remainingCleanupFiles = glob($cleanupDirectory . '/*.json');
+assert_true(is_array($remainingCleanupFiles), 'cleaned counter directory can be inspected');
+assert_same(1, count($remainingCleanupFiles), 'deterministic cursor eventually removes more than one cleanup batch');
+
+$capacityDirectory = sys_get_temp_dir() . '/sah-rate-capacity-' . bin2hex(random_bytes(6));
+mkdir($capacityDirectory, 0700, true);
+$capacity = (new ReflectionClass(FileRateLimiter::class))->getConstant('MAXIMUM_COUNTER_FILES');
+assert_true(is_int($capacity) && $capacity > 20, 'counter capacity is a fixed positive bound above the cleanup batch');
+for ($index = 0; $index < $capacity; $index++) {
+    $capacityPath = $capacityDirectory . '/' . hash('sha256', 'capacity-' . $index) . '.json';
+    file_put_contents($capacityPath, json_encode(['window_started' => 5000, 'count' => 1]));
+    chmod($capacityPath, 0600);
+}
+$capacityLimiter = new FileRateLimiter($capacityDirectory, 'capacity-key', 2, 3600);
+assert_true(!$capacityLimiter->allow('203.0.113.200', 5001), 'new unique client fails closed at counter capacity');
+$capacityFiles = glob($capacityDirectory . '/*.json');
+assert_true(is_array($capacityFiles), 'capacity directory can be inspected');
+assert_same($capacity, count($capacityFiles), 'counter file count cannot grow past the hard capacity');
+
+foreach ([$directory, $cleanupDirectory, $capacityDirectory] as $testDirectory) {
+    foreach (new FilesystemIterator($testDirectory, FilesystemIterator::SKIP_DOTS) as $entry) {
+        unlink($entry->getPathname());
+    }
+    rmdir($testDirectory);
+}
