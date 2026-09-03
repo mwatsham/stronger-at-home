@@ -1,6 +1,6 @@
 # Stronger at Home Physiotherapy
 
-Status: approved strategy, sole-trader public name and exact raster-only primary artwork; website publication blocked
+Status: approved strategy, identity and website design; website implementation and publication blocked
 Approval owner: Melanie Watsham
 
 Experienced care. Personal progress. At home.
@@ -51,6 +51,13 @@ Website publication remains blocked until its content is operationally
 verified, and professional credentials must not be claimed until their
 wording is verified in `brand/clearance.md`. No patient, referral, website,
 social, uniform, vehicle or signage templates are included in this stage.
+
+The reassurance-first, five-page website design was approved by the project
+sponsor on 2026-09-03. It uses `Request an appointment` as its primary action,
+addresses the adult patient directly and adopts the calm-editorial homepage
+composition. The design is documented in
+`docs/superpowers/specs/2026-09-03-stronger-at-home-website-design.md`.
+Approval of the design does not authorise production publication.
 
 Start with [strategy](brand/strategy.md), [messaging](brand/messaging.md),
 [identity](brand/identity.md), [clearance](brand/clearance.md), and the

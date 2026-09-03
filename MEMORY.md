@@ -1,5 +1,20 @@
 # Durable project memory
 
+## 2026-09-03 — website design
+
+The project sponsor approved a reassurance-first website that addresses the
+adult patient directly and uses `Request an appointment` as its primary action.
+The initial site has five principal pages: Home, About Melanie, How I Can Help,
+Appointments & Fees, and Contact. Melanie is introduced on the homepage; a
+temporary portrait placeholder is allowed only during development.
+
+The approved visual direction is the calm-editorial homepage composition. The
+site will use lightweight static pages and a small server-side enquiry handler,
+with no CMS, analytics, online payments, accounts, calendar integration or
+clinical database. Staging review precedes any production release. Credentials,
+referral suitability, the final portrait, privacy wording and deployment-time
+mail configuration remain separate publication dependencies.
+
 ## 2026-09-02 — appointment enquiries
 
 The project sponsor approved flexible appointment hours, subject to
