@@ -16,7 +16,7 @@ PUBLIC_PAGES = {
 class LandmarkParser(HTMLParser):
     def __init__(self):
         super().__init__()
-        self.tags, self.links, self.h1_count = [], [], 0
+        self.tags, self.links, self.text, self.h1_count = [], [], [], 0
 
     def handle_starttag(self, tag, attrs):
         attributes = dict(attrs)
@@ -25,6 +25,9 @@ class LandmarkParser(HTMLParser):
             self.links.append(attributes["href"])
         if tag == "h1":
             self.h1_count += 1
+
+    def handle_data(self, data):
+        self.text.append(data)
 
 
 class SiteValidationTests(unittest.TestCase):
@@ -184,10 +187,13 @@ class SiteValidationTests(unittest.TestCase):
             html = (ROOT / relative_path).read_text(encoding="utf-8")
             self.assertIn(f"<h1>{heading}</h1>", html)
 
-    def test_public_pages_omit_unapproved_claims_and_payment_method_details(self):
-        combined = "\n".join(
-            (ROOT / path).read_text(encoding="utf-8") for path in PUBLIC_PAGES
-        ).lower()
+    def test_public_pages_omit_unapproved_claims_and_payment_content(self):
+        visible_text = []
+        for path in PUBLIC_PAGES:
+            parser = LandmarkParser()
+            parser.feed((ROOT / path).read_text(encoding="utf-8"))
+            visible_text.extend(parser.text)
+        combined = " ".join(visible_text).lower()
 
         for text in (
             "hcpc",
@@ -196,9 +202,12 @@ class SiteValidationTests(unittest.TestCase):
             "atocp",
             "guaranteed",
             "walk-in clinic",
+            "payment",
+            "payment method",
             "cash",
             "bank transfer",
-            "payment timing",
-            "bank details",
+            "card",
+            "cheque",
+            "direct debit",
         ):
             self.assertNotIn(text, combined)
