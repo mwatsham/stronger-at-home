@@ -110,8 +110,11 @@ class SiteValidationTests(unittest.TestCase):
         self.assertIn("status.textContent = '';", javascript)
         privacy_label = stylesheet.split(".form-field-checkbox label {", 1)[1].split("}", 1)[0]
         privacy_link = stylesheet.split(".form-field-checkbox a {", 1)[1].split("}", 1)[0]
+        privacy_checkbox = stylesheet.split(".form-field-checkbox input {", 1)[1].split("}", 1)[0]
         self.assertIn("min-height: 44px;", privacy_label)
         self.assertIn("min-height: 44px;", privacy_link)
+        self.assertIn("inline-size: 44px;", privacy_checkbox)
+        self.assertIn("block-size: 44px;", privacy_checkbox)
 
     def test_homepage_uses_approved_patient_first_content_order(self):
         html = (ROOT / "site/index.html").read_text(encoding="utf-8")
