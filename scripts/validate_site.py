@@ -46,6 +46,10 @@ ALLOWED_BLOCKERS = {
     "referral-suitability",
 }
 EXPECTED_LOGO_SHA256 = "d557a0e8fd05efc86fcca2b3f63d807ad33f29527062697705a8e05616c6db39"
+EXPECTED_PUBLIC_IMAGES = {
+    "portrait-placeholder.svg": "ebb4e3a1644ae864495f6b540b282426d7bf0c41f0089c9798b0d65b151d96a5",
+    "stronger-at-home-logo.png": EXPECTED_LOGO_SHA256,
+}
 EXPECTED_JSON_LD = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
@@ -87,19 +91,68 @@ PROHIBITED_PHRASES = {
     "we cannot help",
     "we do not treat",
 }
-REQUIRED_HTACCESS_LINES = {
-    "Options -Indexes",
-    "ErrorDocument 404 /404.html",
-    "RewriteEngine On",
-    "RewriteCond %{HTTPS} !=on",
-    "RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [R=301,L]",
-    r"RewriteCond %{HTTP_HOST} ^www\.stronger-at-home\.co\.uk$ [NC]",
-    "RewriteRule ^ https://stronger-at-home.co.uk%{REQUEST_URI} [R=301,L]",
-    'Header always set X-Content-Type-Options "nosniff"',
-    'Header always set Referrer-Policy "strict-origin-when-cross-origin"',
-    'Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"',
-    'Header always set Content-Security-Policy "default-src \'self\'; img-src \'self\'; style-src \'self\'; script-src \'self\'; form-action \'self\'; base-uri \'self\'; frame-ancestors \'none\'"',
+PROHIBITED_PUBLIC_PATTERNS = {
+    "eligibility, suitability, exclusion or restriction claim": (
+        r"\b(?:eligibility|eligible|suitability|suitable|exclusions?|restrictions?|restricted)\b"
+        r"|\b(?:not|only)\s+available\s+(?:to|for)\b"
+        r"|\bwe\s+(?:only|do\s+not|cannot)\s+(?:see|support|treat|accept)\b"
+        r"|\b(?:patients?|people|adults)\s+must\s+be\b"
+    ),
+    "registered or credential mark claim": (
+        r"®|\b(?:registered|registration|chartered|licen[cs]ed|accredited|certified|qualified)\b"
+    ),
+    "transaction method wording": (
+        r"\b(?:payments?|cash|cards?|cheques?|bacs|paypal|invoices?)\b"
+        r"|\b(?:bank\s+transfers?|direct\s+debits?|standing\s+orders?)\b"
+        r"|\b(?:bank\s+details|sort\s+code|account\s+number)\b"
+        r"|\b(?:apple|google)\s+pay\b|\bpay(?:ing|able|s|ed)?\b|\bwe\s+accept\b"
+    ),
+    "walk-in or clinic wording": r"\bwalk[\s-]*in\b|\bclinics?\b",
 }
+UNAPPROVED_LOCATIONS = {
+    "Ashtead",
+    "Banstead",
+    "Bookham",
+    "Cheam",
+    "Chessington",
+    "Claygate",
+    "Cobham",
+    "Croydon",
+    "Dorking",
+    "Effingham",
+    "Esher",
+    "Ewell",
+    "Fetcham",
+    "Guildford",
+    "Kingston",
+    "Leatherhead",
+    "London",
+    "Mitcham",
+    "Morden",
+    "Oxshott",
+    "Redhill",
+    "Reigate",
+    "Surbiton",
+    "Sutton",
+    "Tadworth",
+    "Thames Ditton",
+    "Walton-on-the-Hill",
+    "Woking",
+    "Worcester Park",
+}
+EXPECTED_HTACCESS = (
+    "Options -Indexes\n"
+    "ErrorDocument 404 /404.html\n"
+    "RewriteEngine On\n"
+    "RewriteCond %{HTTPS} !=on\n"
+    "RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [R=301,L]\n"
+    "RewriteCond %{HTTP_HOST} ^www\\.stronger-at-home\\.co\\.uk$ [NC]\n"
+    "RewriteRule ^ https://stronger-at-home.co.uk%{REQUEST_URI} [R=301,L]\n"
+    'Header always set X-Content-Type-Options "nosniff"\n'
+    'Header always set Referrer-Policy "strict-origin-when-cross-origin"\n'
+    'Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"\n'
+    'Header always set Content-Security-Policy "default-src \'self\'; img-src \'self\'; style-src \'self\'; script-src \'self\'; form-action \'self\'; base-uri \'self\'; frame-ancestors \'none\'"\n'
+)
 
 
 class SiteHTMLParser(HTMLParser):
@@ -114,6 +167,7 @@ class SiteHTMLParser(HTMLParser):
         self._in_title = False
         self._ignored_text_depth = 0
         self.visible_parts: list[str] = []
+        self.visitor_attributes: list[str] = []
         self.meta: dict[str, list[str]] = {}
         self.canonicals: list[str] = []
         self.references: list[tuple[str, str, str]] = []
@@ -130,6 +184,11 @@ class SiteHTMLParser(HTMLParser):
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         attributes = dict(attrs)
         self.tags.append(tag)
+        self.visitor_attributes.extend(
+            str(attributes[name])
+            for name in ("alt", "aria-label", "title", "placeholder")
+            if attributes.get(name)
+        )
         if attributes.get("id"):
             self.ids.add(str(attributes["id"]))
         if tag == "h1":
@@ -395,13 +454,22 @@ def _validate_images(root: Path, parsed: dict[Path, SiteHTMLParser], errors: lis
             errors.append("Site raster logo does not match the approved logo bytes")
         if brand_logo.is_file() and logo.read_bytes() != brand_logo.read_bytes():
             errors.append("Site raster logo is not an exact copy of the approved brand asset")
-    raster_assets = {
-        path.relative_to(root / "site").as_posix()
-        for path in (root / "site/assets/images").glob("*")
-        if path.suffix.lower() in {".png", ".jpg", ".jpeg", ".gif", ".webp"}
+    image_root = root / "site/assets/images"
+    public_images = {
+        path.relative_to(image_root).as_posix(): path
+        for path in image_root.rglob("*")
+        if path.is_file() or path.is_symlink()
     }
-    if raster_assets != {"assets/images/stronger-at-home-logo.png"}:
-        errors.append("Site image assets contain an unapproved raster derivative")
+    for unexpected in sorted(set(public_images) - set(EXPECTED_PUBLIC_IMAGES)):
+        errors.append(f"Unexpected public image asset: {unexpected}")
+    for expected, expected_hash in EXPECTED_PUBLIC_IMAGES.items():
+        path = public_images.get(expected)
+        if path is None:
+            errors.append(f"Missing expected public image asset: {expected}")
+        elif path.is_symlink():
+            errors.append(f"Public image asset must not be a symlink: {expected}")
+        elif hashlib.sha256(path.read_bytes()).hexdigest() != expected_hash:
+            errors.append(f"Public image asset bytes do not match the approved file: {expected}")
 
 
 def _validate_exact_asset_copies(root: Path, errors: list[str]) -> None:
@@ -450,7 +518,7 @@ def _validate_contacts_and_claims(
     )
     for relative_path, parser in parsed.items():
         searchable = " ".join(
-            [parser.visible_text, parser.title]
+            [parser.visible_text, parser.title, *parser.visitor_attributes]
             + [value for values in parser.meta.values() for value in values]
         )
         lower = searchable.lower()
@@ -460,6 +528,11 @@ def _validate_contacts_and_claims(
         for phrase in sorted(PROHIBITED_PHRASES):
             if phrase in lower:
                 errors.append(f"Prohibited claim in {relative_path.as_posix()}: {phrase}")
+        for category, pattern in sorted(PROHIBITED_PUBLIC_PATTERNS.items()):
+            if re.search(pattern, searchable, re.IGNORECASE):
+                errors.append(
+                    f"Prohibited public content in {relative_path.as_posix()}: {category}"
+                )
         for email in email_pattern.findall(searchable):
             if email.lower() != APPROVED_EMAIL:
                 errors.append(f"Unapproved email address in {relative_path.as_posix()}: {email}")
@@ -471,6 +544,11 @@ def _validate_contacts_and_claims(
             for candidate in candidates:
                 if candidate not in {"Epsom", "Surrey"}:
                     errors.append(f"Unsupported service location in {relative_path.as_posix()}: {candidate}")
+        for location in sorted(UNAPPROVED_LOCATIONS):
+            if re.search(rf"(?<![\w-]){re.escape(location)}(?![\w-])", searchable, re.IGNORECASE):
+                errors.append(
+                    f"Unsupported service location in {relative_path.as_posix()}: {location}"
+                )
         if "Stronger@Home" in searchable:
             errors.append(f"Prose or metadata uses the raster-only wordmark in {relative_path.as_posix()}")
 
@@ -561,11 +639,8 @@ def _validate_crawl_and_headers(root: Path, errors: list[str]) -> None:
         errors.append("Missing required file: site/sitemap.xml")
 
     htaccess = _read_text(root / "site/.htaccess", errors, "site/.htaccess")
-    if htaccess is not None:
-        lines = set(htaccess.splitlines())
-        missing = REQUIRED_HTACCESS_LINES - lines
-        if missing:
-            errors.append(f"Security or canonical-host directives are missing: {', '.join(sorted(missing))}")
+    if htaccess is not None and htaccess != EXPECTED_HTACCESS:
+        errors.append("Server directives must exactly match the approved configuration")
 
 
 def _validate_blockers(

@@ -53,8 +53,13 @@ class SiteValidationTests(unittest.TestCase):
 
     def test_production_rejects_unresolved_publication_gates(self):
         errors = validate_site(ROOT, "production")
-        self.assertIn("Production blocker remains: portrait", errors)
-        self.assertIn("Production blocker remains: privacy-approval", errors)
+        self.assertEqual(
+            errors,
+            [
+                "Production blocker remains: portrait",
+                "Production blocker remains: privacy-approval",
+            ],
+        )
 
     def test_staging_is_not_indexable(self):
         text = (ROOT / "site/robots-staging.txt").read_text(encoding="utf-8")
@@ -123,6 +128,108 @@ class SiteValidationTests(unittest.TestCase):
             self.assertTrue(any("Prohibited claim" in error for error in errors), errors)
             self.assertTrue(any("LocalBusiness fields" in error for error in errors), errors)
 
+    def test_validator_rejects_transaction_method_wording(self):
+        prohibited_examples = (
+            "Payment details are available.",
+            "Cash is accepted.",
+            "Use a bank transfer.",
+            "Bank details are provided.",
+            "A sort code is provided.",
+            "An account number is provided.",
+            "Use a card.",
+            "Use a cheque.",
+            "Use a direct debit.",
+            "Use BACS.",
+            "Use PayPal.",
+            "Use Apple Pay.",
+            "Use Google Pay.",
+            "An invoice is provided.",
+            "Use a standing order.",
+            "Pay by phone.",
+            "We accept several methods.",
+        )
+        for example in prohibited_examples:
+            with self.subTest(example=example), TemporaryDirectory() as directory:
+                copy = Path(directory) / "project"
+                shutil.copytree(ROOT, copy)
+                home = copy / "site/index.html"
+                html = home.read_text(encoding="utf-8").replace(
+                    "</main>", f"<p>{example}</p></main>"
+                )
+                home.write_text(html, encoding="utf-8")
+
+                errors = validate_site(copy, "development")
+
+                self.assertTrue(
+                    any("Prohibited public content" in error for error in errors),
+                    errors,
+                )
+
+    def test_validator_rejects_registration_clinic_and_eligibility_claims(self):
+        prohibited_examples = (
+            "Registered physiotherapist.",
+            "Stronger at Home®.",
+            "Walk-in clinic.",
+            "Eligibility criteria apply.",
+            "Suitability is assessed.",
+            "Exclusions apply.",
+            "Service restrictions apply.",
+            "We only treat people aged over 65.",
+            "Patients must be referred.",
+        )
+        for example in prohibited_examples:
+            with self.subTest(example=example), TemporaryDirectory() as directory:
+                copy = Path(directory) / "project"
+                shutil.copytree(ROOT, copy)
+                home = copy / "site/index.html"
+                html = home.read_text(encoding="utf-8").replace(
+                    "</main>", f"<p>{example}</p></main>"
+                )
+                home.write_text(html, encoding="utf-8")
+
+                errors = validate_site(copy, "development")
+
+                self.assertTrue(
+                    any("Prohibited public content" in error for error in errors),
+                    errors,
+                )
+
+    def test_validator_checks_accessible_text_for_prohibited_content(self):
+        with TemporaryDirectory() as directory:
+            copy = Path(directory) / "project"
+            shutil.copytree(ROOT, copy)
+            home = copy / "site/index.html"
+            html = home.read_text(encoding="utf-8").replace(
+                'alt="Stronger at Home Physiotherapy by Melanie Watsham"',
+                'alt="Payment details for Stronger at Home Physiotherapy"',
+                1,
+            )
+            home.write_text(html, encoding="utf-8")
+
+            errors = validate_site(copy, "development")
+
+            self.assertTrue(
+                any("Prohibited public content" in error for error in errors),
+                errors,
+            )
+
+    def test_validator_rejects_a_bare_extra_service_location(self):
+        with TemporaryDirectory() as directory:
+            copy = Path(directory) / "project"
+            shutil.copytree(ROOT, copy)
+            home = copy / "site/index.html"
+            html = home.read_text(encoding="utf-8").replace(
+                "</main>", "<p>Leatherhead</p></main>"
+            )
+            home.write_text(html, encoding="utf-8")
+
+            errors = validate_site(copy, "development")
+
+            self.assertTrue(
+                any("Unsupported service location" in error for error in errors),
+                errors,
+            )
+
     def test_validator_requires_the_approved_contact_routes(self):
         with TemporaryDirectory() as directory:
             copy = Path(directory) / "project"
@@ -150,6 +257,70 @@ class SiteValidationTests(unittest.TestCase):
 
             self.assertTrue(any("Sitemap routes" in error for error in errors), errors)
             self.assertIn("Staging robots policy must disallow all crawling", errors)
+
+    def test_validator_rejects_reordered_server_directives(self):
+        with TemporaryDirectory() as directory:
+            copy = Path(directory) / "project"
+            shutil.copytree(ROOT, copy)
+            path = copy / "site/.htaccess"
+            lines = path.read_text(encoding="utf-8").splitlines()
+            lines[3], lines[4] = lines[4], lines[3]
+            path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+            errors = validate_site(copy, "development")
+
+            self.assertIn("Server directives must exactly match the approved configuration", errors)
+
+    def test_validator_rejects_conflicting_server_directives(self):
+        conflicting_directives = (
+            "Options +Indexes",
+            "ErrorDocument 404 /other.html",
+            "RewriteRule ^other$ / [R=302,L]",
+            'Header unset Content-Security-Policy',
+        )
+        for directive in conflicting_directives:
+            with self.subTest(directive=directive), TemporaryDirectory() as directory:
+                copy = Path(directory) / "project"
+                shutil.copytree(ROOT, copy)
+                path = copy / "site/.htaccess"
+                path.write_text(
+                    path.read_text(encoding="utf-8") + directive + "\n",
+                    encoding="utf-8",
+                )
+
+                errors = validate_site(copy, "development")
+
+                self.assertIn(
+                    "Server directives must exactly match the approved configuration",
+                    errors,
+                )
+
+    def test_validator_rejects_nested_svg_logo_derivatives(self):
+        with TemporaryDirectory() as directory:
+            copy = Path(directory) / "project"
+            shutil.copytree(ROOT, copy)
+            derivative = copy / "site/assets/images/nested/logo-derived.svg"
+            derivative.parent.mkdir()
+            derivative.write_text("<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>\n", encoding="utf-8")
+
+            errors = validate_site(copy, "development")
+
+            self.assertTrue(any("Unexpected public image asset" in error for error in errors), errors)
+
+    def test_validator_rejects_nested_raster_logo_derivatives(self):
+        with TemporaryDirectory() as directory:
+            copy = Path(directory) / "project"
+            shutil.copytree(ROOT, copy)
+            derivative = copy / "site/assets/images/nested/logo-derived.png"
+            derivative.parent.mkdir()
+            shutil.copyfile(
+                copy / "site/assets/images/stronger-at-home-logo.png",
+                derivative,
+            )
+
+            errors = validate_site(copy, "development")
+
+            self.assertTrue(any("Unexpected public image asset" in error for error in errors), errors)
 
     def test_contact_form_collects_only_approved_fields(self):
         parser = FormParser()
