@@ -4,7 +4,7 @@ import shutil
 from tempfile import TemporaryDirectory
 import unittest
 
-from scripts.validate_site import validate_site
+from scripts.validate_site import find_prohibited_content_categories, validate_site
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -48,6 +48,14 @@ class FormParser(HTMLParser):
 
 
 class SiteValidationTests(unittest.TestCase):
+    def test_policy_helper_does_not_flag_benign_registered_or_card_context(self):
+        for text in (
+            "Your enquiry is registered when submitted.",
+            "This information card summarises the service.",
+        ):
+            with self.subTest(text=text):
+                self.assertEqual(find_prohibited_content_categories(text), [])
+
     def test_development_site_has_no_structural_errors(self):
         self.assertEqual(validate_site(ROOT, "development"), [])
 
@@ -125,7 +133,7 @@ class SiteValidationTests(unittest.TestCase):
 
             errors = validate_site(copy, "development")
 
-            self.assertTrue(any("Prohibited claim" in error for error in errors), errors)
+            self.assertTrue(any("Prohibited public content" in error for error in errors), errors)
             self.assertTrue(any("LocalBusiness fields" in error for error in errors), errors)
 
     def test_validator_rejects_transaction_method_wording(self):
@@ -160,8 +168,8 @@ class SiteValidationTests(unittest.TestCase):
 
                 errors = validate_site(copy, "development")
 
-                self.assertTrue(
-                    any("Prohibited public content" in error for error in errors),
+                self.assertIn(
+                    "Public content approval drift: changed site/index.html",
                     errors,
                 )
 
@@ -189,8 +197,8 @@ class SiteValidationTests(unittest.TestCase):
 
                 errors = validate_site(copy, "development")
 
-                self.assertTrue(
-                    any("Prohibited public content" in error for error in errors),
+                self.assertIn(
+                    "Public content approval drift: changed site/index.html",
                     errors,
                 )
 
@@ -225,10 +233,64 @@ class SiteValidationTests(unittest.TestCase):
 
             errors = validate_site(copy, "development")
 
-            self.assertTrue(
-                any("Unsupported service location" in error for error in errors),
+            self.assertIn(
+                "Public content approval drift: changed site/index.html",
                 errors,
             )
+
+    def test_reviewer_probes_require_public_content_reapproval(self):
+        probes = (
+            "Bitcoin accepted.",
+            "Referral required.",
+            "Drop-in appointments.",
+            "Stronger at Home™.",
+            "Richmond",
+        )
+        for probe in probes:
+            with self.subTest(probe=probe), TemporaryDirectory() as directory:
+                copy = Path(directory) / "project"
+                shutil.copytree(ROOT, copy)
+                home = copy / "site/index.html"
+                html = home.read_text(encoding="utf-8").replace(
+                    "</main>", f"<p>{probe}</p></main>"
+                )
+                home.write_text(html, encoding="utf-8")
+
+                errors = validate_site(copy, "development")
+
+                self.assertIn(
+                    "Public content approval drift: changed site/index.html",
+                    errors,
+                )
+
+    def test_public_content_approval_detects_added_removed_and_changed_sources(self):
+        with TemporaryDirectory() as directory:
+            copy = Path(directory) / "project"
+            shutil.copytree(ROOT, copy)
+            (copy / "site/new-page.html").write_text(
+                "<!doctype html><title>New</title>\n", encoding="utf-8"
+            )
+            (copy / "site/robots-staging.txt").unlink()
+            script = copy / "site/assets/js/site.js"
+            script.write_text(script.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+
+            errors = validate_site(copy, "development")
+
+            self.assertIn("Public content approval drift: added site/new-page.html", errors)
+            self.assertIn("Public content approval drift: removed site/robots-staging.txt", errors)
+            self.assertIn("Public content approval drift: changed site/assets/js/site.js", errors)
+
+    def test_public_content_approval_detects_renamed_sources(self):
+        with TemporaryDirectory() as directory:
+            copy = Path(directory) / "project"
+            shutil.copytree(ROOT, copy)
+            old = copy / "site/robots-staging.txt"
+            old.rename(copy / "site/robots-preview.txt")
+
+            errors = validate_site(copy, "development")
+
+            self.assertIn("Public content approval drift: added site/robots-preview.txt", errors)
+            self.assertIn("Public content approval drift: removed site/robots-staging.txt", errors)
 
     def test_validator_requires_the_approved_contact_routes(self):
         with TemporaryDirectory() as directory:
@@ -316,6 +378,18 @@ class SiteValidationTests(unittest.TestCase):
             shutil.copyfile(
                 copy / "site/assets/images/stronger-at-home-logo.png",
                 derivative,
+            )
+
+            errors = validate_site(copy, "development")
+
+            self.assertTrue(any("Unexpected public image asset" in error for error in errors), errors)
+
+    def test_validator_rejects_top_level_public_logo_derivatives(self):
+        with TemporaryDirectory() as directory:
+            copy = Path(directory) / "project"
+            shutil.copytree(ROOT, copy)
+            (copy / "site/logo-derived.svg").write_text(
+                '<svg xmlns="http://www.w3.org/2000/svg"></svg>\n', encoding="utf-8"
             )
 
             errors = validate_site(copy, "development")

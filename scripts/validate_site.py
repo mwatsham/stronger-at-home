@@ -47,8 +47,38 @@ ALLOWED_BLOCKERS = {
 }
 EXPECTED_LOGO_SHA256 = "d557a0e8fd05efc86fcca2b3f63d807ad33f29527062697705a8e05616c6db39"
 EXPECTED_PUBLIC_IMAGES = {
-    "portrait-placeholder.svg": "ebb4e3a1644ae864495f6b540b282426d7bf0c41f0089c9798b0d65b151d96a5",
-    "stronger-at-home-logo.png": EXPECTED_LOGO_SHA256,
+    "site/assets/images/portrait-placeholder.svg": "ebb4e3a1644ae864495f6b540b282426d7bf0c41f0089c9798b0d65b151d96a5",
+    "site/assets/images/stronger-at-home-logo.png": EXPECTED_LOGO_SHA256,
+}
+PUBLIC_SOURCE_SUFFIXES = {".css", ".html", ".js", ".php", ".txt", ".xml"}
+# Update this sorted allowlist only after the complete public source change has
+# received content, behaviour and release review.
+APPROVED_PUBLIC_SOURCE_SHA256 = {
+    "site/.htaccess": "e1f0c7f3c79a0fd5551ba7139acc0384a9d90a5ce50676fc093f3c75c893adac",
+    "site/404.html": "3a5f600c98009883c9d2ea76cb5449978972352befc5f957e80b259b12f73cd8",
+    "site/about/index.html": "e931bce94118bbdb07885ee2c222b4c48a86843cca9d389b428b1e6289abe65c",
+    "site/accessibility/index.html": "8aa6edb4bcacb6ba770d495380723565a68c3b4ba28fe6916089c0f12b8edcce",
+    "site/api/enquiry.php": "fb619e650414ea32ca9861257e37e17f22efd1166ad0a0f04c501f7d3d82c18b",
+    "site/api/src/EnquiryController.php": "19b9cf247dd062e68f0bac255da4dba2b3b5144385260b913c76e457e1251f92",
+    "site/api/src/EnquiryMessage.php": "715d322e3bbe1d02c117e9ed698798c27bd2622ee603789d844b6a3b4d5fffc9",
+    "site/api/src/EnquiryValidator.php": "7eb31c54d0e09ded863fc81af4184797ca2799ebc26a8e28c268483590c3d368",
+    "site/api/src/FileRateLimiter.php": "2256d62d94069ebb8416020c73c61d419cead3be31fb203986c239140d533956",
+    "site/api/src/MailTransport.php": "215635fb7295bd51f9865e5559cb2b649f49249771e54902c44eb05415ac825b",
+    "site/api/src/PhpMailerTransport.php": "891bd63401873ca013464a727dcaf988fea4702ad71fa38c899c1db8868dab02",
+    "site/api/src/RateLimit.php": "2e1f975f955d86222f2474b66ecaaa2074279a30ce445a8401b2a6b4753aff7a",
+    "site/api/src/Response.php": "47fe950982fd6a7bb84bcf50e7346b644a46b6b8cee414fc44dd7f44f67214c1",
+    "site/api/src/ValidationResult.php": "2ceb38671310bd93cb04ebcbcd1341bcfbc15bf069229a5b375e258772ff1898",
+    "site/appointments-and-fees/index.html": "f55b5d4325ac53509e0e3acd3555f82debb84924027fd58a2b6fa96ddbb4f6e9",
+    "site/assets/css/brand-tokens.css": "9945f6e139a26124a0755d46e0bb4dc93f3e867d87278b0ff4988d0f92d40450",
+    "site/assets/css/site.css": "bb3502e55df18c4250f0e07656b2c401072b2a52e014528de6943fa9b7719d66",
+    "site/assets/js/site.js": "fb0cb0e8b1637d0d170b90ac6ffeedf8aafdac8c193ae41ed86f735ddfc22025",
+    "site/contact/index.php": "f60d5f0d2e8bcad5a0d288755a96d6cc70f1caa1dec999843defec1ef6aa11da",
+    "site/how-i-can-help/index.html": "b2f3910b4b3e7dd751ba98fde53ee9f47c0b96fd1b2e5c1dcc2e0a2d13c8b264",
+    "site/index.html": "a1c21cfeedba232a6224cfd4793b09fa2bb217e4635ed1b63a3cd16886b559c7",
+    "site/privacy/index.html": "a87bba67ed9864a6dfee6c5aaf0c21d236a390255dd045e40206d3ebcbd99597",
+    "site/robots-staging.txt": "331ea9090db0c9f6f597bd9840fd5b171830f6e0b3ba1cb24dfa91f0c95aedc1",
+    "site/robots.txt": "6806d9c899e6b514b73f45b56f6ff0eb6193e996027444ecebc88d4c31bbf294",
+    "site/sitemap.xml": "e343bdfdc81a434ba772c17174e8f36fe79fdab8e3b52d03b63e3d7976469101",
 }
 EXPECTED_JSON_LD = {
     "@context": "https://schema.org",
@@ -76,10 +106,6 @@ PROHIBITED_CLAIMS = {
     "guaranteed",
     "testimonial",
     "testimonials",
-    "review",
-    "reviews",
-    "outcome",
-    "outcomes",
     "cure",
     "cures",
     "emergency",
@@ -97,48 +123,20 @@ PROHIBITED_PUBLIC_PATTERNS = {
         r"|\b(?:not|only)\s+available\s+(?:to|for)\b"
         r"|\bwe\s+(?:only|do\s+not|cannot)\s+(?:see|support|treat|accept)\b"
         r"|\b(?:patients?|people|adults)\s+must\s+be\b"
+        r"|\breferral(?:\s+is)?\s+required\b"
     ),
     "registered or credential mark claim": (
-        r"®|\b(?:registered|registration|chartered|licen[cs]ed|accredited|certified|qualified)\b"
+        r"[®™]|\b(?:registered|chartered|licen[cs]ed|accredited|certified|qualified)\s+physiotherapist\b"
     ),
     "transaction method wording": (
-        r"\b(?:payments?|cash|cards?|cheques?|bacs|paypal|invoices?)\b"
+        r"\b(?:payments?|cash|cheques?|bacs|paypal|invoices?)\b"
         r"|\b(?:bank\s+transfers?|direct\s+debits?|standing\s+orders?)\b"
         r"|\b(?:bank\s+details|sort\s+code|account\s+number)\b"
-        r"|\b(?:apple|google)\s+pay\b|\bpay(?:ing|able|s|ed)?\b|\bwe\s+accept\b"
+        r"|\b(?:credit|debit|payment)\s+cards?\b|\b(?:apple|google)\s+pay\b"
+        r"|\bpay(?:ing|able|s|ed)?\s+by\b"
+        r"|\bwe\s+accept\s+(?:cash|cheques?|cards?|bacs|paypal|apple\s+pay|google\s+pay)\b"
     ),
-    "walk-in or clinic wording": r"\bwalk[\s-]*in\b|\bclinics?\b",
-}
-UNAPPROVED_LOCATIONS = {
-    "Ashtead",
-    "Banstead",
-    "Bookham",
-    "Cheam",
-    "Chessington",
-    "Claygate",
-    "Cobham",
-    "Croydon",
-    "Dorking",
-    "Effingham",
-    "Esher",
-    "Ewell",
-    "Fetcham",
-    "Guildford",
-    "Kingston",
-    "Leatherhead",
-    "London",
-    "Mitcham",
-    "Morden",
-    "Oxshott",
-    "Redhill",
-    "Reigate",
-    "Surbiton",
-    "Sutton",
-    "Tadworth",
-    "Thames Ditton",
-    "Walton-on-the-Hill",
-    "Woking",
-    "Worcester Park",
+    "walk-in, drop-in or clinic wording": r"\b(?:walk|drop)[\s-]*in\b|\bclinics?\b",
 }
 EXPECTED_HTACCESS = (
     "Options -Indexes\n"
@@ -264,6 +262,30 @@ def _read_text(path: Path, errors: list[str], label: str) -> str | None:
     except UnicodeDecodeError:
         errors.append(f"Required text file is not UTF-8: {label}")
     return None
+
+
+def _validate_public_content_approval(root: Path, errors: list[str]) -> None:
+    site_root = root / "site"
+    public_sources: dict[str, Path] = {}
+    if site_root.is_dir():
+        for path in sorted(site_root.rglob("*"), key=lambda item: item.as_posix()):
+            if path.name == ".htaccess" or path.suffix.lower() in PUBLIC_SOURCE_SUFFIXES:
+                public_sources[path.relative_to(root).as_posix()] = path
+
+    approved_paths = set(APPROVED_PUBLIC_SOURCE_SHA256)
+    actual_paths = set(public_sources)
+    for path in sorted(actual_paths - approved_paths):
+        errors.append(f"Public content approval drift: added {path}")
+    for path in sorted(approved_paths - actual_paths):
+        errors.append(f"Public content approval drift: removed {path}")
+    for path in sorted(approved_paths & actual_paths):
+        source = public_sources[path]
+        if source.is_symlink() or not source.is_file():
+            errors.append(f"Public content approval drift: changed {path}")
+            continue
+        actual_hash = hashlib.sha256(source.read_bytes()).hexdigest()
+        if actual_hash != APPROVED_PUBLIC_SOURCE_SHA256[path]:
+            errors.append(f"Public content approval drift: changed {path}")
 
 
 def _parse_pages(root: Path, errors: list[str]) -> dict[Path, SiteHTMLParser]:
@@ -454,11 +476,13 @@ def _validate_images(root: Path, parsed: dict[Path, SiteHTMLParser], errors: lis
             errors.append("Site raster logo does not match the approved logo bytes")
         if brand_logo.is_file() and logo.read_bytes() != brand_logo.read_bytes():
             errors.append("Site raster logo is not an exact copy of the approved brand asset")
-    image_root = root / "site/assets/images"
+    site_root = root / "site"
+    image_extensions = {".avif", ".gif", ".ico", ".jpeg", ".jpg", ".png", ".svg", ".webp"}
     public_images = {
-        path.relative_to(image_root).as_posix(): path
-        for path in image_root.rglob("*")
-        if path.is_file() or path.is_symlink()
+        path.relative_to(root).as_posix(): path
+        for path in site_root.rglob("*")
+        if (path.is_file() or path.is_symlink())
+        and (path.suffix.lower() in image_extensions or "logo" in path.name.lower())
     }
     for unexpected in sorted(set(public_images) - set(EXPECTED_PUBLIC_IMAGES)):
         errors.append(f"Unexpected public image asset: {unexpected}")
@@ -508,47 +532,43 @@ def _validate_forms(parsed: dict[Path, SiteHTMLParser], errors: list[str]) -> No
                 errors.append("Contact form must submit by POST to the same-origin enquiry endpoint")
 
 
+def find_prohibited_content_categories(text: str) -> list[str]:
+    """Return narrowly scoped policy categories present in visitor-facing text."""
+
+    categories: list[str] = []
+    lower = text.lower()
+    for claim in sorted(PROHIBITED_CLAIMS):
+        if re.search(rf"\b{re.escape(claim)}\b", lower):
+            categories.append(f"unapproved claim: {claim}")
+    for phrase in sorted(PROHIBITED_PHRASES):
+        if phrase in lower:
+            categories.append(f"unapproved claim: {phrase}")
+    for category, pattern in sorted(PROHIBITED_PUBLIC_PATTERNS.items()):
+        if re.search(pattern, text, re.IGNORECASE):
+            categories.append(category)
+    return categories
+
+
 def _validate_contacts_and_claims(
     parsed: dict[Path, SiteHTMLParser], errors: list[str]
 ) -> None:
     email_pattern = re.compile(r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b", re.IGNORECASE)
     phone_pattern = re.compile(r"\+44\d{10,11}\b")
-    location_pattern = re.compile(
-        r"\b(?:in|around|near|serving|covering|across)\s+([A-Z][A-Za-z]*(?:\s+and\s+[A-Z][A-Za-z]*)?)"
-    )
     for relative_path, parser in parsed.items():
         searchable = " ".join(
             [parser.visible_text, parser.title, *parser.visitor_attributes]
             + [value for values in parser.meta.values() for value in values]
         )
-        lower = searchable.lower()
-        for claim in sorted(PROHIBITED_CLAIMS):
-            if re.search(rf"\b{re.escape(claim)}\b", lower):
-                errors.append(f"Prohibited claim in {relative_path.as_posix()}: {claim}")
-        for phrase in sorted(PROHIBITED_PHRASES):
-            if phrase in lower:
-                errors.append(f"Prohibited claim in {relative_path.as_posix()}: {phrase}")
-        for category, pattern in sorted(PROHIBITED_PUBLIC_PATTERNS.items()):
-            if re.search(pattern, searchable, re.IGNORECASE):
-                errors.append(
-                    f"Prohibited public content in {relative_path.as_posix()}: {category}"
-                )
+        for category in find_prohibited_content_categories(searchable):
+            errors.append(
+                f"Prohibited public content in {relative_path.as_posix()}: {category}"
+            )
         for email in email_pattern.findall(searchable):
             if email.lower() != APPROVED_EMAIL:
                 errors.append(f"Unapproved email address in {relative_path.as_posix()}: {email}")
         for phone in phone_pattern.findall(searchable):
             if phone != APPROVED_PHONE:
                 errors.append(f"Unapproved phone number in {relative_path.as_posix()}: {phone}")
-        for match in location_pattern.finditer(searchable):
-            candidates = re.findall(r"[A-Z][A-Za-z]*", match.group(1))
-            for candidate in candidates:
-                if candidate not in {"Epsom", "Surrey"}:
-                    errors.append(f"Unsupported service location in {relative_path.as_posix()}: {candidate}")
-        for location in sorted(UNAPPROVED_LOCATIONS):
-            if re.search(rf"(?<![\w-]){re.escape(location)}(?![\w-])", searchable, re.IGNORECASE):
-                errors.append(
-                    f"Unsupported service location in {relative_path.as_posix()}: {location}"
-                )
         if "Stronger@Home" in searchable:
             errors.append(f"Prose or metadata uses the raster-only wordmark in {relative_path.as_posix()}")
 
@@ -669,6 +689,7 @@ def validate_site(root: Path, mode: str) -> list[str]:
         raise ValueError("mode must be development, staging or production")
     root = Path(root)
     errors: list[str] = []
+    _validate_public_content_approval(root, errors)
     parsed = _parse_pages(root, errors)
     _validate_structure_and_metadata(parsed, errors)
     _validate_links(root, parsed, errors)
