@@ -67,6 +67,52 @@ class SiteValidationTests(unittest.TestCase):
         self.assertNotIn("date_of_birth", parser.controls)
         self.assertNotIn("medical_history", parser.controls)
 
+    def test_contact_form_requires_safe_fields_and_explains_the_booking_flow(self):
+        html = (ROOT / "site/contact/index.php").read_text(encoding="utf-8")
+        parser = FormParser()
+        parser.feed(html)
+
+        for field in ("name", "postcode", "message", "privacy_acknowledged"):
+            self.assertIn("required", parser.controls[field], field)
+        self.assertEqual(parser.controls["email"]["type"], "email")
+        self.assertEqual(parser.controls["phone"]["type"], "tel")
+        self.assertIn("Use this form to request an appointment.", html)
+        self.assertIn("confirm availability", html)
+        self.assertIn("Please do not include detailed or urgent medical information.", html)
+        self.assertIn("+447843497871", html)
+        self.assertIn("melanie@stronger-at-home.co.uk", html)
+        for label in (
+            "Name",
+            "Email address",
+            "Phone number",
+            "Preferred contact method",
+            "Postcode",
+            "Short enquiry",
+            "privacy notice",
+        ):
+            self.assertIn(label, html)
+        self.assertIn('role="status"', html)
+        self.assertIn('aria-live="polite"', html)
+        self.assertRegex(
+            html,
+            r'<textarea[^>]+name="message"[^>]*></textarea>',
+        )
+
+    def test_contact_form_uses_native_field_reporting_and_44px_privacy_targets(self):
+        javascript = (ROOT / "site/assets/js/site.js").read_text(encoding="utf-8")
+        stylesheet = (ROOT / "site/assets/css/site.css").read_text(encoding="utf-8")
+
+        self.assertIn("preferredContact", javascript)
+        self.assertIn("email.setCustomValidity", javascript)
+        self.assertIn("phone.setCustomValidity", javascript)
+        self.assertIn("form.reportValidity()", javascript)
+        self.assertIn("Please check the highlighted fields", javascript)
+        self.assertIn("status.textContent = '';", javascript)
+        privacy_label = stylesheet.split(".form-field-checkbox label {", 1)[1].split("}", 1)[0]
+        privacy_link = stylesheet.split(".form-field-checkbox a {", 1)[1].split("}", 1)[0]
+        self.assertIn("min-height: 44px;", privacy_label)
+        self.assertIn("min-height: 44px;", privacy_link)
+
     def test_homepage_uses_approved_patient_first_content_order(self):
         html = (ROOT / "site/index.html").read_text(encoding="utf-8")
         ids = [
