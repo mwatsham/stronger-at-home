@@ -23,7 +23,7 @@ ARCHIVE_TIMESTAMP = (2026, 1, 1, 0, 0, 0)
 EXPECTED_PHPMAILER = ("phpmailer/phpmailer", "v7.1.1")
 EXPECTED_VENDOR_FILES = 84
 EXPECTED_VENDOR_FINGERPRINT = (
-    "f8bcd1092477c5ad8ab4edff307a15fff0bae1c2ba67dd796bb53aaffea9d935"
+    "eaab46c1540505e964ae5fcc132152d45b4bebd2fa543e5a58ea17524b851798"
 )
 FORBIDDEN_COMPONENTS = {".git", "tests", "cache", "__pycache__", "secrets"}
 FORBIDDEN_FILENAMES = {"site.php", ".ds_store"}
@@ -101,6 +101,15 @@ def _validate_production_dependencies(project_root: Path) -> None:
 def _normalise_vendor_fingerprint_content(archive_name: str, content: bytes) -> bytes:
     if archive_name != "vendor/composer/installed.php":
         return content
+
+    root_versions = re.findall(
+        rb"'(?:pretty_version|version)' => '(dev-[^']+)'", content
+    )
+    if len(root_versions) != 4 or len(set(root_versions)) != 1:
+        raise ValueError(
+            "vendor boundary or fingerprint mismatch: invalid Composer root version metadata"
+        )
+    content = content.replace(root_versions[0], b"dev-root")
 
     references = re.findall(rb"'reference' => '([0-9a-f]{40})'", content)
     repeated_references = {
@@ -183,6 +192,10 @@ def package_site(project_root: Path, destination: Path, environment: str) -> Pat
 
     _validate_public_snapshot(entries)
     _validate_vendor_fingerprint(vendor_entries)
+    vendor_entries = [
+        (archive_name, _normalise_vendor_fingerprint_content(archive_name, content))
+        for archive_name, content in vendor_entries
+    ]
     entries.extend(vendor_entries)
     entries.sort(key=lambda item: item[0])
 

@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import sys
@@ -77,6 +78,28 @@ class SitePackageTests(unittest.TestCase):
         with TemporaryDirectory() as first, TemporaryDirectory() as second:
             first_archive = package_site(ROOT, Path(first), "staging")
             second_archive = package_site(ROOT, Path(second), "staging")
+
+            self.assertEqual(first_archive.read_bytes(), second_archive.read_bytes())
+
+    def test_generated_composer_root_branch_metadata_does_not_change_archive(self):
+        with TemporaryDirectory() as directory:
+            copy = Path(directory) / "project"
+            shutil.copytree(ROOT, copy, symlinks=True)
+            first_archive = package_site(copy, Path(directory) / "first", "staging")
+
+            installed_path = copy / "vendor/composer/installed.php"
+            installed = installed_path.read_text(encoding="utf-8")
+            root_versions = re.findall(
+                r"'(?:pretty_version|version)' => '(dev-[^']+)'", installed
+            )
+            self.assertEqual(len(root_versions), 4)
+            self.assertEqual(len(set(root_versions)), 1)
+            installed_path.write_text(
+                installed.replace(root_versions[0], "dev-another-branch"),
+                encoding="utf-8",
+            )
+
+            second_archive = package_site(copy, Path(directory) / "second", "staging")
 
             self.assertEqual(first_archive.read_bytes(), second_archive.read_bytes())
 
