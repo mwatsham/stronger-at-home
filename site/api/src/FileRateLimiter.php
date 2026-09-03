@@ -26,9 +26,15 @@ final class FileRateLimiter implements RateLimit
 
         $key = hash_hmac('sha256', $clientAddress, $this->secret);
         $path = $this->directory . DIRECTORY_SEPARATOR . $key . '.json';
+        $created = false;
         $previousUmask = umask(0077);
         try {
-            $handle = @fopen($path, 'c+');
+            $handle = @fopen($path, 'x+');
+            if ($handle !== false) {
+                $created = true;
+            } else {
+                $handle = @fopen($path, 'r+');
+            }
         } finally {
             umask($previousUmask);
         }
@@ -46,17 +52,30 @@ final class FileRateLimiter implements RateLimit
             if (!@chmod($path, 0600)) {
                 return false;
             }
-            rewind($handle);
-            $raw = stream_get_contents($handle);
-            $state = is_string($raw) && $raw !== '' ? json_decode($raw, true) : null;
-
-            if (!$this->isCurrentState($state, $now)) {
+            if ($created) {
                 $state = ['window_started' => $now, 'count' => 0];
             } else {
+                rewind($handle);
+                $raw = stream_get_contents($handle);
+                if (!is_string($raw) || $raw === '') {
+                    return false;
+                }
+                try {
+                    $state = json_decode($raw, true, 512, JSON_THROW_ON_ERROR);
+                } catch (\JsonException) {
+                    return false;
+                }
+                if (!$this->isValidState($state, $now)) {
+                    return false;
+                }
+
                 $state = [
                     'window_started' => $state['window_started'],
                     'count' => $state['count'],
                 ];
+                if ($now - $state['window_started'] >= $this->windowSeconds) {
+                    $state = ['window_started' => $now, 'count' => 0];
+                }
             }
 
             if ($state['count'] >= $this->maximum) {
@@ -117,7 +136,7 @@ final class FileRateLimiter implements RateLimit
     /**
      * @param mixed $state
      */
-    private function isCurrentState($state, int $now): bool
+    private function isValidState($state, int $now): bool
     {
         if (!is_array($state)
             || !isset($state['window_started'], $state['count'])
@@ -129,7 +148,7 @@ final class FileRateLimiter implements RateLimit
             return false;
         }
 
-        return $now - $state['window_started'] < $this->windowSeconds;
+        return true;
     }
 
     private function cleanup(int $now): void

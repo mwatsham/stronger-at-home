@@ -26,11 +26,15 @@ if (!is_array($config)) {
     exit;
 }
 
-foreach (['allowed_origin', 'recipient', 'sender', 'smtp_host', 'smtp_username', 'smtp_password', 'rate_limit_secret', 'rate_limit_directory'] as $requiredKey) {
+foreach (['environment', 'allowed_origin', 'recipient', 'sender', 'smtp_host', 'smtp_username', 'smtp_password', 'rate_limit_secret', 'rate_limit_directory'] as $requiredKey) {
     if (!isset($config[$requiredKey]) || !is_string($config[$requiredKey]) || trim($config[$requiredKey]) === '') {
         http_response_code(500);
         exit;
     }
+}
+if (!in_array($config['environment'], ['staging', 'production'], true)) {
+    http_response_code(500);
+    exit;
 }
 
 $originParts = parse_url($config['allowed_origin']);
@@ -59,7 +63,7 @@ if ($rateLimitDirectory === $publicRoot || str_starts_with($rateLimitDirectory, 
 }
 $config['rate_limit_directory'] = $rateLimitDirectory;
 
-if (($config['environment'] ?? '') === 'production'
+if ($config['environment'] === 'production'
     && strtolower($config['recipient']) !== 'melanie@stronger-at-home.co.uk'
 ) {
     http_response_code(500);

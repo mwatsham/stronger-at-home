@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 return [
-    'environment' => getenv('APP_ENV') ?: 'staging',
+    'environment' => getenv('APP_ENV'),
     'allowed_origin' => getenv('ALLOWED_ORIGIN') ?: 'https://staging.stronger-at-home.co.uk',
     'recipient' => getenv('ENQUIRY_RECIPIENT') ?: '',
     'sender' => getenv('ENQUIRY_SENDER') ?: '',
