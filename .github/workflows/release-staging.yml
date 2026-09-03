@@ -1,0 +1,104 @@
+name: Prepare staging release branch
+
+on:
+  push:
+    branches: [develop]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-staging
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    env:
+      DEPLOYMENT_BRANCH: deploy-staging
+    steps:
+      - name: Check out develop
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          tools: composer:v2
+          coverage: none
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: Locate Composer cache
+        id: composer-cache
+        run: echo "directory=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Restore Composer cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.composer-cache.outputs.directory }}
+          key: composer-${{ runner.os }}-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: |
+          composer install --no-dev --no-interaction --prefer-dist
+          python -m pip install --disable-pip-version-check -r requirements.txt
+
+      - name: Run the complete quality gate
+        run: |
+          for test_file in tests/php/*Test.php; do php "$test_file" || exit 1; done
+          for php_file in $(find site tests/php config -type f -name '*.php' | sort); do php -l "$php_file" || exit 1; done
+          python -m unittest discover -s tests -q
+          python scripts/validate_site.py --mode development
+          python scripts/validate_site.py --mode staging
+          python scripts/validate_brand.py
+          node --check site/assets/js/site.js
+          python scripts/package_site.py --environment staging --destination output/site-package
+          git diff --exit-code
+
+      - name: Verify the source revision
+        run: |
+          git fetch --no-tags origin develop
+          test "${{ github.sha }}" = "$(git rev-parse origin/develop)"
+
+      - name: Build the staging release tree
+        run: python scripts/build_git_release.py --environment staging --source-sha "${{ github.sha }}" --build-timestamp "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" --output-directory release
+
+      - name: Promote the release tree
+        run: |
+          set -euo pipefail
+          worktree_parent="$(mktemp -d)"
+          release_worktree="$worktree_parent/tree"
+          cleanup() {
+            git worktree remove --force "$release_worktree" 2>/dev/null || true
+            git worktree prune
+            rmdir "$worktree_parent" 2>/dev/null || true
+          }
+          trap cleanup EXIT
+
+          if git ls-remote --exit-code --heads origin "refs/heads/$DEPLOYMENT_BRANCH" >/dev/null; then
+            git fetch --no-tags origin "refs/heads/$DEPLOYMENT_BRANCH:refs/remotes/origin/$DEPLOYMENT_BRANCH"
+            git worktree add --detach "$release_worktree" "refs/remotes/origin/$DEPLOYMENT_BRANCH"
+          else
+            git worktree add --detach "$release_worktree" "${{ github.sha }}"
+            git -C "$release_worktree" checkout --orphan "$DEPLOYMENT_BRANCH"
+          fi
+
+          git -C "$release_worktree" config user.name "github-actions[bot]"
+          git -C "$release_worktree" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C "$release_worktree" rm -r --ignore-unmatch .
+          cp -a release/. "$release_worktree/"
+          git -C "$release_worktree" add --all
+          git -C "$release_worktree" commit -m "deploy: stage ${{ github.sha }}"
+          (
+            cd "$release_worktree"
+            git push origin HEAD:refs/heads/deploy-staging
+          )
