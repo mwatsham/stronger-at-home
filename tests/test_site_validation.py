@@ -145,3 +145,60 @@ class SiteValidationTests(unittest.TestCase):
             parser = LandmarkParser()
             parser.feed((ROOT / relative_path).read_text(encoding="utf-8"))
             self.assertTrue(expected.issubset(set(parser.links)), relative_path)
+
+    def test_information_pages_present_approved_service_and_appointment_facts(self):
+        about = (ROOT / "site/about/index.html").read_text(encoding="utf-8")
+        help_page = (ROOT / "site/how-i-can-help/index.html").read_text(encoding="utf-8")
+        appointments = (ROOT / "site/appointments-and-fees/index.html").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("20+ years of NHS experience", about)
+        for phrase in (
+            "Recovery after surgery",
+            "Following a hospital admission",
+            "A decline in mobility or physical function",
+            "Rehabilitation following a fall",
+            "Falls prevention",
+            "Mobility and balance",
+        ):
+            self.assertIn(phrase, help_page)
+        for phrase in (
+            "60 minutes",
+            "45 minutes",
+            "approximately 10 miles of Epsom",
+            "subject to availability",
+            "postcode or address",
+            "A fixed price will be confirmed and agreed before the appointment is booked.",
+        ):
+            self.assertIn(phrase, appointments)
+
+    def test_information_pages_use_clear_page_titles_as_their_top_level_headings(self):
+        expected_headings = {
+            "site/about/index.html": "About Melanie",
+            "site/how-i-can-help/index.html": "How I can help",
+            "site/appointments-and-fees/index.html": "Appointments and fees",
+        }
+
+        for relative_path, heading in expected_headings.items():
+            html = (ROOT / relative_path).read_text(encoding="utf-8")
+            self.assertIn(f"<h1>{heading}</h1>", html)
+
+    def test_public_pages_omit_unapproved_claims_and_payment_method_details(self):
+        combined = "\n".join(
+            (ROOT / path).read_text(encoding="utf-8") for path in PUBLIC_PAGES
+        ).lower()
+
+        for text in (
+            "hcpc",
+            "csp",
+            "agile",
+            "atocp",
+            "guaranteed",
+            "walk-in clinic",
+            "cash",
+            "bank transfer",
+            "payment timing",
+            "bank details",
+        ):
+            self.assertNotIn(text, combined)

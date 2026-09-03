@@ -128,6 +128,47 @@ main.homepage {
   padding: 0;
 }
 
+.information-page {
+  width: auto;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.information-page h1,
+.information-page h2,
+.information-page h3,
+.information-page p {
+  margin-top: 0;
+}
+
+.information-page h2 {
+  max-width: 22ch;
+  margin-bottom: 1rem;
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  line-height: var(--brand-typography-line-height-tight);
+}
+
+.information-page h3 {
+  margin-bottom: 0.65rem;
+  font-size: 1.45rem;
+  line-height: 1.2;
+}
+
+.page-intro { padding-top: clamp(3.5rem, 9vw, 8rem); }
+
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.service-card { border-top: 3px solid var(--brand-colour-accent-progress); }
+
+.service-card p:last-child { margin-bottom: 0; }
+
+.content-split { align-items: start; }
+
 .section {
   padding: clamp(3rem, 7vw, 6rem) max(1.25rem, calc((100% - 72rem) / 2));
 }
@@ -307,7 +348,8 @@ main.homepage {
 @media (max-width: 48rem) {
   .split,
   .card-grid,
-  .benefit-list {
+  .benefit-list,
+  .service-grid {
     grid-template-columns: 1fr;
   }
 
