@@ -61,14 +61,15 @@ Approval of the design does not authorise production publication.
 
 The local staging workflow prepared on 2026-09-03 packages the exact approved
 public tree as `public/` with a sibling production-only `vendor/` tree pinned to
-PHPMailer 7.1.1. Staging uses deny-all robots and requires a reversible cPanel
-runbook, an external safe-recipient configuration and separate deployment
-authority. No hosting change has been made. The public site and its human
-content-review checklist intentionally contain no payment-method wording; the
-approved individual quotation and agreed fixed-price wording remains. Only the
-final professional portrait and approved privacy retention wording remain as
-production content blockers; unverified credential and referral wording stays
-omitted.
+PHPMailer 7.1.1. The package gate fingerprints the exact 84-file dependency tree
+and rejects any added, missing or changed vendor file. Staging uses deny-all
+robots and requires a reversible cPanel runbook, an external safe-recipient
+configuration and separate deployment authority. No hosting change has been
+made. The public site and its human content-review checklist intentionally
+contain no payment-method wording; the approved individual quotation and agreed
+fixed-price wording remains. Only the final professional portrait and approved
+privacy retention wording remain as production content blockers; unverified
+credential and referral wording stays omitted.
 
 Start with [strategy](brand/strategy.md), [messaging](brand/messaging.md),
 [identity](brand/identity.md), [clearance](brand/clearance.md), and the

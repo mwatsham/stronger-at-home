@@ -57,21 +57,36 @@ Use only the named individual-account profile and cPanel HTTPS port 2083:
 ```bash
 cpanel-admin profiles show test-123reg
 cpanel-admin --profile test-123reg domains inspect --domain staging.stronger-at-home.co.uk
-cpanel-admin --profile test-123reg runtime php-installed
-cpanel-admin --profile test-123reg runtime php-default
-cpanel-admin --profile test-123reg runtime php-directives --version ea-php84
-cpanel-admin --profile test-123reg files inspect --path public_html/staging.stronger-at-home.co.uk
+cpanel-admin --profile test-123reg diagnostics has-feature --name lvephpsel
+cpanel-admin --profile test-123reg diagnostics has-feature --name ea-php84
+cpanel-admin --profile test-123reg diagnostics has-feature --name multiphp
+cpanel-admin --profile test-123reg diagnostics has-feature --name multiphp_ini_editor
+cpanel-admin --profile test-123reg diagnostics has-feature --name filemanager
+cpanel-admin --profile test-123reg diagnostics has-feature --name backup
 cpanel-admin --profile test-123reg diagnostics quota
 ```
 
-Require the domain to resolve to the exact document root above and PHP 8.4 to
-be selected for that host. The runtime commands prove availability and show
-configuration; they do not prove a per-domain assignment. A human operator
-must also inspect `staging.stronger-at-home.co.uk` in cPanel MultiPHP Manager
-and record PHP 8.4 without changing it. Record the current target metadata,
-free quota and the archive byte count. Stop if the profile, domain mapping,
-runtime or target differs. These checks must not expose profile data or
-credentials in the review record.
+These exact reads were exercised against `test-123reg` on 2026-09-03. The
+profile and domain reads succeeded and returned account user `v0398ees6dry`,
+port 2083 and the exact document root above. The feature probes succeeded with
+CloudLinux PHP Selector, PHP 8.4, File Manager and Backup enabled; MultiPHP and
+MultiPHP INI Editor were disabled. The quota read succeeded and reported the
+account below both storage and inode limits.
+
+Do not run `runtime php-*` for this account: those reads require the disabled
+MultiPHP or MultiPHP INI Editor capabilities. Do not use `files inspect` or
+`files list` for the target: their current audit adapter rejects this path.
+Those known failures are not runtime or target evidence.
+
+An authorised human must use the enabled cPanel interfaces without changing
+anything: open **Software > Select PHP Version** (CloudLinux PHP Selector) and
+record that the current account runtime is PHP 8.4; then open **File Manager**
+and list the exact staging document root to record its current metadata. Do not
+use MultiPHP Manager. Stop if Select PHP Version is absent, does not show 8.4,
+or cannot be shown to govern the staging host; stop if File Manager shows a
+different target. Record the free quota and archive byte count without profile
+data or credentials. Browser automation is not permitted for either cPanel
+check.
 
 ## 3. Create and verify recovery material in cPanel
 

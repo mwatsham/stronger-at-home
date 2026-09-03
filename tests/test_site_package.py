@@ -107,6 +107,31 @@ class SitePackageTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "PHPMailer 7.1.1"):
                 package_site(copy, Path(directory) / "output", "staging")
 
+    def test_packager_rejects_an_arbitrary_extra_vendor_file(self):
+        with TemporaryDirectory() as directory:
+            copy = Path(directory) / "project"
+            shutil.copytree(ROOT, copy, symlinks=True)
+            (copy / "vendor/credential.txt").write_text(
+                "must never ship\n", encoding="utf-8"
+            )
+
+            with self.assertRaisesRegex(
+                ValueError, "vendor boundary or fingerprint mismatch"
+            ):
+                package_site(copy, Path(directory) / "output", "staging")
+
+    def test_packager_rejects_a_modified_locked_dependency_file(self):
+        with TemporaryDirectory() as directory:
+            copy = Path(directory) / "project"
+            shutil.copytree(ROOT, copy, symlinks=True)
+            dependency = copy / "vendor/phpmailer/phpmailer/src/PHPMailer.php"
+            dependency.write_bytes(dependency.read_bytes() + b"\n")
+
+            with self.assertRaisesRegex(
+                ValueError, "vendor boundary or fingerprint mismatch"
+            ):
+                package_site(copy, Path(directory) / "output", "staging")
+
     def test_packager_rejects_unvalidated_public_source(self):
         with TemporaryDirectory() as directory:
             copy = Path(directory) / "project"

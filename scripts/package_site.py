@@ -8,6 +8,7 @@ import hashlib
 import json
 import os
 from pathlib import Path, PurePosixPath
+import re
 import sys
 from tempfile import TemporaryDirectory
 from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
@@ -20,6 +21,10 @@ else:
 
 ARCHIVE_TIMESTAMP = (2026, 1, 1, 0, 0, 0)
 EXPECTED_PHPMAILER = ("phpmailer/phpmailer", "v7.1.1")
+EXPECTED_VENDOR_FILES = 84
+EXPECTED_VENDOR_FINGERPRINT = (
+    "f8bcd1092477c5ad8ab4edff307a15fff0bae1c2ba67dd796bb53aaffea9d935"
+)
 FORBIDDEN_COMPONENTS = {".git", "tests", "cache", "__pycache__", "secrets"}
 FORBIDDEN_FILENAMES = {"site.php", ".ds_store"}
 
@@ -92,6 +97,43 @@ def _validate_production_dependencies(project_root: Path) -> None:
         raise ValueError("vendor/autoload.php must be a regular production dependency file")
 
 
+def _normalise_vendor_fingerprint_content(archive_name: str, content: bytes) -> bytes:
+    if archive_name != "vendor/composer/installed.php":
+        return content
+
+    references = re.findall(rb"'reference' => '([0-9a-f]{40})'", content)
+    repeated_references = {
+        reference for reference in references if references.count(reference) == 2
+    }
+    if len(repeated_references) != 1:
+        raise ValueError(
+            "vendor boundary or fingerprint mismatch: invalid Composer root metadata"
+        )
+    return content.replace(repeated_references.pop(), b"0" * 40)
+
+
+def _validate_vendor_fingerprint(entries: list[tuple[str, Path]]) -> None:
+    if len(entries) != EXPECTED_VENDOR_FILES:
+        raise ValueError(
+            "vendor boundary or fingerprint mismatch: "
+            f"expected {EXPECTED_VENDOR_FILES} files, found {len(entries)}"
+        )
+
+    fingerprint = hashlib.sha256()
+    for archive_name, source in sorted(entries, key=lambda item: item[0]):
+        name = archive_name.encode("utf-8")
+        content = _normalise_vendor_fingerprint_content(archive_name, source.read_bytes())
+        fingerprint.update(len(name).to_bytes(4, "big"))
+        fingerprint.update(name)
+        fingerprint.update(len(content).to_bytes(8, "big"))
+        fingerprint.update(content)
+
+    if fingerprint.hexdigest() != EXPECTED_VENDOR_FINGERPRINT:
+        raise ValueError(
+            "vendor boundary or fingerprint mismatch: production tree is not approved"
+        )
+
+
 def _write_entry(package: ZipFile, archive_name: str, content: bytes) -> None:
     information = ZipInfo(archive_name, date_time=ARCHIVE_TIMESTAMP)
     information.create_system = 3
@@ -110,7 +152,9 @@ def package_site(project_root: Path, destination: Path, environment: str) -> Pat
     _validate_production_dependencies(project_root)
 
     entries = _collect_files(project_root, project_root / "site", "public")
-    entries.extend(_collect_files(project_root, project_root / "vendor", "vendor"))
+    vendor_entries = _collect_files(project_root, project_root / "vendor", "vendor")
+    _validate_vendor_fingerprint(vendor_entries)
+    entries.extend(vendor_entries)
     entries.sort(key=lambda item: item[0])
 
     validation_errors = validate_site(project_root, environment)

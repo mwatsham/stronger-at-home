@@ -4,11 +4,13 @@
 
 The approved public website tree is exact-fingerprinted. Its deterministic
 deployment package maps `site/` to the public document root and includes only a
-sibling production Composer dependency tree pinned to PHPMailer 7.1.1. Staging
-replaces the public robots policy with deny-all rules. Configuration and secret
-material remain external. A reversible cPanel staging runbook and an unsigned
-human content-review checklist are prepared, but no staging or production
-deployment is authorised.
+sibling production Composer dependency tree pinned to PHPMailer 7.1.1. The
+approved vendor boundary is exactly 84 regular files and is tree-fingerprinted;
+added, missing or modified dependency files stop packaging. Staging replaces
+the public robots policy with deny-all rules. Configuration and secret material
+remain external. A reversible cPanel staging runbook and an unsigned human
+content-review checklist are prepared, but no staging or production deployment
+is authorised.
 
 The public site and content-review checklist omit payment-method wording under
 the project sponsor's current scope ruling. The approved individual quotation

@@ -17,9 +17,10 @@ or authorise publication.
   removed, renamed or byte-changed public file requires review and makes the
   validator fail.
 - [ ] Approve the deployment mapping: the exact contents of `site/` become
-  `public/`; the production-only Composer tree becomes sibling `vendor/`.
-  Repository history, tests, caches, local configuration and secret material
-  are outside this boundary.
+  `public/`; the approved 84-file, fingerprinted production-only Composer tree
+  becomes sibling `vendor/`. An added, missing or byte-changed dependency file
+  makes packaging fail. Repository history, tests, caches, local configuration
+  and secret material are outside this boundary.
 - [ ] Approve the public logo as the exact approved raster asset copied to
   `site/assets/images/stronger-at-home-logo.png`; no active SVG logo derivative
   is present.
