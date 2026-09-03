@@ -9,3 +9,33 @@ if (button && navigation) {
     navigation.dataset.open = String(!expanded);
   });
 }
+
+const form = document.querySelector('#appointment-request');
+if (form) {
+  const email = form.querySelector('#email');
+  const phone = form.querySelector('#phone');
+  const preferredContact = form.querySelector('#preferred-contact');
+  const status = form.querySelector('[data-form-status]');
+
+  const updateContactRequirements = () => {
+    const prefersEmail = preferredContact.value === 'email';
+    const prefersPhone = preferredContact.value === 'phone';
+    email.setCustomValidity(prefersEmail && !email.value.trim() ? 'Please provide an email address.' : '');
+    phone.setCustomValidity(prefersPhone && !phone.value.trim() ? 'Please provide a phone number.' : '');
+  };
+
+  form.addEventListener('invalid', event => event.target.setAttribute('aria-invalid', 'true'), true);
+  form.addEventListener('input', event => {
+    event.target.removeAttribute('aria-invalid');
+    updateContactRequirements();
+  });
+  preferredContact.addEventListener('change', updateContactRequirements);
+  form.addEventListener('submit', event => {
+    updateContactRequirements();
+    if (!form.checkValidity()) {
+      event.preventDefault();
+      status.textContent = 'Please check the highlighted fields before sending your appointment request.';
+      form.querySelector(':invalid').focus();
+    }
+  });
+}

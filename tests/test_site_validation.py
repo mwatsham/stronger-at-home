@@ -30,7 +30,43 @@ class LandmarkParser(HTMLParser):
         self.text.append(data)
 
 
+class FormParser(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.forms, self.controls = [], {}
+
+    def handle_starttag(self, tag, attrs):
+        attributes = dict(attrs)
+        if tag == "form":
+            self.forms.append(attributes)
+        if tag in {"input", "select", "textarea"} and attributes.get("name"):
+            self.controls[attributes["name"]] = attributes
+
+
 class SiteValidationTests(unittest.TestCase):
+    def test_contact_form_collects_only_approved_fields(self):
+        parser = FormParser()
+        parser.feed((ROOT / "site/contact/index.php").read_text(encoding="utf-8"))
+
+        self.assertEqual(parser.forms[0]["method"].lower(), "post")
+        self.assertEqual(parser.forms[0]["action"], "/api/enquiry.php")
+        self.assertEqual(
+            set(parser.controls),
+            {
+                "name",
+                "email",
+                "phone",
+                "preferred_contact",
+                "postcode",
+                "message",
+                "privacy_acknowledged",
+                "website",
+                "csrf_token",
+            },
+        )
+        self.assertNotIn("date_of_birth", parser.controls)
+        self.assertNotIn("medical_history", parser.controls)
+
     def test_homepage_uses_approved_patient_first_content_order(self):
         html = (ROOT / "site/index.html").read_text(encoding="utf-8")
         ids = [
