@@ -1,0 +1,164 @@
+#!/usr/bin/env python3
+"""Build a deterministic, secret-free website deployment archive."""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path, PurePosixPath
+import sys
+from tempfile import TemporaryDirectory
+from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
+
+if __package__:
+    from .validate_site import validate_site
+else:
+    from validate_site import validate_site
+
+
+ARCHIVE_TIMESTAMP = (2026, 1, 1, 0, 0, 0)
+EXPECTED_PHPMAILER = ("phpmailer/phpmailer", "v7.1.1")
+FORBIDDEN_COMPONENTS = {".git", "tests", "cache", "__pycache__", "secrets"}
+FORBIDDEN_FILENAMES = {"site.php", ".ds_store"}
+
+
+def _forbidden_reason(relative_path: Path) -> str | None:
+    components = [component.lower() for component in relative_path.parts]
+    if any(component in FORBIDDEN_COMPONENTS for component in components):
+        return "forbidden path component"
+    filename = relative_path.name.lower()
+    if filename in FORBIDDEN_FILENAMES or filename == ".env" or filename.startswith(".env."):
+        return "forbidden filename"
+    return None
+
+
+def _collect_files(project_root: Path, source: Path, archive_root: str) -> list[tuple[str, Path]]:
+    if not source.is_dir():
+        raise ValueError(f"missing package source directory: {source.relative_to(project_root)}")
+    if source.is_symlink():
+        raise ValueError(f"package source is a symlink: {source.relative_to(project_root)}")
+
+    collected: list[tuple[str, Path]] = []
+    for directory, directory_names, filenames in os.walk(source, followlinks=False):
+        current = Path(directory)
+        for name in sorted(directory_names):
+            path = current / name
+            relative = path.relative_to(project_root)
+            if path.is_symlink():
+                raise ValueError(f"symlink rejected: {relative.as_posix()}")
+            if reason := _forbidden_reason(relative):
+                raise ValueError(f"forbidden package entry ({reason}): {relative.as_posix()}")
+        for name in sorted(filenames):
+            path = current / name
+            relative = path.relative_to(project_root)
+            if path.is_symlink():
+                raise ValueError(f"symlink rejected: {relative.as_posix()}")
+            if reason := _forbidden_reason(relative):
+                raise ValueError(f"forbidden package entry ({reason}): {relative.as_posix()}")
+            if not path.is_file():
+                raise ValueError(f"non-regular package entry rejected: {relative.as_posix()}")
+            archive_name = PurePosixPath(archive_root, *path.relative_to(source).parts).as_posix()
+            collected.append((archive_name, path))
+    return collected
+
+
+def _validate_production_dependencies(project_root: Path) -> None:
+    composer_path = project_root / "composer.json"
+    lock_path = project_root / "composer.lock"
+    installed_path = project_root / "vendor/composer/installed.json"
+    autoload_path = project_root / "vendor/autoload.php"
+    try:
+        composer = json.loads(composer_path.read_text(encoding="utf-8"))
+        lock = json.loads(lock_path.read_text(encoding="utf-8"))
+        installed = json.loads(installed_path.read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError) as error:
+        raise ValueError(f"Composer production dependencies are unavailable: {error}") from error
+
+    if composer.get("require", {}).get(EXPECTED_PHPMAILER[0]) != "7.1.1":
+        raise ValueError("composer.json must require exact PHPMailer 7.1.1")
+    locked = [(item.get("name"), item.get("version")) for item in lock.get("packages", [])]
+    installed_packages = [
+        (item.get("name"), item.get("version")) for item in installed.get("packages", [])
+    ]
+    if EXPECTED_PHPMAILER not in locked or EXPECTED_PHPMAILER not in installed_packages:
+        raise ValueError("Composer dependencies must contain exact PHPMailer 7.1.1")
+    if lock.get("packages-dev"):
+        raise ValueError("composer.lock must not define development dependencies for this package")
+    if installed_packages != locked or installed.get("dev-package-names"):
+        raise ValueError("vendor must contain only the locked production Composer dependencies")
+    if not autoload_path.is_file() or autoload_path.is_symlink():
+        raise ValueError("vendor/autoload.php must be a regular production dependency file")
+
+
+def _write_entry(package: ZipFile, archive_name: str, content: bytes) -> None:
+    information = ZipInfo(archive_name, date_time=ARCHIVE_TIMESTAMP)
+    information.create_system = 3
+    information.compress_type = ZIP_DEFLATED
+    information.external_attr = 0o100644 << 16
+    package.writestr(information, content, compress_type=ZIP_DEFLATED, compresslevel=9)
+
+
+def package_site(project_root: Path, destination: Path, environment: str) -> Path:
+    """Package public website files and production dependencies for deployment."""
+
+    if environment not in {"staging", "production"}:
+        raise ValueError("environment must be staging or production")
+    project_root = Path(project_root).resolve()
+    destination = Path(destination).resolve()
+    _validate_production_dependencies(project_root)
+
+    entries = _collect_files(project_root, project_root / "site", "public")
+    entries.extend(_collect_files(project_root, project_root / "vendor", "vendor"))
+    entries.sort(key=lambda item: item[0])
+
+    validation_errors = validate_site(project_root, environment)
+    if validation_errors:
+        raise ValueError("Site validation failed: " + "; ".join(validation_errors))
+
+    staging_robots = project_root / "site/robots-staging.txt"
+    if environment == "staging" and staging_robots.is_symlink():
+        raise ValueError("symlink rejected: site/robots-staging.txt")
+    robots_content = staging_robots.read_bytes() if environment == "staging" else None
+
+    destination.mkdir(parents=True, exist_ok=True)
+    archive = destination / f"stronger-at-home-{environment}.zip"
+    with TemporaryDirectory(prefix="site-package-", dir=destination) as temporary:
+        temporary_archive = Path(temporary) / archive.name
+        with ZipFile(temporary_archive, "w", compression=ZIP_DEFLATED, compresslevel=9) as package:
+            for archive_name, source in entries:
+                content = (
+                    robots_content
+                    if environment == "staging" and archive_name == "public/robots.txt"
+                    else source.read_bytes()
+                )
+                _write_entry(package, archive_name, content)
+        temporary_archive.replace(archive)
+    return archive
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--environment", required=True, choices=("staging", "production"))
+    parser.add_argument("--destination", type=Path, required=True)
+    parser.add_argument(
+        "--root",
+        type=Path,
+        default=Path(__file__).resolve().parents[1],
+        help="Project root (defaults to the parent of scripts/).",
+    )
+    arguments = parser.parse_args(argv)
+    try:
+        archive = package_site(arguments.root, arguments.destination, arguments.environment)
+    except (OSError, ValueError) as error:
+        print(f"Package failed: {error}", file=sys.stderr)
+        return 1
+    digest = hashlib.sha256(archive.read_bytes()).hexdigest()
+    print(f"Created {archive}")
+    print(f"SHA-256: {digest}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

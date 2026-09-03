@@ -1,6 +1,6 @@
 # Stronger at Home Physiotherapy
 
-Status: approved strategy, identity and website design; website implementation and publication blocked
+Status: approved strategy, identity and website design; staging deployment and production publication blocked
 Approval owner: Melanie Watsham
 
 Experienced care. Personal progress. At home.
@@ -58,6 +58,17 @@ addresses the adult patient directly and adopts the calm-editorial homepage
 composition. The design is documented in
 `docs/superpowers/specs/2026-09-03-stronger-at-home-website-design.md`.
 Approval of the design does not authorise production publication.
+
+The local staging workflow prepared on 2026-09-03 packages the exact approved
+public tree as `public/` with a sibling production-only `vendor/` tree pinned to
+PHPMailer 7.1.1. Staging uses deny-all robots and requires a reversible cPanel
+runbook, an external safe-recipient configuration and separate deployment
+authority. No hosting change has been made. The public site and its human
+content-review checklist intentionally contain no payment-method wording; the
+approved individual quotation and agreed fixed-price wording remains. Only the
+final professional portrait and approved privacy retention wording remain as
+production content blockers; unverified credential and referral wording stays
+omitted.
 
 Start with [strategy](brand/strategy.md), [messaging](brand/messaging.md),
 [identity](brand/identity.md), [clearance](brand/clearance.md), and the

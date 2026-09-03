@@ -1,5 +1,22 @@
 # Durable project memory
 
+## 2026-09-03 — website packaging and publication gates
+
+The approved public website tree is exact-fingerprinted. Its deterministic
+deployment package maps `site/` to the public document root and includes only a
+sibling production Composer dependency tree pinned to PHPMailer 7.1.1. Staging
+replaces the public robots policy with deny-all rules. Configuration and secret
+material remain external. A reversible cPanel staging runbook and an unsigned
+human content-review checklist are prepared, but no staging or production
+deployment is authorised.
+
+The public site and content-review checklist omit payment-method wording under
+the project sponsor's current scope ruling. The approved individual quotation
+and agreed fixed-price wording remains public. Unverified professional
+credential and referral wording is omitted rather than treated as current
+publication content. Production remains blocked by exactly two content gates:
+the final professional portrait and approval of the privacy retention wording.
+
 ## 2026-09-03 — website design
 
 The project sponsor approved a reassurance-first website that addresses the
