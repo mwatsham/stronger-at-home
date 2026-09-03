@@ -19,10 +19,28 @@ $result = (new EnquiryValidator())->validate($valid);
 assert_true($result->isValid(), 'valid enquiry is accepted');
 assert_same('KT17 4LZ', $result->data['postcode'], 'postcode is normalised');
 
+foreach (['M1 1AE', 'CR2 6XH', 'DN55 1PT', 'W1A 1HQ', 'EC1A 1BB', 'GIR 0AA'] as $postcode) {
+    $postcodeInput = $valid;
+    $postcodeInput['postcode'] = $postcode;
+    assert_true((new EnquiryValidator())->validate($postcodeInput)->isValid(), "valid UK postcode {$postcode} is accepted");
+}
+
+$invalidPostcode = $valid;
+$invalidPostcode['postcode'] = 'AAAAA';
+assert_true(isset((new EnquiryValidator())->validate($invalidPostcode)->errors['postcode']), 'invalid UK postcode is rejected');
+
 $missingEmail = $valid;
 $missingEmail['email'] = '';
 $result = (new EnquiryValidator())->validate($missingEmail);
 assert_same('Please provide an email address.', $result->errors['email'], 'preferred email is required');
+
+$invalidEmail = $valid;
+$invalidEmail['email'] = 'not-an-email';
+assert_true(isset((new EnquiryValidator())->validate($invalidEmail)->errors['email']), 'invalid email is rejected');
+
+$headerInjectedEmail = $valid;
+$headerInjectedEmail['email'] = "alex@example.com\r\nBcc: attacker@example.com";
+assert_true(isset((new EnquiryValidator())->validate($headerInjectedEmail)->errors['email']), 'email header controls are rejected');
 
 $tooLong = $valid;
 $tooLong['message'] = str_repeat('x', 1001);

@@ -44,7 +44,7 @@ final class EnquiryValidator
         if ($data['preferred_contact'] === 'phone' && !preg_match('/^[+0-9() .-]{7,30}$/', $data['phone'])) {
             $errors['phone'] = 'Please provide a phone number.';
         }
-        if (!$fields['postcode']['valid'] || !preg_match('/^[A-Z0-9 ]{5,8}$/', $data['postcode'])) {
+        if (!$fields['postcode']['valid'] || !$this->isUkPostcode($data['postcode'])) {
             $errors['postcode'] = 'Please enter a UK postcode.';
         }
         if (!$fields['message']['valid'] || strlen($data['message']) < 10 || strlen($data['message']) > 1000) {
@@ -81,5 +81,13 @@ final class EnquiryValidator
     private function hasHeaderControls(string $value): bool
     {
         return preg_match('/[\r\n]/', $value) === 1;
+    }
+
+    private function isUkPostcode(string $postcode): bool
+    {
+        return preg_match(
+            '/^(?:GIR ?0AA|(?:[A-PR-UWYZ][0-9]{1,2}|[A-PR-UWYZ][A-HK-Y][0-9]{1,2}|[A-PR-UWYZ][0-9][A-HJKPSTUW]|[A-PR-UWYZ][A-HK-Y][0-9][ABEHMNPRV-Y]) ?[0-9][ABD-HJLNP-UW-Z]{2})$/',
+            $postcode,
+        ) === 1;
     }
 }

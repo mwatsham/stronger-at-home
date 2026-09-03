@@ -21,3 +21,24 @@ assert_true(str_contains($message->textBody, 'KT17 4LZ'), 'text body includes po
 assert_same('alex@example.com', $message->replyToEmail, 'valid email is reply-to');
 assert_true(!str_contains($message->textBody, 'not included'), 'message excludes non-enquiry fields');
 assert_true(!str_contains($message->htmlBody, 'not included'), 'HTML excludes non-enquiry fields');
+
+$invalidReplyTo = EnquiryMessage::from([
+    'name' => 'Alex Morgan',
+    'email' => 'not-an-email',
+    'phone' => '',
+    'preferred_contact' => 'email',
+    'postcode' => 'KT17 4LZ',
+    'message' => 'Please call me.',
+]);
+assert_same('', $invalidReplyTo->replyToEmail, 'invalid email is not used as reply-to');
+
+$headerInjectedReplyTo = EnquiryMessage::from([
+    'name' => "Alex Morgan\r\nBcc: attacker@example.com",
+    'email' => "alex@example.com\r\nBcc: attacker@example.com",
+    'phone' => '',
+    'preferred_contact' => 'email',
+    'postcode' => 'KT17 4LZ',
+    'message' => 'Please call me.',
+]);
+assert_same('', $headerInjectedReplyTo->replyToEmail, 'email header controls are not used as reply-to');
+assert_true(!str_contains($headerInjectedReplyTo->replyToName, "\r") && !str_contains($headerInjectedReplyTo->replyToName, "\n"), 'reply-to name strips header controls');
