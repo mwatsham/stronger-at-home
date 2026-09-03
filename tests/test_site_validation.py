@@ -40,10 +40,55 @@ class SiteValidationTests(unittest.TestCase):
             "request-an-appointment",
         ]
 
-        positions = [html.index(f'id="{section_id}"') for section_id in ids]
-        self.assertEqual(positions, sorted(positions))
+        section_ids = []
+        for tag in html.split("<section ")[1:]:
+            attributes = tag.split(">", 1)[0]
+            if 'id="' in attributes:
+                section_ids.append(attributes.split('id="', 1)[1].split('"', 1)[0])
+
+        self.assertEqual(section_ids, ids)
         self.assertIn("Physiotherapy to help you feel stronger at home", html)
         self.assertIn("20+ years of NHS experience", html)
+
+    def test_homepage_intro_uses_appointment_request_as_primary_action(self):
+        html = (ROOT / "site/index.html").read_text(encoding="utf-8")
+        introduction = html.split('<section id="introduction"', 1)[1].split(
+            '<section id="how-i-can-help"', 1
+        )[0]
+        primary_action = '<a class="button" href="/contact/#appointment-request">Request an appointment</a>'
+        secondary_action = '<a class="text-link" href="tel:+447843497871">Call Melanie</a>'
+
+        self.assertIn(primary_action, introduction)
+        self.assertIn(secondary_action, introduction)
+        self.assertLess(introduction.index(primary_action), introduction.index(secondary_action))
+
+    def test_homepage_claim_boundary_preserves_approved_facts_without_invented_claims(self):
+        html = (ROOT / "site/index.html").read_text(encoding="utf-8")
+        approved_facts = [
+            "After surgery, a hospital admission or a fall",
+            "falls prevention",
+            "Appointments are arranged flexibly, subject to availability.",
+            "Fees are quoted individually because travel requirements vary by location.",
+            "A fixed price will be confirmed and agreed before the appointment is booked.",
+        ]
+        prohibited_claims = [
+            "HCPC",
+            "CSP",
+            "AGILE",
+            "ATOCP",
+            "guaranteed",
+            "testimonial",
+            "review",
+            "referral suitability",
+            "referral exclusion",
+            "emergency",
+            "personal plan",
+        ]
+
+        for fact in approved_facts:
+            self.assertIn(fact, html)
+        for claim in prohibited_claims:
+            self.assertNotIn(claim.lower(), html.lower(), claim)
 
     def test_development_portrait_is_a_production_blocker(self):
         html = (ROOT / "site/index.html").read_text(encoding="utf-8")
