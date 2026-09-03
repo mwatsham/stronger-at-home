@@ -19,8 +19,9 @@ a { color: inherit; }
 
 a:focus-visible,
 button:focus-visible {
-  outline: 3px solid var(--brand-colour-accent-progress);
+  outline: 3px solid var(--brand-colour-text-inverse);
   outline-offset: 3px;
+  box-shadow: 0 0 0 6px var(--brand-colour-background-strong);
 }
 
 .skip-link {
@@ -54,6 +55,7 @@ footer {
 .site-header img { display: block; width: min(100%, 16rem); height: auto; }
 
 .menu-button {
+  display: none;
   min-height: 44px;
   padding: 0.5rem 1rem;
   border: 1px solid currentColor;
@@ -103,7 +105,10 @@ footer {
 
 @media (max-width: 48rem) {
   .site-header { align-items: flex-start; }
-  .menu-button { margin-left: auto; }
+  .js .menu-button {
+    display: block;
+    margin-left: auto;
+  }
   .js #primary-navigation { display: none; flex-basis: 100%; justify-content: flex-start; }
   .js #primary-navigation[data-open="true"] { display: flex; }
   #primary-navigation .button { width: 100%; }
