@@ -206,8 +206,18 @@ class SiteValidationTests(unittest.TestCase):
             "payment method",
             "cash",
             "bank transfer",
+            "bacs",
             "card",
+            "debit card",
+            "credit card",
             "cheque",
             "direct debit",
+            "standing order",
+            "paypal",
+            "apple pay",
+            "google pay",
+            "invoice",
+            "pay by",
+            "we accept",
         ):
             self.assertNotIn(text, combined)
