@@ -292,6 +292,53 @@ class SiteValidationTests(unittest.TestCase):
             self.assertIn("Public content approval drift: added site/robots-preview.txt", errors)
             self.assertIn("Public content approval drift: removed site/robots-staging.txt", errors)
 
+    def test_public_tree_approval_detects_files_regardless_of_name_or_extension(self):
+        added_paths = (
+            "site/public-data.json",
+            "site/app.webmanifest",
+            "site/page.htm",
+            "site/NOTICE",
+            "site/nested/portrait-copy.bmp",
+        )
+        for relative_path in added_paths:
+            with self.subTest(relative_path=relative_path), TemporaryDirectory() as directory:
+                copy = Path(directory) / "project"
+                shutil.copytree(ROOT, copy)
+                added = copy / relative_path
+                added.parent.mkdir(parents=True, exist_ok=True)
+                added.write_bytes(b"unapproved public file\n")
+
+                errors = validate_site(copy, "development")
+
+                self.assertIn(
+                    f"Public content approval drift: added {relative_path}",
+                    errors,
+                )
+
+    def test_public_tree_approval_rejects_symlinks(self):
+        with TemporaryDirectory() as directory:
+            copy = Path(directory) / "project"
+            shutil.copytree(ROOT, copy)
+            link = copy / "site/linked-file"
+            link.symlink_to(copy / "site/robots.txt")
+
+            errors = validate_site(copy, "development")
+
+            self.assertIn("Public tree approval drift: symlink site/linked-file", errors)
+
+    def test_public_tree_approval_rejects_added_empty_directories(self):
+        with TemporaryDirectory() as directory:
+            copy = Path(directory) / "project"
+            shutil.copytree(ROOT, copy)
+            (copy / "site/unapproved-directory").mkdir()
+
+            errors = validate_site(copy, "development")
+
+            self.assertIn(
+                "Public tree approval drift: added directory site/unapproved-directory",
+                errors,
+            )
+
     def test_validator_requires_the_approved_contact_routes(self):
         with TemporaryDirectory() as directory:
             copy = Path(directory) / "project"
@@ -367,7 +414,10 @@ class SiteValidationTests(unittest.TestCase):
 
             errors = validate_site(copy, "development")
 
-            self.assertTrue(any("Unexpected public image asset" in error for error in errors), errors)
+            self.assertIn(
+                "Public content approval drift: added site/assets/images/nested/logo-derived.svg",
+                errors,
+            )
 
     def test_validator_rejects_nested_raster_logo_derivatives(self):
         with TemporaryDirectory() as directory:
@@ -382,7 +432,10 @@ class SiteValidationTests(unittest.TestCase):
 
             errors = validate_site(copy, "development")
 
-            self.assertTrue(any("Unexpected public image asset" in error for error in errors), errors)
+            self.assertIn(
+                "Public content approval drift: added site/assets/images/nested/logo-derived.png",
+                errors,
+            )
 
     def test_validator_rejects_top_level_public_logo_derivatives(self):
         with TemporaryDirectory() as directory:
@@ -394,7 +447,10 @@ class SiteValidationTests(unittest.TestCase):
 
             errors = validate_site(copy, "development")
 
-            self.assertTrue(any("Unexpected public image asset" in error for error in errors), errors)
+            self.assertIn(
+                "Public content approval drift: added site/logo-derived.svg",
+                errors,
+            )
 
     def test_contact_form_collects_only_approved_fields(self):
         parser = FormParser()

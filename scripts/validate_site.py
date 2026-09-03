@@ -46,13 +46,9 @@ ALLOWED_BLOCKERS = {
     "referral-suitability",
 }
 EXPECTED_LOGO_SHA256 = "d557a0e8fd05efc86fcca2b3f63d807ad33f29527062697705a8e05616c6db39"
-EXPECTED_PUBLIC_IMAGES = {
-    "site/assets/images/portrait-placeholder.svg": "ebb4e3a1644ae864495f6b540b282426d7bf0c41f0089c9798b0d65b151d96a5",
-    "site/assets/images/stronger-at-home-logo.png": EXPECTED_LOGO_SHA256,
-}
-PUBLIC_SOURCE_SUFFIXES = {".css", ".html", ".js", ".php", ".txt", ".xml"}
 # Update this sorted allowlist only after the complete public source change has
-# received content, behaviour and release review.
+# received content, behaviour and release review. Every regular file under
+# site/ belongs here, irrespective of its name or extension.
 APPROVED_PUBLIC_SOURCE_SHA256 = {
     "site/.htaccess": "e1f0c7f3c79a0fd5551ba7139acc0384a9d90a5ce50676fc093f3c75c893adac",
     "site/404.html": "3a5f600c98009883c9d2ea76cb5449978972352befc5f957e80b259b12f73cd8",
@@ -71,6 +67,10 @@ APPROVED_PUBLIC_SOURCE_SHA256 = {
     "site/appointments-and-fees/index.html": "f55b5d4325ac53509e0e3acd3555f82debb84924027fd58a2b6fa96ddbb4f6e9",
     "site/assets/css/brand-tokens.css": "9945f6e139a26124a0755d46e0bb4dc93f3e867d87278b0ff4988d0f92d40450",
     "site/assets/css/site.css": "bb3502e55df18c4250f0e07656b2c401072b2a52e014528de6943fa9b7719d66",
+    "site/assets/fonts/atkinson-hyperlegible-next.ttf": "5a455d1cfa099b601ab70751bb9673e8fe1854dc4500c80e1a220d0d75e31745",
+    "site/assets/fonts/source-serif-4.ttf": "97b2d4da6e3cb494b5a1e66ae176914d852ccabef49e0c02c0df25f3e39aca0b",
+    "site/assets/images/portrait-placeholder.svg": "ebb4e3a1644ae864495f6b540b282426d7bf0c41f0089c9798b0d65b151d96a5",
+    "site/assets/images/stronger-at-home-logo.png": EXPECTED_LOGO_SHA256,
     "site/assets/js/site.js": "fb0cb0e8b1637d0d170b90ac6ffeedf8aafdac8c193ae41ed86f735ddfc22025",
     "site/contact/index.php": "f60d5f0d2e8bcad5a0d288755a96d6cc70f1caa1dec999843defec1ef6aa11da",
     "site/how-i-can-help/index.html": "b2f3910b4b3e7dd751ba98fde53ee9f47c0b96fd1b2e5c1dcc2e0a2d13c8b264",
@@ -267,13 +267,49 @@ def _read_text(path: Path, errors: list[str], label: str) -> str | None:
 def _validate_public_content_approval(root: Path, errors: list[str]) -> None:
     site_root = root / "site"
     public_sources: dict[str, Path] = {}
-    if site_root.is_dir():
-        for path in sorted(site_root.rglob("*"), key=lambda item: item.as_posix()):
-            if path.name == ".htaccess" or path.suffix.lower() in PUBLIC_SOURCE_SUFFIXES:
-                public_sources[path.relative_to(root).as_posix()] = path
+    public_directories: set[str] = set()
+
+    def scan_directory(directory: Path) -> None:
+        relative_directory = directory.relative_to(root).as_posix()
+        public_directories.add(relative_directory)
+        try:
+            entries = sorted(directory.iterdir(), key=lambda item: item.name)
+        except OSError as error:
+            errors.append(
+                f"Public tree approval drift: unreadable directory {relative_directory}: {error}"
+            )
+            return
+        for path in entries:
+            relative_path = path.relative_to(root).as_posix()
+            if path.is_symlink():
+                errors.append(f"Public tree approval drift: symlink {relative_path}")
+            elif path.is_dir():
+                scan_directory(path)
+            elif path.is_file():
+                public_sources[relative_path] = path
+            else:
+                errors.append(f"Public tree approval drift: special entry {relative_path}")
+
+    if site_root.is_symlink():
+        errors.append("Public tree approval drift: symlink site")
+    elif site_root.is_dir():
+        scan_directory(site_root)
+    elif site_root.exists():
+        errors.append("Public tree approval drift: site is not a directory")
 
     approved_paths = set(APPROVED_PUBLIC_SOURCE_SHA256)
     actual_paths = set(public_sources)
+    approved_directories = {"site"}
+    for approved_path in approved_paths:
+        parent = Path(approved_path).parent
+        while parent.as_posix() not in {".", ""}:
+            approved_directories.add(parent.as_posix())
+            parent = parent.parent
+
+    for path in sorted(public_directories - approved_directories):
+        errors.append(f"Public tree approval drift: added directory {path}")
+    for path in sorted(approved_directories - public_directories):
+        errors.append(f"Public tree approval drift: removed directory {path}")
     for path in sorted(actual_paths - approved_paths):
         errors.append(f"Public content approval drift: added {path}")
     for path in sorted(approved_paths - actual_paths):
@@ -476,24 +512,6 @@ def _validate_images(root: Path, parsed: dict[Path, SiteHTMLParser], errors: lis
             errors.append("Site raster logo does not match the approved logo bytes")
         if brand_logo.is_file() and logo.read_bytes() != brand_logo.read_bytes():
             errors.append("Site raster logo is not an exact copy of the approved brand asset")
-    site_root = root / "site"
-    image_extensions = {".avif", ".gif", ".ico", ".jpeg", ".jpg", ".png", ".svg", ".webp"}
-    public_images = {
-        path.relative_to(root).as_posix(): path
-        for path in site_root.rglob("*")
-        if (path.is_file() or path.is_symlink())
-        and (path.suffix.lower() in image_extensions or "logo" in path.name.lower())
-    }
-    for unexpected in sorted(set(public_images) - set(EXPECTED_PUBLIC_IMAGES)):
-        errors.append(f"Unexpected public image asset: {unexpected}")
-    for expected, expected_hash in EXPECTED_PUBLIC_IMAGES.items():
-        path = public_images.get(expected)
-        if path is None:
-            errors.append(f"Missing expected public image asset: {expected}")
-        elif path.is_symlink():
-            errors.append(f"Public image asset must not be a symlink: {expected}")
-        elif hashlib.sha256(path.read_bytes()).hexdigest() != expected_hash:
-            errors.append(f"Public image asset bytes do not match the approved file: {expected}")
 
 
 def _validate_exact_asset_copies(root: Path, errors: list[str]) -> None:
