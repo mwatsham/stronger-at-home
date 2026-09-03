@@ -11,7 +11,9 @@ ini_set('display_errors', '0');
 try {
 $publicRoot = realpath(dirname(__DIR__));
 $autoloadPath = getenv('STRONGER_HOME_AUTOLOAD');
-$resolvedAutoloadPath = is_string($autoloadPath) ? realpath($autoloadPath) : false;
+$resolvedAutoloadPath = is_string($autoloadPath) && str_starts_with($autoloadPath, DIRECTORY_SEPARATOR)
+    ? realpath($autoloadPath)
+    : false;
 if ($publicRoot === false
     || $resolvedAutoloadPath === false
     || !is_file($resolvedAutoloadPath)
@@ -25,7 +27,9 @@ if ($publicRoot === false
 require $resolvedAutoloadPath;
 
 $configPath = getenv('STRONGER_HOME_CONFIG');
-$resolvedConfigPath = is_string($configPath) ? realpath($configPath) : false;
+$resolvedConfigPath = is_string($configPath) && str_starts_with($configPath, DIRECTORY_SEPARATOR)
+    ? realpath($configPath)
+    : false;
 if ($publicRoot === false
     || $resolvedConfigPath === false
     || $resolvedConfigPath === $publicRoot

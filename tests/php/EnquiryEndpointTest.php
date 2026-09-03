@@ -19,6 +19,7 @@ function endpoint_status(
     string $temporaryDirectory,
     bool $throwFromConfig = false,
     ?string $autoloadPath = null,
+    bool $relativeConfigPath = false,
 ): int
 {
     $safeLabel = preg_replace('/[^a-z0-9]+/', '-', strtolower($label));
@@ -26,6 +27,7 @@ function endpoint_status(
     $configPath = $temporaryDirectory . '/' . $safeLabel . '-config.php';
     $runnerPath = $temporaryDirectory . '/' . $safeLabel . '-runner.php';
     $autoloadPath ??= dirname($entryPoint, 3) . '/vendor/autoload.php';
+    $configEnvironmentPath = $relativeConfigPath ? basename($configPath) : $configPath;
     $configSource = $throwFromConfig
         ? "<?php\nthrow new RuntimeException('private configuration detail');\n"
         : "<?php\nreturn " . var_export($config, true) . ";\n";
@@ -35,7 +37,7 @@ function endpoint_status(
         "<?php\n"
         . 'session_save_path(' . var_export($temporaryDirectory . '/sessions', true) . ");\n"
         . 'putenv(' . var_export('STRONGER_HOME_AUTOLOAD=' . $autoloadPath, true) . ");\n"
-        . 'putenv(' . var_export('STRONGER_HOME_CONFIG=' . $configPath, true) . ");\n"
+        . 'putenv(' . var_export('STRONGER_HOME_CONFIG=' . $configEnvironmentPath, true) . ");\n"
         . "\$_SERVER = ['REQUEST_METHOD' => 'GET'];\n"
         . "\$_POST = [];\n"
         . "register_shutdown_function(static function (): void {\n"
@@ -49,6 +51,7 @@ function endpoint_status(
         [PHP_BINARY, $runnerPath],
         [1 => ['pipe', 'w'], 2 => ['pipe', 'w']],
         $pipes,
+        $temporaryDirectory,
     );
     assert_true(is_resource($process), $label . ' endpoint process starts');
     $stdout = stream_get_contents($pipes[1]);
@@ -80,13 +83,20 @@ $validConfig = [
 
 $missingAutoloadPath = $temporaryDirectory . '/missing-autoload.php';
 $publicAutoloadPath = $projectRoot . '/site/api/test-autoload-' . bin2hex(random_bytes(6)) . '.php';
+$relativeAutoloadPath = $temporaryDirectory . '/relative-autoload.php';
 file_put_contents(
     $publicAutoloadPath,
     "<?php\nrequire " . var_export($projectRoot . '/vendor/autoload.php', true) . ";\n",
 );
-register_shutdown_function(static function () use ($publicAutoloadPath): void {
-    if (is_file($publicAutoloadPath)) {
-        unlink($publicAutoloadPath);
+file_put_contents(
+    $relativeAutoloadPath,
+    "<?php\nrequire " . var_export($projectRoot . '/vendor/autoload.php', true) . ";\n",
+);
+register_shutdown_function(static function () use ($publicAutoloadPath, $relativeAutoloadPath): void {
+    foreach ([$publicAutoloadPath, $relativeAutoloadPath] as $fixturePath) {
+        if (is_file($fixturePath)) {
+            unlink($fixturePath);
+        }
     }
 });
 $externalAutoloaderStatuses = [
@@ -112,6 +122,32 @@ assert_same(
     [500, 500],
     $externalAutoloaderStatuses,
     'missing and public-root autoloaders return blank generic failures',
+);
+
+$relativePathStatuses = [
+    endpoint_status(
+        $validConfig,
+        'relative autoloader path',
+        $entryPoint,
+        $temporaryDirectory,
+        false,
+        basename($relativeAutoloadPath),
+    ),
+    endpoint_status(
+        $validConfig,
+        'relative configuration path',
+        $entryPoint,
+        $temporaryDirectory,
+        false,
+        null,
+        true,
+    ),
+];
+unlink($relativeAutoloadPath);
+assert_same(
+    [500, 500],
+    $relativePathStatuses,
+    'relative dependency and configuration paths return blank generic failures',
 );
 
 $invalidEnvironments = [
