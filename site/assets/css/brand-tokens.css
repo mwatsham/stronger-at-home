@@ -1,0 +1,26 @@
+:root {
+  --brand-colour-accent-progress: #C3A26E;
+  --brand-colour-background-soft: #E8F1F6;
+  --brand-colour-background-strong: #203E55;
+  --brand-colour-background-warm: #F7F2E8;
+  --brand-colour-brand-deep-navy: #203E55;
+  --brand-colour-brand-pale-sky: #E8F1F6;
+  --brand-colour-brand-warm-cream: #F7F2E8;
+  --brand-colour-brand-warm-sand: #C3A26E;
+  --brand-colour-text-inverse: #F7F2E8;
+  --brand-colour-text-primary: #203E55;
+  --brand-layout-content-max: 72rem;
+  --brand-layout-logo-clearspace: 1em;
+  --brand-schema-version: 1.0;
+  --brand-spacing-lg: 24px;
+  --brand-spacing-md: 16px;
+  --brand-spacing-sm: 8px;
+  --brand-spacing-xl: 40px;
+  --brand-spacing-xs: 4px;
+  --brand-typography-family-body: 'Atkinson Hyperlegible Next';
+  --brand-typography-family-display: 'Source Serif 4';
+  --brand-typography-line-height-body: 1.5;
+  --brand-typography-line-height-tight: 1.1;
+  --brand-typography-weight-regular: 400;
+  --brand-typography-weight-semibold: 600;
+}
