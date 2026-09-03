@@ -54,7 +54,7 @@ APPROVED_PUBLIC_SOURCE_SHA256 = {
     "site/404.html": "3a5f600c98009883c9d2ea76cb5449978972352befc5f957e80b259b12f73cd8",
     "site/about/index.html": "e931bce94118bbdb07885ee2c222b4c48a86843cca9d389b428b1e6289abe65c",
     "site/accessibility/index.html": "8aa6edb4bcacb6ba770d495380723565a68c3b4ba28fe6916089c0f12b8edcce",
-    "site/api/enquiry.php": "2dc3277bed3d49d9e16141abfde4d280bfc421ef59fbf46b83e58fe877e470f1",
+    "site/api/enquiry.php": "a889e9deda547d17303579570962014aa56bd090255d72a6ee67527cf370722b",
     "site/api/src/EnquiryController.php": "f58b674470922b4b741cc038ee7ce4efe8e021c5b53ca37a1cde7d5b21b56d06",
     "site/api/src/EnquiryMessage.php": "715d322e3bbe1d02c117e9ed698798c27bd2622ee603789d844b6a3b4d5fffc9",
     "site/api/src/EnquiryValidator.php": "e490d6c2257e3d6b23bba898d9887fc7507636f17649511f2699b02409026076",

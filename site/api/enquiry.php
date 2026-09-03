@@ -9,16 +9,23 @@ use StrongerAtHome\Enquiry\PhpMailerTransport;
 ini_set('display_errors', '0');
 
 try {
-$autoloadPath = dirname(__DIR__, 2) . '/vendor/autoload.php';
-if (!is_file($autoloadPath) || !is_readable($autoloadPath)) {
+$publicRoot = realpath(dirname(__DIR__));
+$autoloadPath = getenv('STRONGER_HOME_AUTOLOAD');
+$resolvedAutoloadPath = is_string($autoloadPath) ? realpath($autoloadPath) : false;
+if ($publicRoot === false
+    || $resolvedAutoloadPath === false
+    || !is_file($resolvedAutoloadPath)
+    || !is_readable($resolvedAutoloadPath)
+    || $resolvedAutoloadPath === $publicRoot
+    || str_starts_with($resolvedAutoloadPath, $publicRoot . DIRECTORY_SEPARATOR)
+) {
     http_response_code(500);
     exit;
 }
-require $autoloadPath;
+require $resolvedAutoloadPath;
 
-$publicRoot = realpath(dirname(__DIR__));
-$configPath = getenv('STRONGER_HOME_CONFIG') ?: dirname(__DIR__, 2) . '/config/site.php';
-$resolvedConfigPath = realpath($configPath);
+$configPath = getenv('STRONGER_HOME_CONFIG');
+$resolvedConfigPath = is_string($configPath) ? realpath($configPath) : false;
 if ($publicRoot === false
     || $resolvedConfigPath === false
     || $resolvedConfigPath === $publicRoot

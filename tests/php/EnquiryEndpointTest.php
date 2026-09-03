@@ -12,12 +12,20 @@ mkdir($temporaryDirectory . '/sessions', 0700);
 /**
  * @param array<string, mixed> $config
  */
-function endpoint_status(array $config, string $label, string $entryPoint, string $temporaryDirectory, bool $throwFromConfig = false): int
+function endpoint_status(
+    array $config,
+    string $label,
+    string $entryPoint,
+    string $temporaryDirectory,
+    bool $throwFromConfig = false,
+    ?string $autoloadPath = null,
+): int
 {
     $safeLabel = preg_replace('/[^a-z0-9]+/', '-', strtolower($label));
     assert_true(is_string($safeLabel), $label . ' fixture label is valid');
     $configPath = $temporaryDirectory . '/' . $safeLabel . '-config.php';
     $runnerPath = $temporaryDirectory . '/' . $safeLabel . '-runner.php';
+    $autoloadPath ??= dirname($entryPoint, 3) . '/vendor/autoload.php';
     $configSource = $throwFromConfig
         ? "<?php\nthrow new RuntimeException('private configuration detail');\n"
         : "<?php\nreturn " . var_export($config, true) . ";\n";
@@ -26,6 +34,7 @@ function endpoint_status(array $config, string $label, string $entryPoint, strin
         $runnerPath,
         "<?php\n"
         . 'session_save_path(' . var_export($temporaryDirectory . '/sessions', true) . ");\n"
+        . 'putenv(' . var_export('STRONGER_HOME_AUTOLOAD=' . $autoloadPath, true) . ");\n"
         . 'putenv(' . var_export('STRONGER_HOME_CONFIG=' . $configPath, true) . ");\n"
         . "\$_SERVER = ['REQUEST_METHOD' => 'GET'];\n"
         . "\$_POST = [];\n"
@@ -68,6 +77,42 @@ $validConfig = [
     'rate_limit_secret' => 'test-rate-secret',
     'rate_limit_directory' => $temporaryDirectory . '/rate-limit',
 ];
+
+$missingAutoloadPath = $temporaryDirectory . '/missing-autoload.php';
+$publicAutoloadPath = $projectRoot . '/site/api/test-autoload-' . bin2hex(random_bytes(6)) . '.php';
+file_put_contents(
+    $publicAutoloadPath,
+    "<?php\nrequire " . var_export($projectRoot . '/vendor/autoload.php', true) . ";\n",
+);
+register_shutdown_function(static function () use ($publicAutoloadPath): void {
+    if (is_file($publicAutoloadPath)) {
+        unlink($publicAutoloadPath);
+    }
+});
+$externalAutoloaderStatuses = [
+    endpoint_status(
+        $validConfig,
+        'missing external autoloader',
+        $entryPoint,
+        $temporaryDirectory,
+        false,
+        $missingAutoloadPath,
+    ),
+    endpoint_status(
+        $validConfig,
+        'public external autoloader',
+        $entryPoint,
+        $temporaryDirectory,
+        false,
+        $publicAutoloadPath,
+    ),
+];
+unlink($publicAutoloadPath);
+assert_same(
+    [500, 500],
+    $externalAutoloaderStatuses,
+    'missing and public-root autoloaders return blank generic failures',
+);
 
 $invalidEnvironments = [
     'missing environment' => null,
