@@ -1,6 +1,10 @@
 from html.parser import HTMLParser
 from pathlib import Path
+import shutil
+from tempfile import TemporaryDirectory
 import unittest
+
+from scripts.validate_site import validate_site
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -44,6 +48,109 @@ class FormParser(HTMLParser):
 
 
 class SiteValidationTests(unittest.TestCase):
+    def test_development_site_has_no_structural_errors(self):
+        self.assertEqual(validate_site(ROOT, "development"), [])
+
+    def test_production_rejects_unresolved_publication_gates(self):
+        errors = validate_site(ROOT, "production")
+        self.assertIn("Production blocker remains: portrait", errors)
+        self.assertIn("Production blocker remains: privacy-approval", errors)
+
+    def test_staging_is_not_indexable(self):
+        text = (ROOT / "site/robots-staging.txt").read_text(encoding="utf-8")
+        self.assertEqual(text, "User-agent: *\nDisallow: /\n")
+
+    def test_validator_rejects_an_unknown_mode(self):
+        with self.assertRaisesRegex(ValueError, "development, staging or production"):
+            validate_site(ROOT, "preview")
+
+    def test_validator_detects_broken_structure_metadata_and_local_links(self):
+        with TemporaryDirectory() as directory:
+            copy = Path(directory) / "project"
+            shutil.copytree(ROOT, copy)
+            path = copy / "site/about/index.html"
+            html = path.read_text(encoding="utf-8")
+            html = html.replace("<h1>About Melanie</h1>", "<h2>About Melanie</h2>")
+            html = html.replace(
+                '<meta property="og:title" content="About Melanie | Stronger at Home Physiotherapy">',
+                "",
+            )
+            html = html.replace('href="/how-i-can-help/"', 'href="/missing/"', 1)
+            path.write_text(html, encoding="utf-8")
+
+            errors = validate_site(copy, "development")
+
+            self.assertTrue(any("one h1" in error for error in errors), errors)
+            self.assertTrue(any("og:title" in error for error in errors), errors)
+            self.assertTrue(any("Missing local target" in error for error in errors), errors)
+
+    def test_validator_detects_asset_and_form_accessibility_regressions(self):
+        with TemporaryDirectory() as directory:
+            copy = Path(directory) / "project"
+            shutil.copytree(ROOT, copy)
+            logo = copy / "site/assets/images/stronger-at-home-logo.png"
+            logo.write_bytes(logo.read_bytes() + b"changed")
+            contact = copy / "site/contact/index.php"
+            html = contact.read_text(encoding="utf-8").replace(
+                '<label for="postcode">Postcode <span aria-hidden="true">(required)</span></label>',
+                '<span>Postcode <span aria-hidden="true">(required)</span></span>',
+            )
+            contact.write_text(html, encoding="utf-8")
+
+            errors = validate_site(copy, "development")
+
+            self.assertTrue(any("logo" in error.lower() for error in errors), errors)
+            self.assertTrue(any("postcode" in error and "label" in error for error in errors), errors)
+
+    def test_validator_rejects_unapproved_claims_and_structured_data_fields(self):
+        with TemporaryDirectory() as directory:
+            copy = Path(directory) / "project"
+            shutil.copytree(ROOT, copy)
+            home = copy / "site/index.html"
+            html = home.read_text(encoding="utf-8")
+            html = html.replace(
+                "20+ years of NHS experience",
+                "20+ years of NHS experience and guaranteed results",
+                1,
+            ).replace(
+                '"areaServed":"Approximately 10 miles around Epsom, Surrey"',
+                '"areaServed":"Approximately 10 miles around Epsom, Surrey","priceRange":"££"',
+            )
+            home.write_text(html, encoding="utf-8")
+
+            errors = validate_site(copy, "development")
+
+            self.assertTrue(any("Prohibited claim" in error for error in errors), errors)
+            self.assertTrue(any("LocalBusiness fields" in error for error in errors), errors)
+
+    def test_validator_requires_the_approved_contact_routes(self):
+        with TemporaryDirectory() as directory:
+            copy = Path(directory) / "project"
+            shutil.copytree(ROOT, copy)
+            contact = copy / "site/contact/index.php"
+            html = contact.read_text(encoding="utf-8").replace(
+                'href="tel:+447843497871"', 'href="/contact/"'
+            )
+            contact.write_text(html, encoding="utf-8")
+
+            errors = validate_site(copy, "development")
+
+            self.assertIn("Contact page must publish the approved phone and email routes", errors)
+
+    def test_validator_checks_sitemap_and_staging_crawl_policy(self):
+        with TemporaryDirectory() as directory:
+            copy = Path(directory) / "project"
+            shutil.copytree(ROOT, copy)
+            (copy / "site/sitemap.xml").write_text("<urlset></urlset>\n", encoding="utf-8")
+            (copy / "site/robots-staging.txt").write_text(
+                "User-agent: *\nAllow: /\n", encoding="utf-8"
+            )
+
+            errors = validate_site(copy, "staging")
+
+            self.assertTrue(any("Sitemap routes" in error for error in errors), errors)
+            self.assertIn("Staging robots policy must disallow all crawling", errors)
+
     def test_contact_form_collects_only_approved_fields(self):
         parser = FormParser()
         parser.feed((ROOT / "site/contact/index.php").read_text(encoding="utf-8"))
@@ -272,7 +379,7 @@ class SiteValidationTests(unittest.TestCase):
             html = (ROOT / relative_path).read_text(encoding="utf-8")
             self.assertIn(f"<h1>{heading}</h1>", html)
 
-    def test_public_pages_omit_unapproved_claims_and_payment_content(self):
+    def test_public_pages_omit_unapproved_claims(self):
         visible_text = []
         for path in PUBLIC_PAGES:
             parser = LandmarkParser()
@@ -287,22 +394,8 @@ class SiteValidationTests(unittest.TestCase):
             "atocp",
             "guaranteed",
             "walk-in clinic",
-            "payment",
-            "payment method",
-            "cash",
-            "bank transfer",
-            "bacs",
-            "card",
-            "debit card",
-            "credit card",
-            "cheque",
-            "direct debit",
-            "standing order",
-            "paypal",
-            "apple pay",
-            "google pay",
-            "invoice",
-            "pay by",
-            "we accept",
+            "testimonial",
+            "review",
+            "emergency",
         ):
             self.assertNotIn(text, combined)

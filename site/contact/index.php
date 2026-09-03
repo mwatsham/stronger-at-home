@@ -59,7 +59,11 @@ $escape = static fn(string $value): string => htmlspecialchars($value, ENT_QUOTE
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Contact | Stronger at Home Physiotherapy</title>
   <meta name="description" content="Contact Stronger at Home Physiotherapy to request an appointment or ask about a home visit.">
-  <link rel="canonical" href="https://www.stronger-at-home.co.uk/contact/">
+  <link rel="canonical" href="https://stronger-at-home.co.uk/contact/">
+  <meta property="og:title" content="Contact | Stronger at Home Physiotherapy">
+  <meta property="og:description" content="Contact Stronger at Home Physiotherapy to request an appointment or ask about a home visit.">
+  <meta property="og:url" content="https://stronger-at-home.co.uk/contact/">
+  <meta property="og:type" content="website">
   <link rel="stylesheet" href="/assets/css/brand-tokens.css">
   <link rel="stylesheet" href="/assets/css/site.css">
   <script src="/assets/js/site.js" defer></script>
@@ -152,6 +156,9 @@ $escape = static fn(string $value): string => htmlspecialchars($value, ENT_QUOTE
       </form>
     </section>
   </main>
-  <footer>Melanie Watsham trading as Stronger at Home Physiotherapy</footer>
+  <footer>
+    <p>Melanie Watsham trading as Stronger at Home Physiotherapy</p>
+    <nav aria-label="Footer"><a href="/privacy/">Privacy</a><a href="/accessibility/">Accessibility</a></nav>
+  </footer>
 </body>
 </html>
