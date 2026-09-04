@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Page not found | Stronger at Home Physiotherapy</title>
+  <meta name="description" content="The requested Stronger at Home Physiotherapy page could not be found.">
+  <link rel="canonical" href="https://stronger-at-home.co.uk/404.html">
+  <meta property="og:title" content="Page not found | Stronger at Home Physiotherapy">
+  <meta property="og:description" content="The requested Stronger at Home Physiotherapy page could not be found.">
+  <meta property="og:url" content="https://stronger-at-home.co.uk/404.html">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="/assets/css/brand-tokens.css">
+  <link rel="stylesheet" href="/assets/css/site.css">
+  <script src="/assets/js/site.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  <header class="site-header">
+    <a href="/" aria-label="Stronger at Home Physiotherapy, home">
+      <img src="/assets/images/stronger-at-home-logo.png" alt="Stronger at Home Physiotherapy by Melanie Watsham" width="512" height="160">
+    </a>
+    <button class="menu-button" type="button" aria-expanded="false" aria-controls="primary-navigation">Menu</button>
+    <nav id="primary-navigation" aria-label="Primary">
+      <a href="/">Home</a><a href="/about/">About Melanie</a>
+      <a href="/how-i-can-help/">How I can help</a>
+      <a href="/appointments-and-fees/">Appointments &amp; fees</a>
+      <a href="/contact/">Contact</a>
+      <a class="button" href="/contact/#appointment-request">Request an appointment</a>
+    </nav>
+  </header>
+  <main id="main-content" class="information-page">
+    <section class="page-intro section">
+      <div class="section-heading narrow-heading">
+        <p class="eyebrow">Error 404</p>
+        <h1>Page not found</h1>
+        <p class="lead">The page may have moved or the address may be incomplete.</p>
+        <a class="button" href="/">Return to the homepage</a>
+      </div>
+    </section>
+  </main>
+  <footer>
+    <p>Melanie Watsham trading as Stronger at Home Physiotherapy</p>
+    <nav aria-label="Footer"><a href="/privacy/">Privacy</a><a href="/accessibility/">Accessibility</a></nav>
+  </footer>
+</body>
+</html>
