@@ -1133,9 +1133,11 @@ Expected: ERROR because `scripts.package_site` does not exist.
 
 - [ ] **Step 3: Implement deterministic safe packaging**
 
-Copy `site/` into a temporary tree at `public/`, replace `public/robots.txt`
-with `robots-staging.txt` for staging, and place Composer production
-dependencies in the sibling `vendor/` directory. This keeps the entry point's
+Copy the deployable `site/` files into a temporary tree at `public/`, replace
+`public/robots.txt` with `robots-staging.txt` for staging, exclude the
+source-only `public/robots-staging.txt` name in both environments, and place
+Composer production dependencies in the sibling `vendor/` directory. This
+keeps the entry point's
 `dirname(__DIR__, 2) . '/vendor/autoload.php'` path valid locally and after
 deployment. Normalise ZIP timestamps and sort paths. Reject `.git`, `.env`,
 `site.php`, `tests`, `__pycache__`, `.DS_Store` and all symlinks.

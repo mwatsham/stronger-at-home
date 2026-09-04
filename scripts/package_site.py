@@ -28,6 +28,7 @@ EXPECTED_VENDOR_FINGERPRINT = (
 FORBIDDEN_COMPONENTS = {".git", "tests", "cache", "__pycache__", "secrets"}
 FORBIDDEN_FILENAMES = {"site.php", ".ds_store"}
 STAGING_X_ROBOTS_TAG = b'Header always set X-Robots-Tag "noindex, nofollow"\n'
+STAGING_ROBOTS_TEMPLATE = "public/robots-staging.txt"
 
 
 def _forbidden_reason(relative_path: Path) -> str | None:
@@ -191,6 +192,14 @@ def package_site(project_root: Path, destination: Path, environment: str) -> Pat
         raise ValueError("Site validation failed: " + "; ".join(validation_errors))
 
     _validate_public_snapshot(entries)
+    public_snapshot = dict(entries)
+    robots_content = (
+        public_snapshot.get(STAGING_ROBOTS_TEMPLATE) if environment == "staging" else None
+    )
+    if environment == "staging" and robots_content is None:
+        raise ValueError("staging robots snapshot is unavailable")
+    entries = [entry for entry in entries if entry[0] != STAGING_ROBOTS_TEMPLATE]
+
     _validate_vendor_fingerprint(vendor_entries)
     vendor_entries = [
         (archive_name, _normalise_vendor_fingerprint_content(archive_name, content))
@@ -198,11 +207,6 @@ def package_site(project_root: Path, destination: Path, environment: str) -> Pat
     ]
     entries.extend(vendor_entries)
     entries.sort(key=lambda item: item[0])
-
-    snapshot = dict(entries)
-    robots_content = snapshot.get("public/robots-staging.txt") if environment == "staging" else None
-    if environment == "staging" and robots_content is None:
-        raise ValueError("staging robots snapshot is unavailable")
 
     destination.mkdir(parents=True, exist_ok=True)
     archive = destination / f"stronger-at-home-{environment}.zip"

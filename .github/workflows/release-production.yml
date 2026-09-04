@@ -78,6 +78,11 @@ jobs:
       - name: Build the production release tree
         run: python scripts/build_git_release.py --environment production --source-sha "$SOURCE_SHA" --build-timestamp "$BUILD_TIMESTAMP" --output-directory release
 
+      - name: Re-verify main before promotion
+        run: |
+          git fetch --no-tags origin main
+          test "$SOURCE_SHA" = "$(git rev-parse origin/main)"
+
       - name: Promote the release tree
         run: |
           set -euo pipefail

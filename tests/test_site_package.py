@@ -24,10 +24,11 @@ class SitePackageTests(unittest.TestCase):
 
             with ZipFile(archive) as package:
                 names = set(package.namelist())
-                self.assertEqual(len(names), 115)
-                self.assertEqual(sum(name.startswith("public/") for name in names), 31)
+                self.assertEqual(len(names), 114)
+                self.assertEqual(sum(name.startswith("public/") for name in names), 30)
                 self.assertEqual(sum(name.startswith("vendor/") for name in names), 84)
                 self.assertIn("public/robots.txt", names)
+                self.assertNotIn("public/robots-staging.txt", names)
                 self.assertIn("public/api/enquiry.php", names)
                 self.assertIn("public/assets/fonts/OFL-source-serif.txt", names)
                 self.assertIn("public/assets/fonts/OFL-atkinson.txt", names)
@@ -206,6 +207,37 @@ class SitePackageTests(unittest.TestCase):
         with TemporaryDirectory() as directory:
             with self.assertRaisesRegex(ValueError, "Production blocker remains: portrait"):
                 package_site(ROOT, Path(directory), "production")
+
+    def test_real_production_package_excludes_the_staging_robots_template(self):
+        expected_blockers = [
+            "Production blocker remains: portrait",
+            "Production blocker remains: privacy-approval",
+        ]
+        real_validate_site = package_module.validate_site
+
+        def allow_only_known_publication_blockers(project_root, environment):
+            errors = real_validate_site(project_root, environment)
+            self.assertEqual(errors, expected_blockers)
+            return []
+
+        with TemporaryDirectory() as directory, patch.object(
+            package_module,
+            "validate_site",
+            side_effect=allow_only_known_publication_blockers,
+        ):
+            archive = package_site(ROOT, Path(directory), "production")
+
+            with ZipFile(archive) as package:
+                names = set(package.namelist())
+                self.assertEqual(len(names), 114)
+                self.assertEqual(sum(name.startswith("public/") for name in names), 30)
+                self.assertEqual(sum(name.startswith("vendor/") for name in names), 84)
+                self.assertNotIn("public/robots-staging.txt", names)
+                self.assertEqual(
+                    package.read("public/robots.txt"),
+                    (ROOT / "site/robots.txt").read_bytes(),
+                )
+                self.assertNotIn(b"X-Robots-Tag", package.read("public/.htaccess"))
 
     def test_documented_command_line_entry_point_builds_the_staging_archive(self):
         with TemporaryDirectory() as directory:

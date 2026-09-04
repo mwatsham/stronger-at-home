@@ -117,6 +117,34 @@ class GitReleaseWorkflowTests(unittest.TestCase):
                 self.assertIn(fragment, self.production)
         self.assert_common_gate(self.production)
 
+    def test_release_sources_are_rechecked_after_build_and_immediately_before_promotion(self):
+        cases = (
+            (
+                "staging",
+                self.staging,
+                "python scripts/build_git_release.py --environment staging",
+                "git fetch --no-tags origin develop",
+                'test "${{ github.sha }}" = "$(git rev-parse origin/develop)"',
+            ),
+            (
+                "production",
+                self.production,
+                "python scripts/build_git_release.py --environment production",
+                "git fetch --no-tags origin main",
+                'test "$SOURCE_SHA" = "$(git rev-parse origin/main)"',
+            ),
+        )
+
+        for label, source, build, fetch, compare in cases:
+            with self.subTest(workflow=label):
+                after_build = source.index(build) + len(build)
+                promotion = source.index("- name: Promote the release tree")
+                final_gate = source[after_build:promotion]
+                self.assertIn(fetch, final_gate)
+                self.assertIn(compare, final_gate)
+                self.assertLess(final_gate.index(fetch), final_gate.index(compare))
+                self.assertEqual(final_gate.count("- name:"), 1)
+
     def test_release_promotions_replace_tracked_content_and_always_clean_up(self):
         for label, source in (
             ("staging", self.staging),

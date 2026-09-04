@@ -54,6 +54,7 @@ class GitReleaseTests(unittest.TestCase):
             )
 
             self.assert_release_tree(release)
+            self.assertFalse((release / "public/robots-staging.txt").exists())
             expected_metadata = {
                 "buildTimestamp": BUILD_TIMESTAMP,
                 "deploymentBranch": "deploy-staging",

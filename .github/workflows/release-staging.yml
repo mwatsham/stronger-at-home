@@ -72,6 +72,11 @@ jobs:
       - name: Build the staging release tree
         run: python scripts/build_git_release.py --environment staging --source-sha "${{ github.sha }}" --build-timestamp "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" --output-directory release
 
+      - name: Re-verify develop before promotion
+        run: |
+          git fetch --no-tags origin develop
+          test "${{ github.sha }}" = "$(git rev-parse origin/develop)"
+
       - name: Promote the release tree
         run: |
           set -euo pipefail

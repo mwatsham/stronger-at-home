@@ -350,7 +350,7 @@ Retain relevant runtime, secret-file and staging smoke checks. Replace ZIP uploa
 6. verify successful task status and deployed-source-sha; and
 7. run HTTPS, deny-all robots, X-Robots-Tag, security-header, route, asset, accessibility and safe-recipient form tests.
 
-Document the protected source definition:
+Document the protected approval evidence. This records the reviewed source and branch for the operator; it is not a cPanel runtime descriptor:
 
 ~~~json
 {
@@ -389,7 +389,7 @@ git commit -m "docs: define guarded Git deployment operations"
 
 **Files:**
 - No source changes expected.
-- Create outside Git: owner-readable staging source-definition file.
+- Create outside Git: owner-readable staging approval evidence, git-create descriptor and git-update descriptor.
 
 **Interfaces:**
 - Consumes: reviewed Tasks 1–4.
@@ -435,19 +435,55 @@ Protect main and develop from force pushes and deletion, require CI before merge
 
 Run domains inspect for staging.stronger-at-home.co.uk, runtime version-control and runtime deployments with profile test-123reg and the protected audit file. Require the exact document root, no conflicting Stronger@Home mapping and the Fabratory mapping unchanged.
 
-- [ ] **Step 7: Dry-run and create the staging repository mapping**
+- [ ] **Step 7: Dry-run, create and select the staging repository mapping**
 
-Create an owner-readable operator file outside the project containing the staging source-definition JSON from Task 4. Dry-run:
+Create three owner-readable operator files outside the project and public document root. They must contain no credentials, must be mode 0600 and must never be committed.
+
+The source-and-branch approval evidence at `/exact/operator/path/stronger-at-home-staging-approval.json` is:
+
+~~~json
+{
+  "url": "git@github.com:mwatsham/stronger-at-home.git",
+  "branch": "deploy-staging"
+}
+~~~
+
+The git-create descriptor at `/exact/operator/path/stronger-at-home-staging-create.json` is:
+
+~~~json
+{
+  "url": "git@github.com:mwatsham/stronger-at-home.git",
+  "remote_name": "origin"
+}
+~~~
+
+The git-update descriptor at `/exact/operator/path/stronger-at-home-staging-update.json` is:
+
+~~~json
+{
+  "remote_name": "origin"
+}
+~~~
+
+The approval evidence is not passed to `cpanel-admin`. Dry-run creation with the operation-specific git-create descriptor:
 
 ~~~bash
-cpanel-admin --profile test-123reg --audit-file /private/tmp/sah-cpanel-audit.jsonl --pretty runtime git-create --name stronger-at-home-staging --repository-root /home/v0398ees6dry/repositories/stronger-at-home-staging --source-repository /exact/operator/path/stronger-at-home-staging-source.json --type git --dry-run
+cpanel-admin --profile test-123reg --audit-file /private/tmp/sah-cpanel-audit.jsonl --pretty runtime git-create --name stronger-at-home-staging --repository-root /home/v0398ees6dry/repositories/stronger-at-home-staging --source-repository /exact/operator/path/stronger-at-home-staging-create.json --type git --dry-run
 ~~~
 
 At execution, replace /exact/operator/path with the reviewed owner-readable location. Review the returned target, branch, remote, impact, recovery, digest and expiry. With explicit approval, repeat the identical command with its --confirm and --expires-at values. Any changed preflight requires a new dry run.
 
+After the mapping exists, use a new dry-run to select the approved branch explicitly with the remote-name-only git-update descriptor:
+
+~~~bash
+cpanel-admin --profile test-123reg --audit-file /private/tmp/sah-cpanel-audit.jsonl --pretty runtime git-update --name stronger-at-home-staging --repository-root /home/v0398ees6dry/repositories/stronger-at-home-staging --branch deploy-staging --source-repository /exact/operator/path/stronger-at-home-staging-update.json --dry-run
+~~~
+
+Review and confirm this as a separate operation with its own fresh digest and expiry. Verify the remote and selected branch with runtime version-control.
+
 - [ ] **Step 8: Stop at staging activation**
 
-After runtime version-control proves the mapping tracks deploy-staging, report the exact source and deployment SHAs, document root, configuration path and recovery behaviour. Do not run git-update or deployment-create without separate staging activation approval.
+After runtime version-control proves the mapping uses origin and selects deploy-staging, report the exact source and deployment SHAs, document root, configuration path and recovery behaviour. Do not run deployment-create without separate staging activation approval.
 
 ### Task 6: Activate and accept staging
 
@@ -460,7 +496,7 @@ After runtime version-control proves the mapping tracks deploy-staging, report t
 
 - [ ] **Step 1: Dry-run and confirm git-update**
 
-Use runtime git-update for the exact staging repository, deploy-staging and the protected source-definition file. Review and execute only with its unexpired operation-bound confirmation. Verify the cPanel checkout equals the reviewed deployment commit.
+Use runtime git-update for the exact staging repository, `--branch deploy-staging` and the protected remote-name-only `/exact/operator/path/stronger-at-home-staging-update.json` descriptor. Review and execute only with its unexpired operation-bound confirmation. Verify the cPanel checkout equals the reviewed deployment commit.
 
 - [ ] **Step 2: Dry-run and confirm deployment-create**
 
@@ -478,7 +514,7 @@ On success record source SHA, deployment SHA, cPanel deployment ID and acceptanc
 
 **Files:**
 - No deployment-tooling changes expected.
-- Create outside Git: owner-readable production source-definition file.
+- Create outside Git: owner-readable production approval evidence, git-create descriptor and git-update descriptor.
 
 **Interfaces:**
 - Consumes: accepted staging SHA, approved public content, production configuration and protected GitHub production environment.
@@ -496,9 +532,9 @@ Approve a develop-to-main pull request. Require CI success and confirm main cont
 
 Dispatch Release production, approve the GitHub production environment gate and require success. Verify release.json references the current approved main SHA and the artifact has no staging hostname, staging configuration path, deny-all robots replacement or X-Robots-Tag noindex directive.
 
-- [ ] **Step 4: Create the production cPanel mapping**
+- [ ] **Step 4: Create and select the production cPanel mapping**
 
-Create the protected source-definition file:
+Create the source-and-branch approval evidence at `/exact/operator/path/stronger-at-home-production-approval.json`:
 
 ~~~json
 {
@@ -507,11 +543,42 @@ Create the protected source-definition file:
 }
 ~~~
 
-After read-only conflict checks, dry-run git-create for /home/v0398ees6dry/repositories/stronger-at-home-production. Review and execute only with its exact unexpired confirmation and explicit production approval.
+Create the operation-specific git-create descriptor at `/exact/operator/path/stronger-at-home-production-create.json`:
+
+~~~json
+{
+  "url": "git@github.com:mwatsham/stronger-at-home.git",
+  "remote_name": "origin"
+}
+~~~
+
+Create the remote-name-only git-update descriptor at `/exact/operator/path/stronger-at-home-production-update.json`:
+
+~~~json
+{
+  "remote_name": "origin"
+}
+~~~
+
+All three files must be owner-readable mode 0600, outside Git and the public document root, and contain no credentials. The approval evidence is not passed to `cpanel-admin`.
+
+After read-only conflict checks, dry-run creation with the git-create descriptor:
+
+~~~bash
+cpanel-admin --profile test-123reg --audit-file /private/tmp/sah-cpanel-audit.jsonl --pretty runtime git-create --name stronger-at-home-production --repository-root /home/v0398ees6dry/repositories/stronger-at-home-production --source-repository /exact/operator/path/stronger-at-home-production-create.json --type git --dry-run
+~~~
+
+Review and execute only with its exact unexpired confirmation and explicit production approval. Then select the approved production branch in a separate dry-run using the git-update descriptor:
+
+~~~bash
+cpanel-admin --profile test-123reg --audit-file /private/tmp/sah-cpanel-audit.jsonl --pretty runtime git-update --name stronger-at-home-production --repository-root /home/v0398ees6dry/repositories/stronger-at-home-production --branch deploy-production --source-repository /exact/operator/path/stronger-at-home-production-update.json --dry-run
+~~~
+
+Review and execute only with a new exact unexpired confirmation, then verify origin and deploy-production with runtime version-control.
 
 - [ ] **Step 5: Update and deploy with separate confirmations**
 
-Dry-run, review and confirm production git-update; verify the checkout; then separately dry-run, review and confirm deployment-create. Never reuse a confirmation digest.
+For later releases, dry-run, review and confirm production git-update with the same protected remote-name-only update descriptor and explicit `--branch deploy-production`; verify the checkout; then separately dry-run, review and confirm deployment-create. Never reuse a confirmation digest.
 
 - [ ] **Step 6: Verify production or roll back**
 
@@ -520,6 +587,6 @@ Follow docs/website-production-runbook.md. Require canonical HTTPS, no staging i
 ## Plan Self-Review
 
 - Spec coverage: branch flow, artifacts, separate mappings, external configuration, credential boundaries, staging migration, production approval, verification, rollback and deferred full automation are covered by Tasks 1–7.
-- Placeholder scan: cPanel confirmation digests and expiry values must come from fresh dry runs and therefore cannot be stored here. Operator source-definition locations are resolved only in the authorised environment and never committed.
-- Interface consistency: build_git_release() and its CLI are defined in Task 2 and consumed unchanged by workflows and release gates.
+- Placeholder scan: cPanel confirmation digests and expiry values must come from fresh dry runs and therefore cannot be stored here. Operator approval and descriptor locations are resolved only in the authorised environment and never committed.
+- Interface consistency: build_git_release() and its CLI are defined in Task 2 and consumed unchanged by workflows and release gates. Approval evidence records the reviewed URL and branch; git-create receives URL and remote name; git-update receives the remote name while the branch remains an explicit command argument.
 - Scope boundary: portrait and privacy content approval remain hard prerequisites for Task 7 and are not invented by this deployment plan.
