@@ -98,7 +98,8 @@ An authorised operator must verify without revealing values that:
 - `environment` is exactly `production`;
 - `allowed_origin` is exactly `https://stronger-at-home.co.uk`;
 - the sole recipient is exactly `melanie@stronger-at-home.co.uk`;
-- authenticated SMTP settings come from the protected operator source;
+- GoDaddy cPanel relay settings are `localhost`, port `25`, authentication
+  disabled and encryption `none`; SMTP credentials are not required or used;
 - a strong production-only rate-limit secret is configured; and
 - `rate_limit_directory` is
   `/home/v0398ees6dry/private/stronger-at-home/production/rate-limit`.

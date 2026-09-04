@@ -34,11 +34,17 @@ final class PhpMailerTransport implements MailTransport
 
             $mailer->isSMTP();
             $mailer->Host = $this->config['smtp_host'];
-            $mailer->SMTPAuth = true;
-            $mailer->Username = $this->config['smtp_username'];
-            $mailer->Password = $this->config['smtp_password'];
-            $mailer->SMTPSecure = $this->config['smtp_encryption'];
+            $mailer->SMTPAuth = $this->config['smtp_auth'] ?? true;
+            if ($mailer->SMTPAuth) {
+                $mailer->Username = $this->config['smtp_username'];
+                $mailer->Password = $this->config['smtp_password'];
+                $mailer->SMTPSecure = $this->config['smtp_encryption'];
+            } else {
+                $mailer->SMTPAutoTLS = false;
+                $mailer->SMTPSecure = '';
+            }
             $mailer->Port = $this->config['smtp_port'];
+            $mailer->Timeout = 10;
             $mailer->CharSet = 'UTF-8';
             $mailer->SMTPDebug = SMTP::DEBUG_OFF;
             $mailer->setFrom($this->config['sender'], 'Stronger at Home Physiotherapy');
@@ -58,9 +64,22 @@ final class PhpMailerTransport implements MailTransport
 
     private function assertValidConfiguration(): void
     {
-        foreach (['smtp_host', 'smtp_username', 'smtp_password', 'sender', 'recipient'] as $key) {
+        foreach (['smtp_host', 'sender', 'recipient'] as $key) {
             if (!isset($this->config[$key]) || !is_string($this->config[$key]) || trim($this->config[$key]) === '') {
                 throw new InvalidArgumentException('Mail configuration is incomplete.');
+            }
+        }
+
+        $smtpAuth = $this->config['smtp_auth'] ?? true;
+        if (!is_bool($smtpAuth)) {
+            throw new InvalidArgumentException('Mail configuration has invalid authentication mode.');
+        }
+
+        if ($smtpAuth) {
+            foreach (['smtp_username', 'smtp_password'] as $key) {
+                if (!isset($this->config[$key]) || !is_string($this->config[$key]) || trim($this->config[$key]) === '') {
+                    throw new InvalidArgumentException('Mail configuration is incomplete.');
+                }
             }
         }
 
@@ -72,9 +91,17 @@ final class PhpMailerTransport implements MailTransport
             throw new InvalidArgumentException('Mail configuration has an invalid port.');
         }
 
+        if (!$smtpAuth
+            && ($this->config['smtp_host'] !== 'localhost' || $this->config['smtp_port'] !== 25)
+        ) {
+            throw new InvalidArgumentException('Unauthenticated mail relay must use localhost port 25.');
+        }
+
         if (!isset($this->config['smtp_encryption'])
             || !is_string($this->config['smtp_encryption'])
-            || !in_array($this->config['smtp_encryption'], [PHPMailer::ENCRYPTION_STARTTLS, PHPMailer::ENCRYPTION_SMTPS], true)
+            || !in_array($this->config['smtp_encryption'], ['none', PHPMailer::ENCRYPTION_STARTTLS, PHPMailer::ENCRYPTION_SMTPS], true)
+            || ($smtpAuth && $this->config['smtp_encryption'] === 'none')
+            || (!$smtpAuth && $this->config['smtp_encryption'] !== 'none')
         ) {
             throw new InvalidArgumentException('Mail configuration has invalid encryption.');
         }
