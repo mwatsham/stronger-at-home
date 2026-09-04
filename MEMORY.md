@@ -1,5 +1,21 @@
 # Durable project memory
 
+## 2026-09-04 — privacy retention and notice review
+
+The project sponsor approved a 12-month retention period after last contact for
+website enquiries that do not become patient records. If an adult becomes a
+patient, relevant correspondence may form part of the patient record, normally
+retained for eight years after the last treatment. The revised notice must
+identify the lawful bases, service providers, international processing,
+individual rights and ICO complaint route. Melanie Watsham approved the initial
+rendering on 4 September 2026. Independent review then identified additional
+transparency wording for legal obligations and claims, international-transfer
+safeguards, the right to object and required form fields. Melanie approved the
+independently reviewed revision on 4 September 2026, so its visible draft label
+and `privacy-approval` production blocker were removed. ICO data protection fee
+self-assessment and any required sole-trader registration remain a separate
+launch action.
+
 ## 2026-09-03 — website packaging and publication gates
 
 The approved public website tree is exact-fingerprinted. Its deterministic
@@ -16,8 +32,10 @@ The public site and content-review checklist omit payment-method wording under
 the project sponsor's current scope ruling. The approved individual quotation
 and agreed fixed-price wording remains public. Unverified professional
 credential and referral wording is omitted rather than treated as current
-publication content. Production remains blocked by exactly two content gates:
-the final professional portrait and approval of the privacy retention wording.
+publication content. The privacy notice was initially approved on 4 September
+2026, then revised after independent review and approved by Melanie on the same
+date. The final professional portrait remains the sole production content
+blocker.
 
 ## 2026-09-03 — website design
 
@@ -31,8 +49,10 @@ The approved visual direction is the calm-editorial homepage composition. The
 site will use lightweight static pages and a small server-side enquiry handler,
 with no CMS, analytics, online payments, accounts, calendar integration or
 clinical database. Staging review precedes any production release. Credentials,
-referral suitability, the final portrait, privacy wording and deployment-time
-mail configuration remain separate publication dependencies.
+referral suitability, the final portrait and deployment-time mail configuration
+remain separate publication dependencies. The privacy wording was initially
+approved on 4 September 2026, then independently reviewed, revised and approved
+again on the same date.
 
 ## 2026-09-02 — appointment enquiries
 

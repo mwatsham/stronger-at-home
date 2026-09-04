@@ -21,6 +21,9 @@ FORMAL_NAME = "Stronger at Home Physiotherapy"
 FORMAL_IDENTITY = "Melanie Watsham trading as Stronger at Home Physiotherapy"
 APPROVED_PHONE = "+447843497871"
 APPROVED_EMAIL = "melanie@stronger-at-home.co.uk"
+APPROVED_EXTERNAL_URLS = {
+    "https://ico.org.uk/make-a-complaint/data-protection-complaints/check-if-you-can-complain/",
+}
 
 PRIMARY_PAGES = {
     Path("site/index.html"): "/",
@@ -77,7 +80,7 @@ APPROVED_PUBLIC_SOURCE_SHA256 = {
     "site/contact/index.php": "a08d203bcfa1162932f562e68fe40d9d6206fa603f7cdf5759d61fec15e97f0a",
     "site/how-i-can-help/index.html": "b2f3910b4b3e7dd751ba98fde53ee9f47c0b96fd1b2e5c1dcc2e0a2d13c8b264",
     "site/index.html": "a1c21cfeedba232a6224cfd4793b09fa2bb217e4635ed1b63a3cd16886b559c7",
-    "site/privacy/index.html": "a87bba67ed9864a6dfee6c5aaf0c21d236a390255dd045e40206d3ebcbd99597",
+    "site/privacy/index.html": "d199295f24ebaede98b10adbaa2fd93923e09e6b83bce885c96e40d2c9d6dd70",
     "site/robots-staging.txt": "331ea9090db0c9f6f597bd9840fd5b171830f6e0b3ba1cb24dfa91f0c95aedc1",
     "site/robots.txt": "6806d9c899e6b514b73f45b56f6ff0eb6193e996027444ecebc88d4c31bbf294",
     "site/sitemap.xml": "e343bdfdc81a434ba772c17174e8f36fe79fdab8e3b52d03b63e3d7976469101",
@@ -439,8 +442,13 @@ def _validate_links(root: Path, parsed: dict[Path, SiteHTMLParser], errors: list
                 errors.append(f"Unsupported link scheme in {relative_path.as_posix()}: {value}")
                 continue
             if parts.scheme in {"http", "https"}:
-                if f"{parts.scheme}://{parts.netloc}" != CANONICAL_ORIGIN:
+                if (
+                    f"{parts.scheme}://{parts.netloc}" != CANONICAL_ORIGIN
+                    and value not in APPROVED_EXTERNAL_URLS
+                ):
                     errors.append(f"External URL is not approved in {relative_path.as_posix()}: {value}")
+                    continue
+                if value in APPROVED_EXTERNAL_URLS:
                     continue
                 target_route = parts.path or "/"
             else:
@@ -599,6 +607,20 @@ def _validate_contacts_and_claims(
 
     privacy = parsed.get(Path("site/privacy/index.html"))
     if privacy is not None:
+        for required_section in (
+            "privacy-controller",
+            "privacy-information",
+            "privacy-lawful-basis",
+            "privacy-sharing",
+            "privacy-retention",
+            "privacy-rights",
+            "privacy-objection",
+            "privacy-complaints",
+        ):
+            if required_section not in privacy.ids:
+                errors.append(
+                    f"Privacy notice is missing required section: {required_section}"
+                )
         for required in (
             FORMAL_IDENTITY,
             "11 Mospey Crescent Epsom Surrey KT17 4LZ",
@@ -607,9 +629,25 @@ def _validate_contacts_and_claims(
             "detailed or urgent medical information",
             "secure session identifier",
             "rate limit",
+            "Article 6(1)(b)",
+            "Article 6(1)(c)",
+            "Article 6(1)(f)",
+            "Article 9(2)(h)",
+            "Article 9(2)(f)",
+            "GoDaddy",
+            "Titan",
+            "UK-US Data Bridge",
+            "UK International Data Transfer Agreement",
+            "standard data protection clauses under Article 46(2)(c)",
+            "preferred contact method, postcode, short enquiry and privacy acknowledgement are required",
+            "request more information or a copy of the relevant safeguards",
+            "12 months after the last contact",
+            "eight years after the last treatment",
+            "Information Commissioner’s Office",
+            "No solely automated decision-making",
         ):
             if required not in privacy.visible_text:
-                errors.append(f"Privacy draft is missing required information: {required}")
+                errors.append(f"Privacy notice is missing required information: {required}")
     contact = parsed.get(Path("site/contact/index.php"))
     if contact is not None:
         hrefs = {

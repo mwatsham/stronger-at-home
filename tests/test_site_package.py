@@ -221,7 +221,6 @@ class SitePackageTests(unittest.TestCase):
     def test_real_production_package_excludes_the_staging_robots_template(self):
         expected_blockers = [
             "Production blocker remains: portrait",
-            "Production blocker remains: privacy-approval",
         ]
         real_validate_site = package_module.validate_site
 

@@ -65,9 +65,24 @@ class SiteValidationTests(unittest.TestCase):
             errors,
             [
                 "Production blocker remains: portrait",
-                "Production blocker remains: privacy-approval",
             ],
         )
+
+    def test_privacy_notice_covers_legal_claims_transfers_and_required_fields(self):
+        html = (ROOT / "site/privacy/index.html").read_text(encoding="utf-8")
+        for required in (
+            "Article 6(1)(c)",
+            "Article 6(1)(f)",
+            "Article 9(2)(f)",
+            "UK-US Data Bridge",
+            "UK International Data Transfer Agreement",
+            "standard data protection clauses under Article 46(2)(c)",
+            'id="privacy-objection"',
+            "preferred contact method, postcode, short enquiry and privacy acknowledgement are required",
+            "request more information or a copy of the relevant safeguards",
+        ):
+            with self.subTest(required=required):
+                self.assertIn(required, html)
 
     def test_staging_is_not_indexable(self):
         text = (ROOT / "site/robots-staging.txt").read_text(encoding="utf-8")
@@ -352,6 +367,64 @@ class SiteValidationTests(unittest.TestCase):
             errors = validate_site(copy, "development")
 
             self.assertIn("Contact page must publish the approved phone and email routes", errors)
+
+    def test_validator_requires_every_privacy_notice_section(self):
+        required_sections = (
+            "privacy-controller",
+            "privacy-information",
+            "privacy-lawful-basis",
+            "privacy-sharing",
+            "privacy-retention",
+            "privacy-rights",
+            "privacy-objection",
+            "privacy-complaints",
+        )
+        for missing in required_sections:
+            with self.subTest(missing=missing), TemporaryDirectory() as directory:
+                copy = Path(directory) / "project"
+                shutil.copytree(ROOT, copy)
+                privacy = copy / "site/privacy/index.html"
+                html = privacy.read_text(encoding="utf-8")
+                target = f'id="{missing}"'
+                self.assertIn(target, html)
+                privacy.write_text(
+                    html.replace(target, f'id="{missing}-removed"', 1),
+                    encoding="utf-8",
+                )
+
+                errors = validate_site(copy, "development")
+
+                self.assertIn(
+                    f"Privacy notice is missing required section: {missing}",
+                    errors,
+                )
+
+    def test_validator_allows_the_official_ico_complaints_link(self):
+        errors = validate_site(ROOT, "development")
+
+        self.assertFalse(
+            any(error.startswith("External URL is not approved") for error in errors),
+            errors,
+        )
+
+    def test_validator_still_rejects_other_external_links(self):
+        with TemporaryDirectory() as directory:
+            copy = Path(directory) / "project"
+            shutil.copytree(ROOT, copy)
+            privacy = copy / "site/privacy/index.html"
+            html = privacy.read_text(encoding="utf-8").replace(
+                "https://ico.org.uk/make-a-complaint/data-protection-complaints/check-if-you-can-complain/",
+                "https://example.com/complaints/",
+                1,
+            )
+            privacy.write_text(html, encoding="utf-8")
+
+            errors = validate_site(copy, "development")
+
+            self.assertIn(
+                "External URL is not approved in site/privacy/index.html: https://example.com/complaints/",
+                errors,
+            )
 
     def test_validator_checks_sitemap_and_staging_crawl_policy(self):
         with TemporaryDirectory() as directory:

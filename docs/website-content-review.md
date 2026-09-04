@@ -1,6 +1,6 @@
 # Website content and release review
 
-Review date: 2026-09-03
+Review date: 2026-09-04
 
 Review scope: the exact local staging candidate; no staging or production mutation
 
@@ -124,11 +124,22 @@ or authorise publication.
 
 ### Privacy — `/privacy/`
 
-- [ ] The page identifies the exact sole-trader identity, address and email,
-  lists the enquiry fields and explains the strictly necessary session and
-  rate-limit data.
-- [ ] The draft retention wording is visibly labelled and remains blocked by
-  `privacy-approval`; it is not approved for production publication.
+- [x] The page identifies the exact sole-trader identity, address and email,
+  explains which enquiry and security information is used, and states what is
+  required to respond.
+- [x] The lawful bases cover pre-contract steps, health information and the
+  legitimate interest in website security. The acknowledgement checkbox is
+  not presented as consent.
+- [x] GoDaddy and Titan are identified as service providers, possible
+  international processing is explained, and marketing, sale of information
+  and automated decision-making are excluded.
+- [x] Unconverted enquiries are retained for up to 12 months after last
+  contact. Relevant correspondence may become part of an adult patient record,
+  normally retained for eight years after last treatment.
+- [x] The page explains individual rights, how to contact Melanie and the right
+  to complain to the Information Commissioner's Office.
+- [x] Melanie approved the independently reviewed revision on 4 September 2026.
+  Its draft label and `privacy-approval` blocker have been removed.
 
 ### Accessibility — `/accessibility/`
 
@@ -156,8 +167,11 @@ or authorise publication.
   integration, account system or clinical-data store has been introduced.
 - [ ] The final professional photograph of Melanie has replaced the labelled
   placeholder and the `portrait` blocker has been removed before production.
-- [ ] Melanie has approved the final privacy wording and the
+- [x] Melanie has approved the final privacy wording and the
   `privacy-approval` blocker has been removed before production.
+- [ ] Melanie has completed the ICO data protection fee self-assessment and,
+  if required, the sole-trader registration is active before patient records
+  are processed electronically.
 - [ ] Production validation reports no blockers before any production package
   or deployment is authorised.
 
