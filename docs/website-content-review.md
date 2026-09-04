@@ -16,11 +16,12 @@ or authorise publication.
   `APPROVED_PUBLIC_SOURCE_SHA256` in `scripts/validate_site.py`. An added,
   removed, renamed or byte-changed public file requires review and makes the
   validator fail.
-- [ ] Approve the deployment mapping: 30 deployable files from the approved
-  31-file `site/` source tree become `public/`; the source-only
-  `site/robots-staging.txt` supplies staging `public/robots.txt` but is never
-  shipped by name. The approved 84-file, fingerprinted production-only Composer
-  tree becomes sibling `vendor/`, for 114 package entries in either environment.
+- [ ] Approve the deployment mapping: the approved 31-file `site/` source tree
+  becomes 31 files under `public/`; the source-only `site/robots-staging.txt`
+  supplies staging `public/robots.txt` but is never shipped by name, while the
+  approved `site/404.html` bytes are also packaged as cPanel's `public/404.shtml`
+  compatibility name. The approved 84-file, fingerprinted production-only Composer
+  tree becomes sibling `vendor/`, for 115 package entries in either environment.
   An added, missing or byte-changed dependency file makes packaging fail.
   Repository history, tests, caches, local configuration and secret material
   are outside this boundary.
