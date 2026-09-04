@@ -235,6 +235,7 @@ fail() {{
 [[ "${{HOME:-}}" == "$ACCOUNT_HOME" ]] || fail 'Unexpected cPanel account home.'
 [[ "$(pwd -P)" == "$REPOSITORY_ROOT" ]] || fail 'Unexpected cPanel repository root.'
 [[ -d public && ! -L public && -f public/.htaccess && ! -L public/.htaccess ]] || fail 'Missing public release tree.'
+[[ -d public/api/src && ! -L public/api/src ]] || fail 'Missing application source tree.'
 [[ -d vendor && ! -L vendor && -f vendor/autoload.php && ! -L vendor/autoload.php ]] || fail 'Missing vendor release tree.'
 [[ -f "$CONFIG_PATH" && ! -L "$CONFIG_PATH" ]] || fail 'Missing external environment configuration.'
 [[ ! -e "$RELEASE_DIRECTORY" && ! -L "$RELEASE_DIRECTORY" ]] || fail 'Release directory already exists.'
@@ -243,6 +244,8 @@ fail() {{
 mkdir -p -- "$RELEASE_ROOT"
 mkdir -- "$RELEASE_DIRECTORY"
 cp -a -- vendor "$RELEASE_DIRECTORY/vendor"
+mkdir -p -- "$RELEASE_DIRECTORY/site/api"
+cp -a -- public/api/src "$RELEASE_DIRECTORY/site/api/src"
 cp -a -- public "$NEXT_DIRECTORY"
 
 swap_pending=0
