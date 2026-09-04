@@ -1,4 +1,7 @@
 from pathlib import Path
+import os
+import subprocess
+from tempfile import TemporaryDirectory
 import unittest
 
 
@@ -25,6 +28,14 @@ def top_level_section(source: str, heading: str) -> str:
     while end < len(lines) and (not lines[end] or lines[end].startswith(" ")):
         end += 1
     return "\n".join(lines[start:end])
+
+
+def promotion_reset_command(source: str) -> str:
+    return next(
+        line.strip()
+        for line in source.splitlines()
+        if line.strip().startswith('git -C "$release_worktree" rm ')
+    )
 
 
 class GitReleaseWorkflowTests(unittest.TestCase):
@@ -153,7 +164,7 @@ class GitReleaseWorkflowTests(unittest.TestCase):
             with self.subTest(workflow=label):
                 for fragment in (
                     "github-actions[bot]",
-                    'git -C "$release_worktree" rm -r --ignore-unmatch .',
+                    'git -C "$release_worktree" rm -rf --ignore-unmatch .',
                     'cp -a release/. "$release_worktree/"',
                     'git -C "$release_worktree" add --all',
                     "trap cleanup EXIT",
@@ -163,6 +174,71 @@ class GitReleaseWorkflowTests(unittest.TestCase):
                     self.assertIn(fragment, source)
                 self.assertNotIn("git push --force", source)
                 self.assertNotIn("git push --force-with-lease", source)
+
+    def test_release_promotions_can_clear_a_new_orphan_worktree(self):
+        for label, source in (
+            ("staging", self.staging),
+            ("production", self.production),
+        ):
+            with self.subTest(workflow=label), TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                repository = root / "repository"
+                release_worktree = root / "release-worktree"
+                repository.mkdir()
+                subprocess.run(
+                    ["git", "init", "--quiet"], cwd=repository, check=True
+                )
+                subprocess.run(
+                    ["git", "config", "user.name", "Workflow Test"],
+                    cwd=repository,
+                    check=True,
+                )
+                subprocess.run(
+                    ["git", "config", "user.email", "workflow@example.invalid"],
+                    cwd=repository,
+                    check=True,
+                )
+                (repository / "tracked.txt").write_text("source\n", encoding="utf-8")
+                subprocess.run(["git", "add", "tracked.txt"], cwd=repository, check=True)
+                subprocess.run(
+                    ["git", "commit", "--quiet", "-m", "source"],
+                    cwd=repository,
+                    check=True,
+                )
+                subprocess.run(
+                    [
+                        "git",
+                        "worktree",
+                        "add",
+                        "--detach",
+                        str(release_worktree),
+                        "HEAD",
+                    ],
+                    cwd=repository,
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                )
+                subprocess.run(
+                    ["git", "checkout", "--orphan", f"deploy-{label}"],
+                    cwd=release_worktree,
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                )
+
+                environment = os.environ.copy()
+                environment["release_worktree"] = str(release_worktree)
+                result = subprocess.run(
+                    ["bash", "-ceu", promotion_reset_command(source)],
+                    cwd=repository,
+                    env=environment,
+                    capture_output=True,
+                    text=True,
+                )
+
+                self.assertEqual(0, result.returncode, result.stderr)
+                self.assertFalse((release_worktree / "tracked.txt").exists())
 
     def test_workflows_contain_no_private_deployment_credentials_or_actions(self):
         forbidden = (
