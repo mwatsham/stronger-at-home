@@ -34,8 +34,10 @@ and agreed fixed-price wording remains public. Unverified professional
 credential and referral wording is omitted rather than treated as current
 publication content. The privacy notice was initially approved on 4 September
 2026, then revised after independent review and approved by Melanie on the same
-date. The final professional portrait remains the sole production content
-blocker.
+date. The supplied professional portrait is integrated as a faithful,
+metadata-free 1020 × 1190 web crop with no generative alteration. The automated
+portrait blocker is removed and the rendered treatment is approved, while full
+staging sign-off remains a human publication gate.
 
 ## 2026-09-03 — website design
 
@@ -49,10 +51,11 @@ The approved visual direction is the calm-editorial homepage composition. The
 site will use lightweight static pages and a small server-side enquiry handler,
 with no CMS, analytics, online payments, accounts, calendar integration or
 clinical database. Staging review precedes any production release. Credentials,
-referral suitability, the final portrait and deployment-time mail configuration
-remain separate publication dependencies. The privacy wording was initially
-approved on 4 September 2026, then independently reviewed, revised and approved
-again on the same date.
+referral suitability and deployment-time mail configuration remain separate
+publication dependencies. The supplied portrait has since replaced the
+temporary placeholder and its rendered treatment is approved. The privacy wording
+was initially approved on 4 September 2026, then independently reviewed, revised
+and approved again on the same date.
 
 ## 2026-09-02 — appointment enquiries
 

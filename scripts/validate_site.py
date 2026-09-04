@@ -43,7 +43,6 @@ SITEMAP_URLS = {
 }
 
 ALLOWED_BLOCKERS = {
-    "portrait",
     "privacy-approval",
     "credentials",
     "referral-suitability",
@@ -74,12 +73,12 @@ APPROVED_PUBLIC_SOURCE_SHA256 = {
     "site/assets/fonts/OFL-atkinson.txt": "09636801ed3e868736cc359bb1c819c5ef76529cbb41473cb1f602ef166dad0a",
     "site/assets/fonts/OFL-source-serif.txt": "0fd8b796c1c6220a559a5682cfd00d1c8488b428369f7cb70deb671888cef85f",
     "site/assets/fonts/source-serif-4.ttf": "97b2d4da6e3cb494b5a1e66ae176914d852ccabef49e0c02c0df25f3e39aca0b",
-    "site/assets/images/portrait-placeholder.svg": "ebb4e3a1644ae864495f6b540b282426d7bf0c41f0089c9798b0d65b151d96a5",
+    "site/assets/images/melanie-watsham-portrait.jpg": "9f5b50683414293d1fecb9b6ba0eb644259cd6007c4e309b51777a05651f5718",
     "site/assets/images/stronger-at-home-logo.png": EXPECTED_LOGO_SHA256,
     "site/assets/js/site.js": "3719a73b082b915082cc65fd4369e9e970e48629912377f52b9e44467ad42b07",
     "site/contact/index.php": "a08d203bcfa1162932f562e68fe40d9d6206fa603f7cdf5759d61fec15e97f0a",
     "site/how-i-can-help/index.html": "b2f3910b4b3e7dd751ba98fde53ee9f47c0b96fd1b2e5c1dcc2e0a2d13c8b264",
-    "site/index.html": "a1c21cfeedba232a6224cfd4793b09fa2bb217e4635ed1b63a3cd16886b559c7",
+    "site/index.html": "2817da6fcb79fb9b0fc50aec06a4e422581e8d6303e457e6de6eaff57f4e89eb",
     "site/privacy/index.html": "d199295f24ebaede98b10adbaa2fd93923e09e6b83bce885c96e40d2c9d6dd70",
     "site/robots-staging.txt": "331ea9090db0c9f6f597bd9840fd5b171830f6e0b3ba1cb24dfa91f0c95aedc1",
     "site/robots.txt": "6806d9c899e6b514b73f45b56f6ff0eb6193e996027444ecebc88d4c31bbf294",
@@ -483,6 +482,39 @@ def _actual_image_size(path: Path) -> tuple[int, int] | None:
         if len(data) < 24 or data[:8] != b"\x89PNG\r\n\x1a\n" or data[12:16] != b"IHDR":
             return None
         return struct.unpack(">II", data[16:24])
+    if path.suffix.lower() in {".jpg", ".jpeg"}:
+        data = path.read_bytes()
+        if len(data) < 4 or data[:2] != b"\xff\xd8":
+            return None
+        offset = 2
+        start_of_frame_markers = {
+            0xC0, 0xC1, 0xC2, 0xC3, 0xC5, 0xC6, 0xC7,
+            0xC9, 0xCA, 0xCB, 0xCD, 0xCE, 0xCF,
+        }
+        while offset + 4 <= len(data):
+            if data[offset] != 0xFF:
+                return None
+            while offset < len(data) and data[offset] == 0xFF:
+                offset += 1
+            if offset >= len(data):
+                return None
+            marker = data[offset]
+            offset += 1
+            if marker in {0xD8, 0xD9}:
+                continue
+            if marker == 0xDA:
+                return None
+            if offset + 2 > len(data):
+                return None
+            segment_length = struct.unpack(">H", data[offset:offset + 2])[0]
+            if segment_length < 2 or offset + segment_length > len(data):
+                return None
+            if marker in start_of_frame_markers:
+                if segment_length < 7:
+                    return None
+                height, width = struct.unpack(">HH", data[offset + 3:offset + 7])
+                return width, height
+            offset += segment_length
     if path.suffix.lower() == ".svg":
         try:
             root = ET.parse(path).getroot()
@@ -733,10 +765,10 @@ def _validate_blockers(
     for blocker in sorted(blockers - ALLOWED_BLOCKERS):
         errors.append(f"Unapproved publication blocker: {blocker}")
     home = parsed.get(Path("site/index.html"))
-    if home is not None and "/assets/images/portrait-placeholder.svg" in {
+    if home is not None and "/assets/images/melanie-watsham-portrait.jpg" not in {
         str(image.get("src") or "") for image in home.images
-    } and "portrait" not in blockers:
-        errors.append("Portrait placeholder must carry the portrait publication blocker")
+    }:
+        errors.append("Homepage must publish the approved Melanie portrait")
     privacy = parsed.get(Path("site/privacy/index.html"))
     if privacy is not None and "Draft for approval" in privacy.visible_text and "privacy-approval" not in blockers:
         errors.append("Draft privacy notice must carry the privacy-approval publication blocker")

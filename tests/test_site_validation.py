@@ -4,6 +4,8 @@ import shutil
 from tempfile import TemporaryDirectory
 import unittest
 
+from PIL import Image
+
 from scripts.validate_site import find_prohibited_content_categories, validate_site
 
 
@@ -59,14 +61,8 @@ class SiteValidationTests(unittest.TestCase):
     def test_development_site_has_no_structural_errors(self):
         self.assertEqual(validate_site(ROOT, "development"), [])
 
-    def test_production_rejects_unresolved_publication_gates(self):
-        errors = validate_site(ROOT, "production")
-        self.assertEqual(
-            errors,
-            [
-                "Production blocker remains: portrait",
-            ],
-        )
+    def test_production_has_no_automated_publication_blockers(self):
+        self.assertEqual(validate_site(ROOT, "production"), [])
 
     def test_privacy_notice_covers_legal_claims_transfers_and_required_fields(self):
         html = (ROOT / "site/privacy/index.html").read_text(encoding="utf-8")
@@ -680,11 +676,21 @@ class SiteValidationTests(unittest.TestCase):
         for claim in prohibited_claims:
             self.assertNotIn(claim.lower(), html.lower(), claim)
 
-    def test_development_portrait_is_a_production_blocker(self):
+    def test_homepage_uses_the_approved_web_portrait(self):
+        portrait = ROOT / "site/assets/images/melanie-watsham-portrait.jpg"
         html = (ROOT / "site/index.html").read_text(encoding="utf-8")
 
-        self.assertIn('data-production-blocker="portrait"', html)
-        self.assertIn("Professional portrait to be supplied", html)
+        self.assertTrue(portrait.is_file())
+        with Image.open(portrait) as image:
+            self.assertEqual(image.format, "JPEG")
+            self.assertEqual(image.size, (1020, 1190))
+            self.assertEqual(image.mode, "RGB")
+            self.assertEqual(len(image.getexif()), 0)
+
+        self.assertIn('/assets/images/melanie-watsham-portrait.jpg', html)
+        self.assertIn('alt="Melanie Watsham, physiotherapist"', html)
+        self.assertNotIn('data-production-blocker="portrait"', html)
+        self.assertNotIn("Professional portrait to be supplied", html)
 
     def test_mobile_menu_is_a_javascript_enhancement_with_an_accurate_disclosure_control(self):
         stylesheet = (ROOT / "site/assets/css/site.css").read_text(encoding="utf-8")

@@ -31,9 +31,9 @@ or authorise publication.
 - [ ] Approve the two bundled font files, their two exact SIL Open Font License
   text files, generated brand-token stylesheet, site stylesheet and site script
   under `site/assets/` as the complete public front-end asset set.
-- [ ] Confirm that `site/assets/images/portrait-placeholder.svg` is visibly
-  labelled `Professional portrait to be supplied`, is non-final, and remains a
-  production blocker.
+- [x] Approve `site/assets/images/melanie-watsham-portrait.jpg` as the final
+  homepage portrait: a faithful metadata-free 1020 × 1190 crop of the supplied
+  source photograph, with no generative alteration.
 - [ ] Confirm that staging replaces `public/robots.txt` with the exact deny-all
   content `User-agent: *` followed by `Disallow: /`, and adds the staging-only
   response header `X-Robots-Tag: noindex, nofollow` without changing the
@@ -78,7 +78,7 @@ or authorise publication.
 - [ ] The home-visit benefits are described as a personal visit, a familiar
   setting and practical support relevant to daily life.
 - [ ] Melanie's introduction uses only the approved experience and approach
-  wording; the portrait remains the clearly labelled non-final asset.
+  wording, alongside the supplied professional portrait.
 - [ ] Appointment lengths, service area, individual quotation wording and
   request meaning match the shared facts above.
 - [ ] LocalBusiness structured data contains only the approved name, canonical
@@ -165,14 +165,15 @@ or authorise publication.
   wording are absent.
 - [ ] No CMS, analytics, advertising, non-essential cookies, calendar
   integration, account system or clinical-data store has been introduced.
-- [ ] The final professional photograph of Melanie has replaced the labelled
-  placeholder and the `portrait` blocker has been removed before production.
+- [x] The supplied professional photograph of Melanie has replaced the labelled
+  placeholder, its rendered homepage treatment is approved, and the `portrait`
+  blocker has been removed before production.
 - [x] Melanie has approved the final privacy wording and the
   `privacy-approval` blocker has been removed before production.
 - [ ] Melanie has completed the ICO data protection fee self-assessment and,
   if required, the sole-trader registration is active before patient records
   are processed electronically.
-- [ ] Production validation reports no blockers before any production package
+- [x] Production validation reports no blockers before any production package
   or deployment is authorised.
 
 ## Local browser review evidence

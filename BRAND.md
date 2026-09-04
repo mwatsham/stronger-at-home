@@ -69,7 +69,9 @@ made. The public site and its human content-review checklist intentionally
 contain no payment-method wording; the approved individual quotation and agreed
 fixed-price wording remains. The privacy notice was independently reviewed,
 revised and approved on 2026-09-04, and its approval blocker was removed. The
-final professional portrait remains the sole production content blocker;
+supplied professional portrait is now integrated as a faithful, non-generative
+web crop, its rendered homepage treatment is approved, and it has no automated
+production blocker. The full staging candidate still requires human sign-off;
 unverified credential and referral wording stays omitted.
 
 Start with [strategy](brand/strategy.md), [messaging](brand/messaging.md),
