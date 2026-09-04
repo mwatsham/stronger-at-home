@@ -24,8 +24,8 @@ class SitePackageTests(unittest.TestCase):
 
             with ZipFile(archive) as package:
                 names = set(package.namelist())
-                self.assertEqual(len(names), 114)
-                self.assertEqual(sum(name.startswith("public/") for name in names), 30)
+                self.assertEqual(len(names), 115)
+                self.assertEqual(sum(name.startswith("public/") for name in names), 31)
                 self.assertEqual(sum(name.startswith("vendor/") for name in names), 84)
                 self.assertIn("public/robots.txt", names)
                 self.assertNotIn("public/robots-staging.txt", names)
@@ -74,6 +74,16 @@ class SitePackageTests(unittest.TestCase):
                     "/.ds_store",
                 ):
                     self.assertFalse(any(forbidden in f"/{name}" for name in lowered))
+
+    def test_package_supplies_cpanel_404_shtml_with_the_approved_error_page(self):
+        with TemporaryDirectory() as directory:
+            archive = package_site(ROOT, Path(directory), "staging")
+
+            with ZipFile(archive) as package:
+                self.assertEqual(
+                    package.read("public/404.shtml"),
+                    package.read("public/404.html"),
+                )
 
     def test_repeated_builds_are_byte_for_byte_deterministic(self):
         with TemporaryDirectory() as first, TemporaryDirectory() as second:
@@ -229,8 +239,8 @@ class SitePackageTests(unittest.TestCase):
 
             with ZipFile(archive) as package:
                 names = set(package.namelist())
-                self.assertEqual(len(names), 114)
-                self.assertEqual(sum(name.startswith("public/") for name in names), 30)
+                self.assertEqual(len(names), 115)
+                self.assertEqual(sum(name.startswith("public/") for name in names), 31)
                 self.assertEqual(sum(name.startswith("vendor/") for name in names), 84)
                 self.assertNotIn("public/robots-staging.txt", names)
                 self.assertEqual(
