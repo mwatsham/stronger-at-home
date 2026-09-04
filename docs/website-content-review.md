@@ -178,9 +178,12 @@ or authorise publication.
 
 ## Local browser review evidence
 
-The visual review uses the in-app browser against a loopback PHP server. Every
-primary page is captured at 390×844, 768×1024 and 1440×1000. Evidence is stored
-under `output/review/website-task-8/`, outside source control.
+The visual review uses the in-app browser against a loopback PHP server. The
+original full-site review captured every primary page at 390×844, 768×1024 and
+1440×1000. That historical evidence is stored under
+`output/review/website-task-8/`, outside source control. The final portrait was
+subsequently reviewed at the same three explicit viewport sizes; its current
+metrics are recorded below.
 
 | Check | Result | Evidence |
 |---|---|---|
@@ -192,11 +195,11 @@ under `output/review/website-task-8/`, outside source control.
 | 200% reflow | Pass | Native browser UI reported 200%; DPR and scroll metrics recorded below |
 | Horizontal overflow | Pass | Document and body widths equal client width in all 15 required captures and five reflow checks |
 | Reduced-motion behaviour | Partial | Live rule and zero inline animated elements verified; active emulation unavailable |
-| Final portrait desktop treatment | Pass | Current local homepage preview reviewed and approved by the project sponsor on 2026-09-04 |
-| Final portrait mobile and tablet recapture | Outstanding | Required before whole-site staging sign-off |
+| Final portrait desktop treatment | Pass | Local 1440×1000 homepage preview reviewed and approved by the project sponsor on 2026-09-04 |
+| Final portrait mobile and tablet treatment | Pass | Fresh full-page 390×844 and 768×1024 browser captures and metrics below |
 | Console warnings and errors | Pass | No warning/error entries after the review route set |
 
-### Required viewport captures
+### Historical full-site viewport captures
 
 - 390×844: `home-390x844.jpg`, `about-390x844.jpg`,
   `how-i-can-help-390x844.jpg`, `appointments-and-fees-390x844.jpg`,
@@ -211,13 +214,32 @@ under `output/review/website-task-8/`, outside source control.
 Each path is relative to `output/review/website-task-8/`. At the three required
 viewports, these captures predate the approved final portrait. They remain a
 baseline for unchanged site structure but are not evidence of the current
-portrait treatment; fresh mobile, tablet and desktop captures are required for
-whole-site staging sign-off.
+portrait treatment.
 
 At the three required sizes, the browser reported client widths of 375, 753 and
 1425 CSS pixels after
 the vertical scrollbar; `documentElement.scrollWidth` and `body.scrollWidth`
 matched the client width for every page.
+
+### Final portrait responsive review — 2026-09-04
+
+The final homepage was reloaded and captured in full at each explicit viewport.
+The approved 1020 × 1190 JPEG loaded completely with the accessible name
+`Melanie Watsham, physiotherapist`; no warning or error was recorded in the
+browser console.
+
+| Viewport | Client/document/body width | Rendered portrait | Menu | Result |
+|---|---:|---:|---|---|
+| 390×844 | 375 / 375 / 375 | 309×361 | Mobile | Pass |
+| 768×1024 | 753 / 753 / 753 | 687×802 | Mobile | Pass |
+| 1440×1000 | 1425 / 1425 / 1425 | 449×524 | Desktop | Pass |
+
+The equal client, document and body widths show no horizontal overflow. The
+rendered sizes preserve the source's 6:7 aspect ratio without distortion. The
+portrait remains centred in its bordered frame and the face, hair and shoulders
+remain visible at every reviewed size. This clears the portrait-specific
+responsive review; it does not sign the separate whole-site human approval
+lines below.
 
 ### Interaction and reflow record
 
