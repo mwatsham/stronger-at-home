@@ -22,13 +22,21 @@ PUBLIC_PAGES = {
 class LandmarkParser(HTMLParser):
     def __init__(self):
         super().__init__()
-        self.tags, self.links, self.text, self.h1_count = [], [], [], 0
+        self.tags, self.links, self.images, self.text, self.h1_count = (
+            [],
+            [],
+            [],
+            [],
+            0,
+        )
 
     def handle_starttag(self, tag, attrs):
         attributes = dict(attrs)
         self.tags.append(tag)
         if tag == "a" and attributes.get("href"):
             self.links.append(attributes["href"])
+        if tag == "img":
+            self.images.append(attributes)
         if tag == "h1":
             self.h1_count += 1
 
@@ -679,6 +687,8 @@ class SiteValidationTests(unittest.TestCase):
     def test_homepage_uses_the_approved_web_portrait(self):
         portrait = ROOT / "site/assets/images/melanie-watsham-portrait.jpg"
         html = (ROOT / "site/index.html").read_text(encoding="utf-8")
+        parser = LandmarkParser()
+        parser.feed(html)
 
         self.assertTrue(portrait.is_file())
         with Image.open(portrait) as image:
@@ -687,8 +697,22 @@ class SiteValidationTests(unittest.TestCase):
             self.assertEqual(image.mode, "RGB")
             self.assertEqual(len(image.getexif()), 0)
 
-        self.assertIn('/assets/images/melanie-watsham-portrait.jpg', html)
-        self.assertIn('alt="Melanie Watsham, physiotherapist"', html)
+        matching_images = [
+            image
+            for image in parser.images
+            if image.get("src") == "/assets/images/melanie-watsham-portrait.jpg"
+        ]
+        self.assertEqual(
+            matching_images,
+            [
+                {
+                    "src": "/assets/images/melanie-watsham-portrait.jpg",
+                    "alt": "Melanie Watsham, physiotherapist",
+                    "width": "1020",
+                    "height": "1190",
+                }
+            ],
+        )
         self.assertNotIn('data-production-blocker="portrait"', html)
         self.assertNotIn("Professional portrait to be supplied", html)
 

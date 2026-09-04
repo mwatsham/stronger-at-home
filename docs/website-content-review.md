@@ -184,7 +184,7 @@ under `output/review/website-task-8/`, outside source control.
 
 | Check | Result | Evidence |
 |---|---|---|
-| Fifteen primary-page viewport captures | Pass | Full-page files listed below |
+| Fifteen primary-page viewport captures before portrait replacement | Historical baseline | Full-page files listed below |
 | Mobile menu pointer disclosure | Pass | `mobile-menu-open-390x844.jpg` |
 | Keyboard-only order and activation | Pass | Main-session key sequence and resulting menu states recorded below |
 | Visible focus treatment | Pass | Menu capture and `contact-field-errors-390x844.jpg` |
@@ -192,7 +192,8 @@ under `output/review/website-task-8/`, outside source control.
 | 200% reflow | Pass | Native browser UI reported 200%; DPR and scroll metrics recorded below |
 | Horizontal overflow | Pass | Document and body widths equal client width in all 15 required captures and five reflow checks |
 | Reduced-motion behaviour | Partial | Live rule and zero inline animated elements verified; active emulation unavailable |
-| Portrait placeholder is visibly non-final | Pass | All three homepage captures |
+| Final portrait desktop treatment | Pass | Current local homepage preview reviewed and approved by the project sponsor on 2026-09-04 |
+| Final portrait mobile and tablet recapture | Outstanding | Required before whole-site staging sign-off |
 | Console warnings and errors | Pass | No warning/error entries after the review route set |
 
 ### Required viewport captures
@@ -208,7 +209,13 @@ under `output/review/website-task-8/`, outside source control.
   `contact-1440x1000.jpg`.
 
 Each path is relative to `output/review/website-task-8/`. At the three required
-sizes the browser reported client widths of 375, 753 and 1425 CSS pixels after
+viewports, these captures predate the approved final portrait. They remain a
+baseline for unchanged site structure but are not evidence of the current
+portrait treatment; fresh mobile, tablet and desktop captures are required for
+whole-site staging sign-off.
+
+At the three required sizes, the browser reported client widths of 375, 753 and
+1425 CSS pixels after
 the vertical scrollbar; `documentElement.scrollWidth` and `body.scrollWidth`
 matched the client width for every page.
 
