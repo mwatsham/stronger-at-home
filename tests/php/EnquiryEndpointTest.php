@@ -74,6 +74,7 @@ $validConfig = [
     'sender' => 'website@stronger-at-home.co.uk',
     'smtp_host' => 'smtp.example.test',
     'smtp_port' => 587,
+    'smtp_auth' => true,
     'smtp_username' => 'mailer@example.test',
     'smtp_password' => 'test-password',
     'smtp_encryption' => 'tls',
@@ -172,6 +173,18 @@ assert_same(
     405,
     endpoint_status($validConfig, 'valid staging', $entryPoint, $temporaryDirectory),
     'staging with a safe configured recipient reaches request handling',
+);
+
+$relayConfig = $validConfig;
+$relayConfig['smtp_host'] = 'localhost';
+$relayConfig['smtp_port'] = 25;
+$relayConfig['smtp_auth'] = false;
+$relayConfig['smtp_encryption'] = 'none';
+unset($relayConfig['smtp_username'], $relayConfig['smtp_password']);
+assert_same(
+    405,
+    endpoint_status($relayConfig, 'valid unauthenticated relay', $entryPoint, $temporaryDirectory),
+    'an unauthenticated local relay without credentials reaches request handling',
 );
 
 $liveRecipientOnStaging = $validConfig;
