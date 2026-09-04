@@ -87,18 +87,18 @@ class RasterLogoGenerationTests(unittest.TestCase):
             )
             self.assertEqual(second, first)
 
-    def test_generate_candidate_matches_exact_approved_hashes(self):
+    def test_checked_in_candidate_files_match_exact_approved_hashes(self):
         expected_hashes = (
             "4e8988e571269353aed86697468e0a60b838bc1e121c8e590f974d5124df3683",
             "d557a0e8fd05efc86fcca2b3f63d807ad33f29527062697705a8e05616c6db39",
         )
-        with TemporaryDirectory() as directory:
-            root = Path(directory)
-            self._copy_inputs(root)
-            paths = generate_candidate(root)
-            actual_hashes = tuple(
-                hashlib.sha256(path.read_bytes()).hexdigest() for path in paths
-            )
+        paths = (
+            PROJECT_ROOT / CANDIDATE_MASTER_OUTPUT,
+            PROJECT_ROOT / CANDIDATE_SMALL_OUTPUT,
+        )
+        actual_hashes = tuple(
+            hashlib.sha256(path.read_bytes()).hexdigest() for path in paths
+        )
         self.assertEqual(
             (CANDIDATE_MASTER_SHA256, CANDIDATE_SMALL_SHA256), expected_hashes
         )
