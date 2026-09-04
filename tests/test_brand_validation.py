@@ -436,6 +436,21 @@ class BrandValidationTests(unittest.TestCase):
             errors = validate_project(root)
         self.assertIn("Invalid decision status in DECISIONS.md: final", errors)
 
+    def test_superseded_decision_status_is_allowed(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "DECISIONS.md").write_text(
+                "| D-1 | Test | superseded | Owner | 2026-08-03 |",
+                encoding="utf-8",
+            )
+
+            errors = validate_project(root)
+
+        self.assertNotIn(
+            "Invalid decision status in DECISIONS.md: superseded",
+            errors,
+        )
+
     def test_source_serif_requires_its_licence_file(self):
         with TemporaryDirectory() as directory:
             root = Path(directory)
@@ -638,6 +653,22 @@ class BrandValidationTests(unittest.TestCase):
         )
         self.assertNotIn(
             "Approved asset logo_primary_hybrid must have an ISO review date", errors
+        )
+
+    def test_superseded_status_remains_invalid_for_assets(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_asset_project(
+                root,
+                role="supporting_document",
+                status="superseded",
+            )
+
+            errors = validate_project(root)
+
+        self.assertIn(
+            "Asset logo_primary_hybrid has invalid status: superseded",
+            errors,
         )
 
     def test_historical_roles_require_original_paths(self):

@@ -23,7 +23,8 @@ try:
 except ImportError:
     from generate_brand_tokens import render_css
 
-ALLOWED_STATUSES = {"approved", "proposed", "rejected", "deprecated"}
+ALLOWED_ASSET_STATUSES = {"approved", "proposed", "rejected", "deprecated"}
+ALLOWED_DECISION_STATUSES = ALLOWED_ASSET_STATUSES | {"superseded"}
 REQUIRED_FILES = (
     "BRAND.md",
     "DECISIONS.md",
@@ -351,7 +352,7 @@ def _validate_asset_manifest(root: Path, manifest: object) -> list[str]:
             errors.append(f"Asset hash mismatch: {relative_path}")
 
         status = asset.get("status")
-        if status not in ALLOWED_STATUSES:
+        if status not in ALLOWED_ASSET_STATUSES:
             errors.append(f"Asset {asset_id or '<unknown>'} has invalid status: {status}")
         role = asset.get("role")
         if (
@@ -405,7 +406,7 @@ def validate_project(root: Path) -> list[str]:
         for line in decisions.read_text(encoding="utf-8").splitlines():
             if line.startswith("| D-"):
                 columns = [value.strip() for value in line.strip("|").split("|")]
-                if len(columns) >= 3 and columns[2] not in ALLOWED_STATUSES:
+                if len(columns) >= 3 and columns[2] not in ALLOWED_DECISION_STATUSES:
                     errors.append(f"Invalid decision status in DECISIONS.md: {columns[2]}")
     for relative in ("brand/tokens.json", ".ai/context/brand.json", "brand/assets/manifest.json"):
         path = root / relative
