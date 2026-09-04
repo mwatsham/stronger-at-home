@@ -213,28 +213,8 @@ class SitePackageTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "Site validation failed.*approval drift"):
                 package_site(copy, Path(directory) / "output", "staging")
 
-    def test_production_package_is_blocked_by_unresolved_publication_gates(self):
+    def test_real_production_package_contains_the_portrait_and_excludes_staging_robots(self):
         with TemporaryDirectory() as directory:
-            with self.assertRaisesRegex(ValueError, "Production blocker remains: portrait"):
-                package_site(ROOT, Path(directory), "production")
-
-    def test_real_production_package_excludes_the_staging_robots_template(self):
-        expected_blockers = [
-            "Production blocker remains: portrait",
-            "Production blocker remains: privacy-approval",
-        ]
-        real_validate_site = package_module.validate_site
-
-        def allow_only_known_publication_blockers(project_root, environment):
-            errors = real_validate_site(project_root, environment)
-            self.assertEqual(errors, expected_blockers)
-            return []
-
-        with TemporaryDirectory() as directory, patch.object(
-            package_module,
-            "validate_site",
-            side_effect=allow_only_known_publication_blockers,
-        ):
             archive = package_site(ROOT, Path(directory), "production")
 
             with ZipFile(archive) as package:
@@ -243,6 +223,8 @@ class SitePackageTests(unittest.TestCase):
                 self.assertEqual(sum(name.startswith("public/") for name in names), 31)
                 self.assertEqual(sum(name.startswith("vendor/") for name in names), 84)
                 self.assertNotIn("public/robots-staging.txt", names)
+                self.assertIn("public/assets/images/melanie-watsham-portrait.jpg", names)
+                self.assertNotIn("public/assets/images/portrait-placeholder.svg", names)
                 self.assertEqual(
                     package.read("public/robots.txt"),
                     (ROOT / "site/robots.txt").read_bytes(),

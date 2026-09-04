@@ -1,6 +1,6 @@
 # Website content and release review
 
-Review date: 2026-09-03
+Review date: 2026-09-04
 
 Review scope: the exact local staging candidate; no staging or production mutation
 
@@ -31,9 +31,9 @@ or authorise publication.
 - [ ] Approve the two bundled font files, their two exact SIL Open Font License
   text files, generated brand-token stylesheet, site stylesheet and site script
   under `site/assets/` as the complete public front-end asset set.
-- [ ] Confirm that `site/assets/images/portrait-placeholder.svg` is visibly
-  labelled `Professional portrait to be supplied`, is non-final, and remains a
-  production blocker.
+- [x] Approve `site/assets/images/melanie-watsham-portrait.jpg` as the final
+  homepage portrait: a faithful metadata-free 1020 × 1190 crop of the supplied
+  source photograph, with no generative alteration.
 - [ ] Confirm that staging replaces `public/robots.txt` with the exact deny-all
   content `User-agent: *` followed by `Disallow: /`, and adds the staging-only
   response header `X-Robots-Tag: noindex, nofollow` without changing the
@@ -78,7 +78,7 @@ or authorise publication.
 - [ ] The home-visit benefits are described as a personal visit, a familiar
   setting and practical support relevant to daily life.
 - [ ] Melanie's introduction uses only the approved experience and approach
-  wording; the portrait remains the clearly labelled non-final asset.
+  wording, alongside the supplied professional portrait.
 - [ ] Appointment lengths, service area, individual quotation wording and
   request meaning match the shared facts above.
 - [ ] LocalBusiness structured data contains only the approved name, canonical
@@ -124,11 +124,22 @@ or authorise publication.
 
 ### Privacy — `/privacy/`
 
-- [ ] The page identifies the exact sole-trader identity, address and email,
-  lists the enquiry fields and explains the strictly necessary session and
-  rate-limit data.
-- [ ] The draft retention wording is visibly labelled and remains blocked by
-  `privacy-approval`; it is not approved for production publication.
+- [x] The page identifies the exact sole-trader identity, address and email,
+  explains which enquiry and security information is used, and states what is
+  required to respond.
+- [x] The lawful bases cover pre-contract steps, health information and the
+  legitimate interest in website security. The acknowledgement checkbox is
+  not presented as consent.
+- [x] GoDaddy and Titan are identified as service providers, possible
+  international processing is explained, and marketing, sale of information
+  and automated decision-making are excluded.
+- [x] Unconverted enquiries are retained for up to 12 months after last
+  contact. Relevant correspondence may become part of an adult patient record,
+  normally retained for eight years after last treatment.
+- [x] The page explains individual rights, how to contact Melanie and the right
+  to complain to the Information Commissioner's Office.
+- [x] Melanie approved the independently reviewed revision on 4 September 2026.
+  Its draft label and `privacy-approval` blocker have been removed.
 
 ### Accessibility — `/accessibility/`
 
@@ -154,22 +165,29 @@ or authorise publication.
   wording are absent.
 - [ ] No CMS, analytics, advertising, non-essential cookies, calendar
   integration, account system or clinical-data store has been introduced.
-- [ ] The final professional photograph of Melanie has replaced the labelled
-  placeholder and the `portrait` blocker has been removed before production.
-- [ ] Melanie has approved the final privacy wording and the
+- [x] The supplied professional photograph of Melanie has replaced the labelled
+  placeholder, its rendered homepage treatment is approved, and the `portrait`
+  blocker has been removed before production.
+- [x] Melanie has approved the final privacy wording and the
   `privacy-approval` blocker has been removed before production.
-- [ ] Production validation reports no blockers before any production package
+- [ ] Melanie has completed the ICO data protection fee self-assessment and,
+  if required, the sole-trader registration is active before patient records
+  are processed electronically.
+- [x] Production validation reports no blockers before any production package
   or deployment is authorised.
 
 ## Local browser review evidence
 
-The visual review uses the in-app browser against a loopback PHP server. Every
-primary page is captured at 390×844, 768×1024 and 1440×1000. Evidence is stored
-under `output/review/website-task-8/`, outside source control.
+The visual review uses the in-app browser against a loopback PHP server. The
+original full-site review captured every primary page at 390×844, 768×1024 and
+1440×1000. That historical evidence is stored under
+`output/review/website-task-8/`, outside source control. The final portrait was
+subsequently reviewed at the same three explicit viewport sizes; its current
+metrics are recorded below.
 
 | Check | Result | Evidence |
 |---|---|---|
-| Fifteen primary-page viewport captures | Pass | Full-page files listed below |
+| Fifteen primary-page viewport captures before portrait replacement | Historical baseline | Full-page files listed below |
 | Mobile menu pointer disclosure | Pass | `mobile-menu-open-390x844.jpg` |
 | Keyboard-only order and activation | Pass | Main-session key sequence and resulting menu states recorded below |
 | Visible focus treatment | Pass | Menu capture and `contact-field-errors-390x844.jpg` |
@@ -177,10 +195,11 @@ under `output/review/website-task-8/`, outside source control.
 | 200% reflow | Pass | Native browser UI reported 200%; DPR and scroll metrics recorded below |
 | Horizontal overflow | Pass | Document and body widths equal client width in all 15 required captures and five reflow checks |
 | Reduced-motion behaviour | Partial | Live rule and zero inline animated elements verified; active emulation unavailable |
-| Portrait placeholder is visibly non-final | Pass | All three homepage captures |
+| Final portrait desktop treatment | Pass | Local 1440×1000 homepage preview reviewed and approved by the project sponsor on 2026-09-04 |
+| Final portrait mobile and tablet treatment | Pass | Fresh full-page 390×844 and 768×1024 browser captures and metrics below |
 | Console warnings and errors | Pass | No warning/error entries after the review route set |
 
-### Required viewport captures
+### Historical full-site viewport captures
 
 - 390×844: `home-390x844.jpg`, `about-390x844.jpg`,
   `how-i-can-help-390x844.jpg`, `appointments-and-fees-390x844.jpg`,
@@ -193,9 +212,34 @@ under `output/review/website-task-8/`, outside source control.
   `contact-1440x1000.jpg`.
 
 Each path is relative to `output/review/website-task-8/`. At the three required
-sizes the browser reported client widths of 375, 753 and 1425 CSS pixels after
+viewports, these captures predate the approved final portrait. They remain a
+baseline for unchanged site structure but are not evidence of the current
+portrait treatment.
+
+At the three required sizes, the browser reported client widths of 375, 753 and
+1425 CSS pixels after
 the vertical scrollbar; `documentElement.scrollWidth` and `body.scrollWidth`
 matched the client width for every page.
+
+### Final portrait responsive review — 2026-09-04
+
+The final homepage was reloaded and captured in full at each explicit viewport.
+The approved 1020 × 1190 JPEG loaded completely with the accessible name
+`Melanie Watsham, physiotherapist`; no warning or error was recorded in the
+browser console.
+
+| Viewport | Client/document/body width | Rendered portrait | Menu | Result |
+|---|---:|---:|---|---|
+| 390×844 | 375 / 375 / 375 | 309×361 | Mobile | Pass |
+| 768×1024 | 753 / 753 / 753 | 687×802 | Mobile | Pass |
+| 1440×1000 | 1425 / 1425 / 1425 | 449×524 | Desktop | Pass |
+
+The equal client, document and body widths show no horizontal overflow. The
+rendered sizes preserve the source's 6:7 aspect ratio without distortion. The
+portrait remains centred in its bordered frame and the face, hair and shoulders
+remain visible at every reviewed size. This clears the portrait-specific
+responsive review; it does not sign the separate whole-site human approval
+lines below.
 
 ### Interaction and reflow record
 

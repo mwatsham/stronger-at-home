@@ -4,6 +4,8 @@ import shutil
 from tempfile import TemporaryDirectory
 import unittest
 
+from PIL import Image
+
 from scripts.validate_site import find_prohibited_content_categories, validate_site
 
 
@@ -20,13 +22,21 @@ PUBLIC_PAGES = {
 class LandmarkParser(HTMLParser):
     def __init__(self):
         super().__init__()
-        self.tags, self.links, self.text, self.h1_count = [], [], [], 0
+        self.tags, self.links, self.images, self.text, self.h1_count = (
+            [],
+            [],
+            [],
+            [],
+            0,
+        )
 
     def handle_starttag(self, tag, attrs):
         attributes = dict(attrs)
         self.tags.append(tag)
         if tag == "a" and attributes.get("href"):
             self.links.append(attributes["href"])
+        if tag == "img":
+            self.images.append(attributes)
         if tag == "h1":
             self.h1_count += 1
 
@@ -59,15 +69,24 @@ class SiteValidationTests(unittest.TestCase):
     def test_development_site_has_no_structural_errors(self):
         self.assertEqual(validate_site(ROOT, "development"), [])
 
-    def test_production_rejects_unresolved_publication_gates(self):
-        errors = validate_site(ROOT, "production")
-        self.assertEqual(
-            errors,
-            [
-                "Production blocker remains: portrait",
-                "Production blocker remains: privacy-approval",
-            ],
-        )
+    def test_production_has_no_automated_publication_blockers(self):
+        self.assertEqual(validate_site(ROOT, "production"), [])
+
+    def test_privacy_notice_covers_legal_claims_transfers_and_required_fields(self):
+        html = (ROOT / "site/privacy/index.html").read_text(encoding="utf-8")
+        for required in (
+            "Article 6(1)(c)",
+            "Article 6(1)(f)",
+            "Article 9(2)(f)",
+            "UK-US Data Bridge",
+            "UK International Data Transfer Agreement",
+            "standard data protection clauses under Article 46(2)(c)",
+            'id="privacy-objection"',
+            "preferred contact method, postcode, short enquiry and privacy acknowledgement are required",
+            "request more information or a copy of the relevant safeguards",
+        ):
+            with self.subTest(required=required):
+                self.assertIn(required, html)
 
     def test_staging_is_not_indexable(self):
         text = (ROOT / "site/robots-staging.txt").read_text(encoding="utf-8")
@@ -353,6 +372,64 @@ class SiteValidationTests(unittest.TestCase):
 
             self.assertIn("Contact page must publish the approved phone and email routes", errors)
 
+    def test_validator_requires_every_privacy_notice_section(self):
+        required_sections = (
+            "privacy-controller",
+            "privacy-information",
+            "privacy-lawful-basis",
+            "privacy-sharing",
+            "privacy-retention",
+            "privacy-rights",
+            "privacy-objection",
+            "privacy-complaints",
+        )
+        for missing in required_sections:
+            with self.subTest(missing=missing), TemporaryDirectory() as directory:
+                copy = Path(directory) / "project"
+                shutil.copytree(ROOT, copy)
+                privacy = copy / "site/privacy/index.html"
+                html = privacy.read_text(encoding="utf-8")
+                target = f'id="{missing}"'
+                self.assertIn(target, html)
+                privacy.write_text(
+                    html.replace(target, f'id="{missing}-removed"', 1),
+                    encoding="utf-8",
+                )
+
+                errors = validate_site(copy, "development")
+
+                self.assertIn(
+                    f"Privacy notice is missing required section: {missing}",
+                    errors,
+                )
+
+    def test_validator_allows_the_official_ico_complaints_link(self):
+        errors = validate_site(ROOT, "development")
+
+        self.assertFalse(
+            any(error.startswith("External URL is not approved") for error in errors),
+            errors,
+        )
+
+    def test_validator_still_rejects_other_external_links(self):
+        with TemporaryDirectory() as directory:
+            copy = Path(directory) / "project"
+            shutil.copytree(ROOT, copy)
+            privacy = copy / "site/privacy/index.html"
+            html = privacy.read_text(encoding="utf-8").replace(
+                "https://ico.org.uk/make-a-complaint/data-protection-complaints/check-if-you-can-complain/",
+                "https://example.com/complaints/",
+                1,
+            )
+            privacy.write_text(html, encoding="utf-8")
+
+            errors = validate_site(copy, "development")
+
+            self.assertIn(
+                "External URL is not approved in site/privacy/index.html: https://example.com/complaints/",
+                errors,
+            )
+
     def test_validator_checks_sitemap_and_staging_crawl_policy(self):
         with TemporaryDirectory() as directory:
             copy = Path(directory) / "project"
@@ -607,11 +684,37 @@ class SiteValidationTests(unittest.TestCase):
         for claim in prohibited_claims:
             self.assertNotIn(claim.lower(), html.lower(), claim)
 
-    def test_development_portrait_is_a_production_blocker(self):
+    def test_homepage_uses_the_approved_web_portrait(self):
+        portrait = ROOT / "site/assets/images/melanie-watsham-portrait.jpg"
         html = (ROOT / "site/index.html").read_text(encoding="utf-8")
+        parser = LandmarkParser()
+        parser.feed(html)
 
-        self.assertIn('data-production-blocker="portrait"', html)
-        self.assertIn("Professional portrait to be supplied", html)
+        self.assertTrue(portrait.is_file())
+        with Image.open(portrait) as image:
+            self.assertEqual(image.format, "JPEG")
+            self.assertEqual(image.size, (1020, 1190))
+            self.assertEqual(image.mode, "RGB")
+            self.assertEqual(len(image.getexif()), 0)
+
+        matching_images = [
+            image
+            for image in parser.images
+            if image.get("src") == "/assets/images/melanie-watsham-portrait.jpg"
+        ]
+        self.assertEqual(
+            matching_images,
+            [
+                {
+                    "src": "/assets/images/melanie-watsham-portrait.jpg",
+                    "alt": "Melanie Watsham, physiotherapist",
+                    "width": "1020",
+                    "height": "1190",
+                }
+            ],
+        )
+        self.assertNotIn('data-production-blocker="portrait"', html)
+        self.assertNotIn("Professional portrait to be supplied", html)
 
     def test_mobile_menu_is_a_javascript_enhancement_with_an_accurate_disclosure_control(self):
         stylesheet = (ROOT / "site/assets/css/site.css").read_text(encoding="utf-8")

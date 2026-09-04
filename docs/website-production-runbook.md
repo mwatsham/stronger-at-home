@@ -13,6 +13,8 @@ any production mutation, require all of the following recorded gates:
   the required reviewer and no self-approval;
 - the final portrait supplied, reviewed, and approved for publication;
 - final privacy approval for the published notice and enquiry handling;
+- completion of the ICO data protection fee self-assessment and any required
+  sole-trader registration;
 - an owner-only production configuration verified without exposing values;
 - live-recipient confirmation that the sole recipient is exactly
   `melanie@stronger-at-home.co.uk`;

@@ -67,9 +67,12 @@ robots and requires a reversible cPanel runbook, an external safe-recipient
 configuration and separate deployment authority. No hosting change has been
 made. The public site and its human content-review checklist intentionally
 contain no payment-method wording; the approved individual quotation and agreed
-fixed-price wording remains. Only the final professional portrait and approved
-privacy retention wording remain as production content blockers; unverified
-credential and referral wording stays omitted.
+fixed-price wording remains. The privacy notice was independently reviewed,
+revised and approved on 2026-09-04, and its approval blocker was removed. The
+supplied professional portrait is now integrated as a faithful, non-generative
+web crop, its rendered homepage treatment is approved, and it has no automated
+production blocker. The full staging candidate still requires human sign-off;
+unverified credential and referral wording stays omitted.
 
 Start with [strategy](brand/strategy.md), [messaging](brand/messaging.md),
 [identity](brand/identity.md), [clearance](brand/clearance.md), and the

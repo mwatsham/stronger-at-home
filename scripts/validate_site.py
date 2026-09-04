@@ -21,6 +21,9 @@ FORMAL_NAME = "Stronger at Home Physiotherapy"
 FORMAL_IDENTITY = "Melanie Watsham trading as Stronger at Home Physiotherapy"
 APPROVED_PHONE = "+447843497871"
 APPROVED_EMAIL = "melanie@stronger-at-home.co.uk"
+APPROVED_EXTERNAL_URLS = {
+    "https://ico.org.uk/make-a-complaint/data-protection-complaints/check-if-you-can-complain/",
+}
 
 PRIMARY_PAGES = {
     Path("site/index.html"): "/",
@@ -40,7 +43,6 @@ SITEMAP_URLS = {
 }
 
 ALLOWED_BLOCKERS = {
-    "portrait",
     "privacy-approval",
     "credentials",
     "referral-suitability",
@@ -71,13 +73,13 @@ APPROVED_PUBLIC_SOURCE_SHA256 = {
     "site/assets/fonts/OFL-atkinson.txt": "09636801ed3e868736cc359bb1c819c5ef76529cbb41473cb1f602ef166dad0a",
     "site/assets/fonts/OFL-source-serif.txt": "0fd8b796c1c6220a559a5682cfd00d1c8488b428369f7cb70deb671888cef85f",
     "site/assets/fonts/source-serif-4.ttf": "97b2d4da6e3cb494b5a1e66ae176914d852ccabef49e0c02c0df25f3e39aca0b",
-    "site/assets/images/portrait-placeholder.svg": "ebb4e3a1644ae864495f6b540b282426d7bf0c41f0089c9798b0d65b151d96a5",
+    "site/assets/images/melanie-watsham-portrait.jpg": "9f5b50683414293d1fecb9b6ba0eb644259cd6007c4e309b51777a05651f5718",
     "site/assets/images/stronger-at-home-logo.png": EXPECTED_LOGO_SHA256,
     "site/assets/js/site.js": "3719a73b082b915082cc65fd4369e9e970e48629912377f52b9e44467ad42b07",
     "site/contact/index.php": "a08d203bcfa1162932f562e68fe40d9d6206fa603f7cdf5759d61fec15e97f0a",
     "site/how-i-can-help/index.html": "b2f3910b4b3e7dd751ba98fde53ee9f47c0b96fd1b2e5c1dcc2e0a2d13c8b264",
-    "site/index.html": "a1c21cfeedba232a6224cfd4793b09fa2bb217e4635ed1b63a3cd16886b559c7",
-    "site/privacy/index.html": "a87bba67ed9864a6dfee6c5aaf0c21d236a390255dd045e40206d3ebcbd99597",
+    "site/index.html": "2817da6fcb79fb9b0fc50aec06a4e422581e8d6303e457e6de6eaff57f4e89eb",
+    "site/privacy/index.html": "d199295f24ebaede98b10adbaa2fd93923e09e6b83bce885c96e40d2c9d6dd70",
     "site/robots-staging.txt": "331ea9090db0c9f6f597bd9840fd5b171830f6e0b3ba1cb24dfa91f0c95aedc1",
     "site/robots.txt": "6806d9c899e6b514b73f45b56f6ff0eb6193e996027444ecebc88d4c31bbf294",
     "site/sitemap.xml": "e343bdfdc81a434ba772c17174e8f36fe79fdab8e3b52d03b63e3d7976469101",
@@ -439,8 +441,13 @@ def _validate_links(root: Path, parsed: dict[Path, SiteHTMLParser], errors: list
                 errors.append(f"Unsupported link scheme in {relative_path.as_posix()}: {value}")
                 continue
             if parts.scheme in {"http", "https"}:
-                if f"{parts.scheme}://{parts.netloc}" != CANONICAL_ORIGIN:
+                if (
+                    f"{parts.scheme}://{parts.netloc}" != CANONICAL_ORIGIN
+                    and value not in APPROVED_EXTERNAL_URLS
+                ):
                     errors.append(f"External URL is not approved in {relative_path.as_posix()}: {value}")
+                    continue
+                if value in APPROVED_EXTERNAL_URLS:
                     continue
                 target_route = parts.path or "/"
             else:
@@ -475,6 +482,39 @@ def _actual_image_size(path: Path) -> tuple[int, int] | None:
         if len(data) < 24 or data[:8] != b"\x89PNG\r\n\x1a\n" or data[12:16] != b"IHDR":
             return None
         return struct.unpack(">II", data[16:24])
+    if path.suffix.lower() in {".jpg", ".jpeg"}:
+        data = path.read_bytes()
+        if len(data) < 4 or data[:2] != b"\xff\xd8":
+            return None
+        offset = 2
+        start_of_frame_markers = {
+            0xC0, 0xC1, 0xC2, 0xC3, 0xC5, 0xC6, 0xC7,
+            0xC9, 0xCA, 0xCB, 0xCD, 0xCE, 0xCF,
+        }
+        while offset + 4 <= len(data):
+            if data[offset] != 0xFF:
+                return None
+            while offset < len(data) and data[offset] == 0xFF:
+                offset += 1
+            if offset >= len(data):
+                return None
+            marker = data[offset]
+            offset += 1
+            if marker in {0xD8, 0xD9}:
+                continue
+            if marker == 0xDA:
+                return None
+            if offset + 2 > len(data):
+                return None
+            segment_length = struct.unpack(">H", data[offset:offset + 2])[0]
+            if segment_length < 2 or offset + segment_length > len(data):
+                return None
+            if marker in start_of_frame_markers:
+                if segment_length < 7:
+                    return None
+                height, width = struct.unpack(">HH", data[offset + 3:offset + 7])
+                return width, height
+            offset += segment_length
     if path.suffix.lower() == ".svg":
         try:
             root = ET.parse(path).getroot()
@@ -599,6 +639,20 @@ def _validate_contacts_and_claims(
 
     privacy = parsed.get(Path("site/privacy/index.html"))
     if privacy is not None:
+        for required_section in (
+            "privacy-controller",
+            "privacy-information",
+            "privacy-lawful-basis",
+            "privacy-sharing",
+            "privacy-retention",
+            "privacy-rights",
+            "privacy-objection",
+            "privacy-complaints",
+        ):
+            if required_section not in privacy.ids:
+                errors.append(
+                    f"Privacy notice is missing required section: {required_section}"
+                )
         for required in (
             FORMAL_IDENTITY,
             "11 Mospey Crescent Epsom Surrey KT17 4LZ",
@@ -607,9 +661,25 @@ def _validate_contacts_and_claims(
             "detailed or urgent medical information",
             "secure session identifier",
             "rate limit",
+            "Article 6(1)(b)",
+            "Article 6(1)(c)",
+            "Article 6(1)(f)",
+            "Article 9(2)(h)",
+            "Article 9(2)(f)",
+            "GoDaddy",
+            "Titan",
+            "UK-US Data Bridge",
+            "UK International Data Transfer Agreement",
+            "standard data protection clauses under Article 46(2)(c)",
+            "preferred contact method, postcode, short enquiry and privacy acknowledgement are required",
+            "request more information or a copy of the relevant safeguards",
+            "12 months after the last contact",
+            "eight years after the last treatment",
+            "Information Commissioner’s Office",
+            "No solely automated decision-making",
         ):
             if required not in privacy.visible_text:
-                errors.append(f"Privacy draft is missing required information: {required}")
+                errors.append(f"Privacy notice is missing required information: {required}")
     contact = parsed.get(Path("site/contact/index.php"))
     if contact is not None:
         hrefs = {
@@ -695,10 +765,10 @@ def _validate_blockers(
     for blocker in sorted(blockers - ALLOWED_BLOCKERS):
         errors.append(f"Unapproved publication blocker: {blocker}")
     home = parsed.get(Path("site/index.html"))
-    if home is not None and "/assets/images/portrait-placeholder.svg" in {
+    if home is not None and "/assets/images/melanie-watsham-portrait.jpg" not in {
         str(image.get("src") or "") for image in home.images
-    } and "portrait" not in blockers:
-        errors.append("Portrait placeholder must carry the portrait publication blocker")
+    }:
+        errors.append("Homepage must publish the approved Melanie portrait")
     privacy = parsed.get(Path("site/privacy/index.html"))
     if privacy is not None and "Draft for approval" in privacy.visible_text and "privacy-approval" not in blockers:
         errors.append("Draft privacy notice must carry the privacy-approval publication blocker")
