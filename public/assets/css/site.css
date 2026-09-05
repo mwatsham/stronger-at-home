@@ -183,6 +183,19 @@ footer a {
   text-underline-offset: 0.2em;
 }
 
+@media (min-width: 61rem) {
+  #primary-navigation { gap: 0.5rem; }
+
+  #primary-navigation a:not(.button) {
+    flex: 1 1 0;
+    min-width: 0;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  #primary-navigation .button { flex: 0 0 auto; }
+}
+
 @media (max-width: 48rem) {
   .site-identity {
     flex-direction: column;
