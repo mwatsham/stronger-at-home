@@ -68,7 +68,7 @@ APPROVED_PUBLIC_SOURCE_SHA256 = {
     "site/api/src/ValidationResult.php": "2ceb38671310bd93cb04ebcbcd1341bcfbc15bf069229a5b375e258772ff1898",
     "site/appointments-and-fees/index.html": "c7f00698a41ed12cd7de31c4b97e0f026b47bca2079a7832e5040717098f2ce8",
     "site/assets/css/brand-tokens.css": "9945f6e139a26124a0755d46e0bb4dc93f3e867d87278b0ff4988d0f92d40450",
-    "site/assets/css/site.css": "d81c6766c840d76cbcfd2f26e30d652597471b3fb024089e0541f1ced2235fa2",
+    "site/assets/css/site.css": "6f7af19fdbeda3d8bb4abed9ec574e27d7b3e0f5d2a884082161293d01ea7a98",
     "site/assets/fonts/atkinson-hyperlegible-next.ttf": "5a455d1cfa099b601ab70751bb9673e8fe1854dc4500c80e1a220d0d75e31745",
     "site/assets/fonts/OFL-atkinson.txt": "09636801ed3e868736cc359bb1c819c5ef76529cbb41473cb1f602ef166dad0a",
     "site/assets/fonts/OFL-source-serif.txt": "0fd8b796c1c6220a559a5682cfd00d1c8488b428369f7cb70deb671888cef85f",

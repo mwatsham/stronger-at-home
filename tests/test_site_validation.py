@@ -115,6 +115,21 @@ class SiteValidationTests(unittest.TestCase):
         self.assertIn('#primary-navigation a[aria-current="page"]', stylesheet)
         self.assertIn("text-decoration: underline;", stylesheet)
 
+    def test_desktop_navigation_evenly_spaces_standard_links_and_keeps_cta_separate(self):
+        stylesheet = (ROOT / "site/assets/css/site.css").read_text(encoding="utf-8")
+
+        desktop_start = stylesheet.index("@media (min-width: 61rem)")
+        mobile_start = stylesheet.index("@media (max-width: 48rem)")
+        desktop_rules = stylesheet[desktop_start:mobile_start]
+
+        self.assertIn("#primary-navigation a:not(.button)", desktop_rules)
+        self.assertIn("flex: 1 1 0;", desktop_rules)
+        self.assertIn("min-width: 0;", desktop_rules)
+        self.assertIn("text-align: center;", desktop_rules)
+        self.assertIn("white-space: nowrap;", desktop_rules)
+        self.assertIn("#primary-navigation .button", desktop_rules)
+        self.assertIn("flex: 0 0 auto;", desktop_rules)
+
     def test_primary_navigation_marks_the_current_page(self):
         for relative_path, route in PUBLIC_PAGES.items():
             with self.subTest(relative_path=relative_path):
