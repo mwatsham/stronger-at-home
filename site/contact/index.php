@@ -71,17 +71,22 @@ $escape = static fn(string $value): string => htmlspecialchars($value, ENT_QUOTE
 <body>
   <a class="skip-link" href="#main-content">Skip to main content</a>
   <header class="site-header">
-    <a href="/" aria-label="Stronger at Home Physiotherapy, home">
-      <img src="/assets/images/stronger-at-home-logo.png" alt="Stronger at Home Physiotherapy by Melanie Watsham" width="512" height="160">
-    </a>
-    <button class="menu-button" type="button" aria-expanded="false" aria-controls="primary-navigation">Menu</button>
-    <nav id="primary-navigation" aria-label="Primary">
-      <a href="/">Home</a><a href="/about/">About Melanie</a>
-      <a href="/how-i-can-help/">How I can help</a>
-      <a href="/appointments-and-fees/">Appointments &amp; fees</a>
-      <a href="/contact/">Contact</a>
-      <a class="button" href="/contact/#appointment-request">Request an appointment</a>
-    </nav>
+    <div class="site-identity">
+      <a class="brand-home" href="/" aria-label="Stronger at Home Physiotherapy, home">
+        <img src="/assets/images/stronger-at-home-logo.png" alt="Stronger at Home Physiotherapy by Melanie Watsham" width="512" height="160">
+      </a>
+      <p class="brand-strap"><strong>Home physiotherapy for adults</strong><span>Epsom and surrounding areas</span></p>
+    </div>
+    <div class="site-navigation">
+      <button class="menu-button" type="button" aria-expanded="false" aria-controls="primary-navigation">Menu</button>
+      <nav id="primary-navigation" aria-label="Primary">
+        <a href="/">Home</a><a href="/about/">About Melanie</a>
+        <a href="/how-i-can-help/">How I can help</a>
+        <a href="/appointments-and-fees/">Appointments &amp; fees</a>
+        <a aria-current="page" href="/contact/">Contact</a>
+        <a class="button" href="/contact/#appointment-request">Request an appointment</a>
+      </nav>
+    </div>
   </header>
   <main id="main-content" class="contact-page">
     <section class="page-intro contact-intro" aria-labelledby="contact-heading">

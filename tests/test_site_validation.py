@@ -17,6 +17,16 @@ PUBLIC_PAGES = {
     "site/appointments-and-fees/index.html": "/appointments-and-fees/",
     "site/contact/index.php": "/contact/",
 }
+BRANDED_PAGE_PATHS = (
+    "site/index.html",
+    "site/about/index.html",
+    "site/how-i-can-help/index.html",
+    "site/appointments-and-fees/index.html",
+    "site/contact/index.php",
+    "site/privacy/index.html",
+    "site/accessibility/index.html",
+    "site/404.html",
+)
 
 
 class LandmarkParser(HTMLParser):
@@ -58,6 +68,62 @@ class FormParser(HTMLParser):
 
 
 class SiteValidationTests(unittest.TestCase):
+    def test_every_public_page_uses_the_approved_compact_editorial_header(self):
+        for relative_path in BRANDED_PAGE_PATHS:
+            with self.subTest(relative_path=relative_path):
+                html = (ROOT / relative_path).read_text(encoding="utf-8")
+                header = html.split('<header class="site-header">', 1)[1].split(
+                    "</header>", 1
+                )[0]
+
+                self.assertEqual(header.count('class="site-identity"'), 1)
+                self.assertEqual(header.count('class="brand-home"'), 1)
+                self.assertEqual(header.count('class="brand-strap"'), 1)
+                self.assertEqual(header.count('class="site-navigation"'), 1)
+                self.assertEqual(header.count("Home physiotherapy for adults"), 1)
+                self.assertEqual(header.count("Epsom and surrounding areas"), 1)
+                self.assertEqual(
+                    header.count(
+                        'aria-label="Stronger at Home Physiotherapy, home"'
+                    ),
+                    1,
+                )
+                self.assertEqual(
+                    header.count(
+                        'alt="Stronger at Home Physiotherapy by Melanie Watsham"'
+                    ),
+                    1,
+                )
+                self.assertLess(
+                    header.index('class="site-identity"'),
+                    header.index('class="site-navigation"'),
+                )
+                self.assertLess(
+                    header.index('class="menu-button"'),
+                    header.index('id="primary-navigation"'),
+                )
+
+    def test_compact_editorial_header_styles_preserve_logo_scale_and_link_affordance(self):
+        stylesheet = (ROOT / "site/assets/css/site.css").read_text(encoding="utf-8")
+
+        self.assertIn("background: #F9F4F2;", stylesheet)
+        self.assertIn("width: min(100%, 19.6875rem);", stylesheet)
+        self.assertIn(".brand-strap", stylesheet)
+        self.assertIn(".site-navigation", stylesheet)
+        self.assertIn("#primary-navigation a:not(.button):hover", stylesheet)
+        self.assertIn("#primary-navigation a:not(.button):focus-visible", stylesheet)
+        self.assertIn('#primary-navigation a[aria-current="page"]', stylesheet)
+        self.assertIn("text-decoration: underline;", stylesheet)
+
+    def test_primary_navigation_marks_the_current_page(self):
+        for relative_path, route in PUBLIC_PAGES.items():
+            with self.subTest(relative_path=relative_path):
+                html = (ROOT / relative_path).read_text(encoding="utf-8")
+                header = html.split('<header class="site-header">', 1)[1].split(
+                    "</header>", 1
+                )[0]
+                self.assertIn(f'aria-current="page" href="{route}"', header)
+
     def test_policy_helper_does_not_flag_benign_registered_or_card_context(self):
         for text in (
             "Your enquiry is registered when submitted.",
