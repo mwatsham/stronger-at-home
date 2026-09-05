@@ -707,7 +707,26 @@ class SiteValidationTests(unittest.TestCase):
                 section_ids.append(attributes.split('id="', 1)[1].split('"', 1)[0])
 
         self.assertEqual(section_ids, ids)
-        self.assertIn("Physiotherapy to help you feel stronger at home", html)
+        self.assertIn("Experienced care. Personal progress. At home.", html)
+
+    def test_homepage_uses_the_approved_promise_led_opening(self):
+        html = (ROOT / "site/index.html").read_text(encoding="utf-8")
+        introduction = html.split('<section id="introduction"', 1)[1].split(
+            '<section id="how-i-can-help"', 1
+        )[0]
+
+        heading = "Experienced care. Personal progress. At home."
+        explanation = (
+            "Personal physiotherapy visits for adults recovering strength, "
+            "mobility, balance and confidence."
+        )
+        self.assertEqual(introduction.count(f"<h1>{heading}</h1>"), 1)
+        self.assertEqual(introduction.count(f'<p class="lead">{explanation}</p>'), 1)
+        self.assertLess(introduction.index(heading), introduction.index(explanation))
+        self.assertNotIn("Physiotherapy to help you feel stronger at home", introduction)
+        self.assertIn("Request an appointment", introduction)
+        self.assertIn("Call Melanie", introduction)
+        self.assertIn("20+ years of NHS experience", introduction)
         self.assertIn("20+ years of NHS experience", html)
 
     def test_homepage_intro_uses_appointment_request_as_primary_action(self):

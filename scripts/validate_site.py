@@ -78,7 +78,7 @@ APPROVED_PUBLIC_SOURCE_SHA256 = {
     "site/assets/js/site.js": "3719a73b082b915082cc65fd4369e9e970e48629912377f52b9e44467ad42b07",
     "site/contact/index.php": "c648dae8718c26bfdc857b9e129fc9006f1a3c8b9d763894f3308521dc5d8b46",
     "site/how-i-can-help/index.html": "e2d029ce0e335ef785cd9e0c78992dd061b9ebc81a585d50f0a99ba7db87f416",
-    "site/index.html": "20b6c01e32ce03ce14fff12a19d053c55c8dd08afff61f0f7b7584de35373830",
+    "site/index.html": "3faa795c7fbc7ffc57352a2272d8d08a4d69d2898f047e0f2faf30cf56763fc0",
     "site/privacy/index.html": "ce85373512657f372f321b7527225326adf8907e23ba35f1a98317728f182b6b",
     "site/robots-staging.txt": "331ea9090db0c9f6f597bd9840fd5b171830f6e0b3ba1cb24dfa91f0c95aedc1",
     "site/robots.txt": "6806d9c899e6b514b73f45b56f6ff0eb6193e996027444ecebc88d4c31bbf294",
