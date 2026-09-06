@@ -57,6 +57,7 @@ $escape = static fn(string $value): string => htmlspecialchars($value, ENT_QUOTE
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" sizes="64x64" href="/assets/images/stronger-at-home-favicon.png">
   <title>Contact | Stronger at Home Physiotherapy</title>
   <meta name="description" content="Contact Stronger at Home Physiotherapy to request an appointment or ask about a home visit.">
   <link rel="canonical" href="https://stronger-at-home.co.uk/contact/">
