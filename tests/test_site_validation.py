@@ -4,7 +4,7 @@ import shutil
 from tempfile import TemporaryDirectory
 import unittest
 
-from PIL import Image
+from PIL import Image, ImageChops
 
 from scripts.validate_site import find_prohibited_content_categories, validate_site
 
@@ -32,7 +32,8 @@ BRANDED_PAGE_PATHS = (
 class LandmarkParser(HTMLParser):
     def __init__(self):
         super().__init__()
-        self.tags, self.links, self.images, self.text, self.h1_count = (
+        self.tags, self.links, self.icon_links, self.images, self.text, self.h1_count = (
+            [],
             [],
             [],
             [],
@@ -45,6 +46,8 @@ class LandmarkParser(HTMLParser):
         self.tags.append(tag)
         if tag == "a" and attributes.get("href"):
             self.links.append(attributes["href"])
+        if tag == "link" and "icon" in attributes.get("rel", "").split():
+            self.icon_links.append(attributes)
         if tag == "img":
             self.images.append(attributes)
         if tag == "h1":
@@ -114,6 +117,41 @@ class SiteValidationTests(unittest.TestCase):
         self.assertIn("#primary-navigation a:not(.button):focus-visible", stylesheet)
         self.assertIn('#primary-navigation a[aria-current="page"]', stylesheet)
         self.assertIn("text-decoration: underline;", stylesheet)
+
+    def test_browser_tab_icon_is_a_square_png(self):
+        icon_path = ROOT / "site/assets/images/stronger-at-home-favicon.png"
+
+        self.assertTrue(icon_path.is_file())
+        with Image.open(icon_path) as icon:
+            self.assertEqual(icon.format, "PNG")
+            self.assertEqual(icon.size, (64, 64))
+
+    def test_browser_tab_icon_artwork_is_centred(self):
+        icon_path = ROOT / "site/assets/images/stronger-at-home-favicon.png"
+
+        with Image.open(icon_path) as icon:
+            rgb_icon = icon.convert("RGB")
+            background = Image.new("RGB", rgb_icon.size, rgb_icon.getpixel((0, 0)))
+            difference = ImageChops.difference(rgb_icon, background).convert("L")
+            artwork = difference.point(lambda value: 255 if value > 12 else 0)
+            left, top, right, bottom = artwork.getbbox()
+
+        self.assertEqual(left, rgb_icon.width - right)
+        self.assertEqual(top, rgb_icon.height - bottom)
+
+    def test_every_public_page_references_the_browser_tab_icon(self):
+        expected = {
+            "rel": "icon",
+            "type": "image/png",
+            "sizes": "64x64",
+            "href": "/assets/images/stronger-at-home-favicon.png",
+        }
+
+        for relative_path in BRANDED_PAGE_PATHS:
+            with self.subTest(relative_path=relative_path):
+                parser = LandmarkParser()
+                parser.feed((ROOT / relative_path).read_text(encoding="utf-8"))
+                self.assertEqual(parser.icon_links, [expected])
 
     def test_desktop_navigation_evenly_spaces_standard_links_and_keeps_cta_separate(self):
         stylesheet = (ROOT / "site/assets/css/site.css").read_text(encoding="utf-8")
