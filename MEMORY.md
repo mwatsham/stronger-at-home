@@ -1,5 +1,21 @@
 # Durable project memory
 
+## 2026-09-06 — approved core logo asset pack
+
+Melanie Watsham approved the exact treatments shown in the logo asset pack
+comparison. The governed PNG-only pack contains transparent primary lockups,
+transparent and contained standalone secondary marks, and an email-sized
+lockup. The generator verifies the approved source hashes and creates the pack
+deterministically without redrawing, recolouring or changing the source
+geometry. Every public export is recorded by exact SHA-256 in the asset
+manifest.
+
+Transparent exports are permitted only on light, plain backgrounds. Use the
+approved opaque primary or contained secondary mark on dark, photographic or
+uncontrolled backgrounds. The standalone symbol is now allowed within this
+exact pack, superseding its earlier Stage 1 prohibition. No website adoption or
+deployment was authorised by the asset approval.
+
 ## 2026-09-04 — privacy retention and notice review
 
 The project sponsor approved a 12-month retention period after last contact for

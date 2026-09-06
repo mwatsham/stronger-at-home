@@ -367,7 +367,9 @@ def _validate_asset_manifest(root: Path, manifest: object) -> list[str]:
             errors.extend(_validate_hybrid_logo(asset_path))
         if role in RASTER_SIZES:
             errors.extend(_validate_raster_approval_record(asset))
-        elif role in PRIMARY_LOGO_ROLES:
+        elif role in PRIMARY_LOGO_ROLES or (
+            isinstance(role, str) and role.startswith("logo_")
+        ):
             if status == "approved":
                 if asset.get("reviewed_by") != "Melanie Watsham":
                     errors.append(

@@ -52,6 +52,15 @@ verified, and professional credentials must not be claimed until their
 wording is verified in `brand/clearance.md`. No patient, referral, website,
 social, uniform, vehicle or signage templates are included in this stage.
 
+Melanie Watsham approved the core PNG logo export pack on 2026-09-06. It adds
+exact transparent primary lockups, transparent and contained standalone marks,
+and an email-sized lockup without changing either approved primary source file.
+Transparent exports are restricted to light, plain backgrounds; opaque or
+contained artwork is required on dark, photographic or uncontrolled
+backgrounds. The pack is governed by `brand/assets/manifest.json` and explained
+in `brand/assets/exports/README.md`. Its approval does not authorise a website
+or production deployment.
+
 The reassurance-first, five-page website design was approved by the project
 sponsor on 2026-09-03. It uses `Request an appointment` as its primary action,
 addresses the adult patient directly and adopts the calm-editorial homepage

@@ -375,7 +375,20 @@ class BrandValidationTests(unittest.TestCase):
             context["identity_architecture"]["exact_artwork_reviewed_on"],
             "2026-08-05",
         )
+        self.assertEqual(
+            context["identity_architecture"]["approved_export_pack"],
+            {
+                "directory": "brand/assets/exports",
+                "format": "PNG only",
+                "standalone_symbol_allowed": True,
+                "transparent_backgrounds": "light, plain backgrounds only",
+                "dark_or_uncontrolled_backgrounds": "opaque or contained versions only",
+                "reviewed_by": "Melanie Watsham",
+                "reviewed_on": "2026-09-06",
+            },
+        )
         self.assertNotIn("public use before clearance", context["prohibitions"])
+        self.assertNotIn("standalone symbol in Stage 1", context["prohibitions"])
         self.assertIn(
             "use of registered trade mark symbol without registration",
             context["prohibitions"],
@@ -612,6 +625,25 @@ class BrandValidationTests(unittest.TestCase):
         with TemporaryDirectory() as directory:
             root = Path(directory)
             write_asset_project(root, status="approved")
+
+            errors = validate_project(root)
+
+        self.assertIn(
+            "Approved asset logo_primary_hybrid must be reviewed by Melanie Watsham",
+            errors,
+        )
+        self.assertIn(
+            "Approved asset logo_primary_hybrid must have an ISO review date", errors
+        )
+
+    def test_approved_derived_logo_requires_melanie_and_iso_review_date(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_asset_project(
+                root,
+                role="logo_secondary_transparent_512",
+                status="approved",
+            )
 
             errors = validate_project(root)
 
