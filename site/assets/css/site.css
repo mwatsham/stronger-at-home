@@ -360,8 +360,6 @@ main.homepage {
 .trust-point {
   display: inline-block;
   margin: 1.5rem 0 0;
-  padding-top: 0.75rem;
-  border-top: 2px solid var(--brand-colour-accent-progress);
   font-weight: var(--brand-typography-weight-semibold);
 }
 
@@ -369,6 +367,7 @@ main.homepage {
   margin: 0;
   padding: 0.75rem;
   border: 1px solid var(--brand-colour-brand-warm-sand);
+  border-radius: 1rem;
   background: var(--brand-colour-background-soft);
 }
 
@@ -376,6 +375,7 @@ main.homepage {
   display: block;
   width: 100%;
   height: auto;
+  border-radius: 0.5rem;
 }
 
 .portrait-frame figcaption {

@@ -854,6 +854,26 @@ class SiteValidationTests(unittest.TestCase):
         self.assertNotIn('data-production-blocker="portrait"', html)
         self.assertNotIn("Professional portrait to be supplied", html)
 
+    def test_portrait_frame_uses_nested_rounded_corners(self):
+        stylesheet = (ROOT / "site/assets/css/site.css").read_text(encoding="utf-8")
+
+        self.assertRegex(
+            stylesheet,
+            r"\.portrait-frame \{[^}]*border-radius: 1rem;[^}]*\}",
+        )
+        self.assertRegex(
+            stylesheet,
+            r"\.portrait-frame img \{[^}]*border-radius: 0\.5rem;[^}]*\}",
+        )
+
+    def test_hero_trust_point_does_not_add_a_rule_beneath_the_primary_action(self):
+        stylesheet = (ROOT / "site/assets/css/site.css").read_text(encoding="utf-8")
+        trust_point_rule = stylesheet.split(".trust-point {", 1)[1].split("}", 1)[0]
+
+        self.assertIn("margin: 1.5rem 0 0;", trust_point_rule)
+        self.assertNotIn("border-top:", trust_point_rule)
+        self.assertNotIn("padding-top:", trust_point_rule)
+
     def test_mobile_menu_is_a_javascript_enhancement_with_an_accurate_disclosure_control(self):
         stylesheet = (ROOT / "site/assets/css/site.css").read_text(encoding="utf-8")
 
