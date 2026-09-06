@@ -58,8 +58,9 @@ and an email-sized lockup without changing either approved primary source file.
 Transparent exports are restricted to light, plain backgrounds; opaque or
 contained artwork is required on dark, photographic or uncontrolled
 backgrounds. The pack is governed by `brand/assets/manifest.json` and explained
-in `brand/assets/EXPORTS.md`. Its approval does not authorise a website
-or production deployment.
+in `brand/assets/EXPORTS.md`. The project sponsor approved website-header use of
+the exact transparent 512 × 160 export and its rendered composition on
+2026-09-06. Staging or production release remains a separate gate.
 
 The reassurance-first, five-page website design was approved by the project
 sponsor on 2026-09-03. It uses `Request an appointment` as its primary action,

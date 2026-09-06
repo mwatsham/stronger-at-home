@@ -1,5 +1,17 @@
 # Durable project memory
 
+## 2026-09-06 — transparent primary logo adopted in website source
+
+The project sponsor approved replacing the website header's opaque logo copy
+with the exact approved 512 × 160 transparent primary export. The public path,
+rendered dimensions, scale, spacing, alt text and surrounding markup remain
+unchanged. The header's light, plain `#F9F4F2` background complies with the
+approved transparency boundary. Asset syncing and site validation now require
+the exact approved transparent bytes.
+
+The project sponsor subsequently approved the rendered composition for website
+use. Neither staging nor production release is authorised by this change.
+
 ## 2026-09-06 — approved core logo asset pack
 
 Melanie Watsham approved the exact treatments shown in the logo asset pack

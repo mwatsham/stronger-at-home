@@ -16,7 +16,10 @@ class SiteAssetSyncTests(unittest.TestCase):
 
             self.assertEqual(
                 (target / "assets/images/stronger-at-home-logo.png").read_bytes(),
-                (ROOT / "brand/assets/source/logo-primary-raster-v2-512.png").read_bytes(),
+                (
+                    ROOT
+                    / "brand/assets/exports/logo-primary-transparent-512.png"
+                ).read_bytes(),
             )
             self.assertEqual(
                 (target / "assets/css/brand-tokens.css").read_bytes(),

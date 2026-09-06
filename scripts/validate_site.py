@@ -47,7 +47,7 @@ ALLOWED_BLOCKERS = {
     "credentials",
     "referral-suitability",
 }
-EXPECTED_LOGO_SHA256 = "d557a0e8fd05efc86fcca2b3f63d807ad33f29527062697705a8e05616c6db39"
+EXPECTED_LOGO_SHA256 = "8159f4a14c38f6b334329c01bf86cb84cbd059d5503e83e3ec15bdf1bc0ab0ff"
 # Update this sorted allowlist only after the complete public source change has
 # received content, behaviour and release review. Every regular file under
 # site/ belongs here, irrespective of its name or extension.
@@ -551,7 +551,7 @@ def _validate_images(root: Path, parsed: dict[Path, SiteHTMLParser], errors: lis
                 errors.append(f"Image dimensions for {source} must be {actual[0]} × {actual[1]}")
 
     logo = root / "site/assets/images/stronger-at-home-logo.png"
-    brand_logo = root / "brand/assets/source/logo-primary-raster-v2-512.png"
+    brand_logo = root / "brand/assets/exports/logo-primary-transparent-512.png"
     if logo.is_file():
         logo_hash = hashlib.sha256(logo.read_bytes()).hexdigest()
         if logo_hash != EXPECTED_LOGO_SHA256:

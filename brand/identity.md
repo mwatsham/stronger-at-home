@@ -64,7 +64,10 @@ formal name `Stronger at Home Physiotherapy` in accessible text, metadata,
 ordinary prose and spoken usage even when the display artwork reads
 `Stronger@Home`.
 
-The export pack does not itself authorise a website change, publication or a
-new application template. Those actions remain subject to their own approval
-and the website-publication and credential-claim boundaries recorded in
-`brand/clearance.md`.
+Under D-40, the website source uses the exact approved 512 × 160 transparent
+primary export on its light, plain `#F9F4F2` header. The public filename,
+rendered dimensions, scale, spacing and accessible text remain unchanged.
+The project sponsor approved the rendered composition for website use on
+2026-09-06. Staging and production publication remain separate actions subject
+to their own approval and the website-publication and credential-claim
+boundaries recorded in `brand/clearance.md`.

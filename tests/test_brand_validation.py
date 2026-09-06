@@ -404,6 +404,16 @@ class BrandValidationTests(unittest.TestCase):
                 "reviewed_on": "2026-09-06",
             },
         )
+        self.assertEqual(
+            context["identity_architecture"]["website_logo"],
+            {
+                "asset": "brand/assets/exports/logo-primary-transparent-512.png",
+                "background": "light plain #F9F4F2 header",
+                "status": "approved for website use; release pending",
+                "approved_by": "Project sponsor",
+                "approved_on": "2026-09-06",
+            },
+        )
         self.assertNotIn("public use before clearance", context["prohibitions"])
         self.assertNotIn("standalone symbol in Stage 1", context["prohibitions"])
         self.assertIn(
