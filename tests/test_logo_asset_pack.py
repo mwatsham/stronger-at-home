@@ -69,13 +69,56 @@ class LogoAssetPackTests(unittest.TestCase):
             try:
                 with self.assertRaisesRegex(
                     RuntimeError,
-                    "Generated logo bytes do not match approved SHA-256",
+                    "Canonical approved logo hash mismatch",
                 ):
                     generator.generate_asset_pack(root)
             finally:
                 generator.APPROVED_EXPORT_SHA256[relative] = original_hash
 
             self.assertFalse((root / relative).exists())
+
+    def test_approved_exports_do_not_depend_on_platform_png_encoding(self):
+        generator = load_generator()
+        relative = Path("brand/assets/exports/logo-primary-transparent-512.png")
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            with Image.open(PROJECT_ROOT / relative) as approved:
+                image = approved.copy()
+
+            original_png_bytes = generator._png_bytes
+            generator._png_bytes = lambda *args, **kwargs: b"platform-dependent"
+            try:
+                generator._save_approved_export(image, root, relative)
+            finally:
+                generator._png_bytes = original_png_bytes
+
+            self.assertEqual(
+                (root / relative).read_bytes(),
+                (PROJECT_ROOT / relative).read_bytes(),
+            )
+
+    def test_approved_export_refuses_pixel_mode_or_size_drift_before_writing(self):
+        generator = load_generator()
+        relative = Path("brand/assets/exports/logo-primary-transparent-512.png")
+        with Image.open(PROJECT_ROOT / relative) as approved:
+            base = approved.copy()
+
+        pixel_drift = base.copy()
+        pixel_drift.putpixel((0, 0), (1, 2, 3, 4))
+        variants = {
+            "pixel": pixel_drift,
+            "mode": base.convert("RGB"),
+            "size": base.resize((511, 160)),
+        }
+        for label, image in variants.items():
+            with self.subTest(label=label), TemporaryDirectory() as directory:
+                root = Path(directory)
+                with self.assertRaisesRegex(
+                    RuntimeError,
+                    "Generated logo pixels do not match approved asset",
+                ):
+                    generator._save_approved_export(image, root, relative)
+                self.assertFalse((root / relative).exists())
 
     def test_pack_generates_the_approved_png_matrix(self):
         generator = load_generator()

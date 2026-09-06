@@ -34,6 +34,7 @@ SOURCE_SERIF = Path("brand/fonts/source-serif-4.ttf")
 ATKINSON = Path("brand/fonts/atkinson-hyperlegible-next.ttf")
 EXPORT_DIRECTORY = Path("brand/assets/exports")
 REVIEW_OUTPUT = Path("brand/assets/review/logo-asset-pack-comparison.png")
+CANONICAL_ASSET_ROOT = Path(__file__).resolve().parents[1]
 
 PRIMARY_SIZES = {
     2048: (2048, 640),
@@ -192,12 +193,35 @@ def _save_approved_export(
     print_master: bool = False,
 ) -> Path:
     path = root / relative_path
-    _save_png(
-        image,
-        path,
-        print_master=print_master,
-        approved_hash=APPROVED_EXPORT_SHA256[relative_path.as_posix()],
-    )
+    canonical_path = CANONICAL_ASSET_ROOT / relative_path
+    payload = canonical_path.read_bytes()
+    expected_hash = APPROVED_EXPORT_SHA256[relative_path.as_posix()]
+    actual_hash = hashlib.sha256(payload).hexdigest()
+    if actual_hash != expected_hash:
+        raise RuntimeError(
+            f"Canonical approved logo hash mismatch for {canonical_path}: "
+            f"expected {expected_hash}, received {actual_hash}"
+        )
+
+    with Image.open(BytesIO(payload)) as approved:
+        approved.load()
+        if (
+            approved.size != image.size
+            or approved.mode != image.mode
+            or approved.tobytes() != image.tobytes()
+        ):
+            raise RuntimeError(
+                f"Generated logo pixels do not match approved asset for {path.name}"
+            )
+        if print_master:
+            horizontal, vertical = approved.info.get("dpi", (0, 0))
+            if abs(horizontal - 300) > 0.1 or abs(vertical - 300) > 0.1:
+                raise RuntimeError(
+                    f"Approved print master must record 300 dpi for {path.name}"
+                )
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(payload)
     return path
 
 
