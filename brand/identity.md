@@ -23,11 +23,15 @@ The wordmark uses Source Serif 4 at 112 px for `Stronger@Home` and 82 px
 for `Physiotherapy`; the endorsement uses Atkinson Hyperlegible Next at 44 px.
 All wordmark text is Deep Navy `#203E55`.
 
-Do not create SVG derivatives, transparent or monochrome variants, AI-redrawn
-versions, recoloured source artwork, background-removed versions, or altered
-source geometry. D-14 is deprecated historical vector-cleanup direction only.
-Both exact current v2 PNG files were approved without changes by Melanie
-Watsham on 2026-08-05. That approval applies only to those exact output pixels.
+Do not create SVG derivatives, monochrome variants, AI-redrawn versions,
+recoloured source artwork or altered source geometry. D-14 is deprecated
+historical vector-cleanup direction only. Both exact current v2 PNG files were
+approved without changes by Melanie Watsham on 2026-08-05. Under D-39, Melanie
+also approved the exact deterministic PNG derivatives in
+`brand/assets/exports/` on 2026-09-06. Those derivatives include transparent
+primary lockups, transparent and contained secondary marks, and an email-sized
+lockup. Their hashes and approval records are governed by
+`brand/assets/manifest.json`.
 The project sponsor separately confirmed usage rights on 2026-08-04 for the
 immutable supplied-v2 source image with SHA-256
 `41267865711ca55f9225df8370c50bca823f68ca966b8fc216852e65a36d0ef1`.
@@ -52,7 +56,18 @@ before downloading font files into this refreshed repository.
 
 ## Application boundary
 
-No standalone house symbol, new public export, or application template may be
-made in Stage 1. The approved exact artwork may be used with the approved name,
-subject to the website-publication and credential-claim boundaries recorded in
-`brand/clearance.md`.
+The standalone secondary mark is approved only in the exact PNG exports. Use
+transparent files on light, plain backgrounds. Use an opaque or contained file
+on dark, photographic or otherwise uncontrolled backgrounds. Do not recreate,
+recolour, trace or reshape the artwork, and do not create SVG versions. Use the
+formal name `Stronger at Home Physiotherapy` in accessible text, metadata,
+ordinary prose and spoken usage even when the display artwork reads
+`Stronger@Home`.
+
+Under D-40, the website source uses the exact approved 512 × 160 transparent
+primary export on its light, plain `#F9F4F2` header. The public filename,
+rendered dimensions, scale, spacing and accessible text remain unchanged.
+The project sponsor approved the rendered composition for website use on
+2026-09-06. Staging and production publication remain separate actions subject
+to their own approval and the website-publication and credential-claim
+boundaries recorded in `brand/clearance.md`.

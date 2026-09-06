@@ -118,6 +118,17 @@ class SiteValidationTests(unittest.TestCase):
         self.assertIn('#primary-navigation a[aria-current="page"]', stylesheet)
         self.assertIn("text-decoration: underline;", stylesheet)
 
+    def test_website_header_uses_the_exact_approved_transparent_logo(self):
+        site_logo = ROOT / "site/assets/images/stronger-at-home-logo.png"
+        approved_logo = (
+            ROOT / "brand/assets/exports/logo-primary-transparent-512.png"
+        )
+
+        self.assertEqual(site_logo.read_bytes(), approved_logo.read_bytes())
+        with Image.open(site_logo) as image:
+            self.assertEqual(image.mode, "RGBA")
+            self.assertEqual(image.size, (512, 160))
+
     def test_browser_tab_icon_is_a_square_png(self):
         icon_path = ROOT / "site/assets/images/stronger-at-home-favicon.png"
 

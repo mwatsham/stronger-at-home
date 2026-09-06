@@ -104,6 +104,26 @@ HISTORICAL_RASTER_RECORDS = {
         "reviewed_on": "2026-08-04",
     },
 }
+APPROVED_EXPORT_RECORDS = {
+    "brand/assets/exports/logo-email-transparent-600.png": "1d1282ff9f5df7eeda3b49976a4d104c77467f145957a93d6a583cff553cf7c6",
+    "brand/assets/exports/logo-primary-transparent-1024.png": "857c31f151052fe4ce4f589f7de80c11119c87b7fbe09bb37a20848b6108bc0d",
+    "brand/assets/exports/logo-primary-transparent-2048.png": "0328080f1f7ecc01a93108cc686fad88490f404c0d989671271bd7b16a96717c",
+    "brand/assets/exports/logo-primary-transparent-256.png": "cdeb1048b9b3f2240568a098bb178e5bced80d1ac12e0a3f749d25af20bf25c7",
+    "brand/assets/exports/logo-primary-transparent-512.png": "8159f4a14c38f6b334329c01bf86cb84cbd059d5503e83e3ec15bdf1bc0ab0ff",
+    "brand/assets/exports/logo-secondary-contained-1024.png": "35ee071a01c91998fb3c88c5ec15f6047e2dae2e1634a714895ea9ef7264bbe0",
+    "brand/assets/exports/logo-secondary-contained-16.png": "58024d77114572f8b7f93efb24d1cf982a19584d62ed68839ceeb438390e0574",
+    "brand/assets/exports/logo-secondary-contained-180.png": "ae8b91455206a2169ebba94c5b2e92796093784bfa71c6e76d867f98c388f91e",
+    "brand/assets/exports/logo-secondary-contained-192.png": "a9a72f62748b13b2e093583171aa948f22de6bb45c09510be58b3dfd7e7146d9",
+    "brand/assets/exports/logo-secondary-contained-32.png": "876a1a8339942d228a9b971779e9581661827ade976c2a4dfdc2eafa97cb35d0",
+    "brand/assets/exports/logo-secondary-contained-512.png": "13d4c724c28b02792177a22cac32c7553ec668b8b95300ee71d8aa358320997d",
+    "brand/assets/exports/logo-secondary-contained-64.png": "87d944d4741b0e309ec5fec5b6efd233ef43219740e2449fa06ee7d2a51b4eae",
+    "brand/assets/exports/logo-secondary-transparent-1024.png": "e1b6e546b866c0b2eb17a997a3e873104d1e863c0074437c12c7ff826e6ce67f",
+    "brand/assets/exports/logo-secondary-transparent-128.png": "a2d1109ed2e50f63f9f4a1d52d8acbda855226cff2715c3f2d2c0098ec462928",
+    "brand/assets/exports/logo-secondary-transparent-256.png": "62c00ac3fcc4256c2253fa1d9e65ff9799de4806caff7244b8d502b18eee2067",
+    "brand/assets/exports/logo-secondary-transparent-512.png": "6b886f09ada6314a55b4a7a6cf034e3267841d41fb97f9b36448a315bbc9c50c",
+}
+APPROVED_EXPORT_REVIEWER = "Melanie Watsham"
+APPROVED_EXPORT_DATE = "2026-09-06"
 
 
 def _relative_luminance(hex_colour: str) -> float:
@@ -278,6 +298,51 @@ def _validate_asset_manifest(root: Path, manifest: object) -> list[str]:
         return ["Asset manifest must contain an assets array"]
 
     errors: list[str] = []
+    export_directory = root / "brand/assets/exports"
+    actual_export_paths = {
+        path.relative_to(root).as_posix()
+        for path in export_directory.rglob("*")
+        if path.is_file()
+    } if export_directory.is_dir() else set()
+    expected_export_paths = set(APPROVED_EXPORT_RECORDS)
+    for relative_path in sorted(actual_export_paths - expected_export_paths):
+        errors.append(
+            f"Unmanaged file in brand/assets/exports: {relative_path}"
+        )
+    for relative_path in sorted(expected_export_paths - actual_export_paths):
+        errors.append(f"Missing approved export: {relative_path}")
+
+    for relative_path, approved_hash in APPROVED_EXPORT_RECORDS.items():
+        entries = [
+            asset
+            for asset in assets
+            if isinstance(asset, dict) and asset.get("path") == relative_path
+        ]
+        if len(entries) != 1:
+            errors.append(
+                f"Asset manifest must contain exactly one approved export entry: {relative_path}"
+            )
+            continue
+        asset = entries[0]
+        expected_role = Path(relative_path).stem.replace("-", "_")
+        if asset.get("id") != expected_role or asset.get("role") != expected_role:
+            errors.append(
+                f"Approved export {relative_path} must use id and role {expected_role}"
+            )
+        if asset.get("status") != "approved":
+            errors.append(f"Approved export {relative_path} must have status approved")
+        if asset.get("reviewed_by") != APPROVED_EXPORT_REVIEWER:
+            errors.append(
+                f"Approved export {relative_path} must be reviewed by {APPROVED_EXPORT_REVIEWER}"
+            )
+        if asset.get("reviewed_on") != APPROVED_EXPORT_DATE:
+            errors.append(
+                f"Approved export {relative_path} must have approval date {APPROVED_EXPORT_DATE}"
+            )
+        if asset.get("sha256") != approved_hash:
+            errors.append(
+                f"Approved export {relative_path} must have approved SHA-256 {approved_hash}"
+            )
     entries_by_role = {
         role: [
             asset
@@ -367,7 +432,9 @@ def _validate_asset_manifest(root: Path, manifest: object) -> list[str]:
             errors.extend(_validate_hybrid_logo(asset_path))
         if role in RASTER_SIZES:
             errors.extend(_validate_raster_approval_record(asset))
-        elif role in PRIMARY_LOGO_ROLES:
+        elif role in PRIMARY_LOGO_ROLES or (
+            isinstance(role, str) and role.startswith("logo_")
+        ):
             if status == "approved":
                 if asset.get("reviewed_by") != "Melanie Watsham":
                     errors.append(
