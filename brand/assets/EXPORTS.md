@@ -7,12 +7,13 @@ exact approved hashes are recorded in `brand/assets/manifest.json`.
 
 | Use | Recommended file |
 |---|---|
-| Website or wide digital header on a light background | `logo-primary-transparent-1024.png` or `logo-primary-transparent-512.png` |
-| High-resolution document or print artwork | `logo-primary-transparent-2048.png` (300 dpi metadata) |
-| Email signature | `logo-email-transparent-600.png` |
-| Social profile or large square mark on a light background | `logo-secondary-transparent-1024.png` or `logo-secondary-transparent-512.png` |
-| Social profile or square mark on a dark, photographic or uncontrolled background | `logo-secondary-contained-1024.png` or `logo-secondary-contained-512.png` |
-| Browser, app or shortcut icon | the nearest `logo-secondary-contained-*.png` size |
+| Website or wide digital header on a light background | `exports/logo-primary-transparent-1024.png` or `exports/logo-primary-transparent-512.png` |
+| High-resolution document or print artwork on a light background | `exports/logo-primary-transparent-2048.png` (300 dpi metadata) |
+| Wide primary logo on a dark, photographic or uncontrolled background | `source/logo-primary-raster-v2-2048.png` or `source/logo-primary-raster-v2-512.png` |
+| Email signature on a light background | `exports/logo-email-transparent-600.png` |
+| Social profile or large square mark on a light background | `exports/logo-secondary-transparent-1024.png` or `exports/logo-secondary-transparent-512.png` |
+| Social profile or square mark on a dark, photographic or uncontrolled background | `exports/logo-secondary-contained-1024.png` or `exports/logo-secondary-contained-512.png` |
+| Browser, app or shortcut icon | the nearest `exports/logo-secondary-contained-*.png` size |
 
 Choose the smallest file that is at least as large as its rendered size. Do not
 enlarge a smaller PNG.

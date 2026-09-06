@@ -58,7 +58,7 @@ and an email-sized lockup without changing either approved primary source file.
 Transparent exports are restricted to light, plain backgrounds; opaque or
 contained artwork is required on dark, photographic or uncontrolled
 backgrounds. The pack is governed by `brand/assets/manifest.json` and explained
-in `brand/assets/exports/README.md`. Its approval does not authorise a website
+in `brand/assets/EXPORTS.md`. Its approval does not authorise a website
 or production deployment.
 
 The reassurance-first, five-page website design was approved by the project

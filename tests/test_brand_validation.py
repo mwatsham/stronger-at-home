@@ -116,6 +116,23 @@ def _write_default_rasters(root: Path) -> list[dict[str, object]]:
     return assets
 
 
+def _copy_approved_export_pack(root: Path) -> None:
+    manifest_path = root / "brand/assets/manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    approved_manifest = json.loads(
+        (PROJECT_ROOT / "brand/assets/manifest.json").read_text(encoding="utf-8")
+    )
+    for asset in approved_manifest["assets"]:
+        if not asset["path"].startswith("brand/assets/exports/"):
+            continue
+        source = PROJECT_ROOT / asset["path"]
+        destination = root / asset["path"]
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes(source.read_bytes())
+        manifest["assets"].append(dict(asset))
+    _write_manifest(root, manifest["assets"])
+
+
 def write_asset_project(
     root: Path,
     *,
@@ -492,6 +509,7 @@ class BrandValidationTests(unittest.TestCase):
         with TemporaryDirectory() as directory:
             root = Path(directory)
             write_asset_project(root)
+            _copy_approved_export_pack(root)
 
             errors = validate_project(root)
 
@@ -618,6 +636,44 @@ class BrandValidationTests(unittest.TestCase):
 
         self.assertIn(
             "Asset hash mismatch: brand/assets/source/logo-primary-hybrid.svg",
+            errors,
+        )
+
+    def test_approved_export_bytes_cannot_be_reapproved_by_updating_manifest_hash(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_asset_project(root)
+            _copy_approved_export_pack(root)
+            relative = "brand/assets/exports/logo-secondary-transparent-128.png"
+            asset_path = root / relative
+            Image.new("RGBA", (128, 128), (32, 62, 85, 255)).save(asset_path)
+            manifest_path = root / "brand/assets/manifest.json"
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            entry = next(
+                asset for asset in manifest["assets"] if asset["path"] == relative
+            )
+            entry["sha256"] = hashlib.sha256(asset_path.read_bytes()).hexdigest()
+            _write_manifest(root, manifest["assets"])
+
+            errors = validate_project(root)
+
+        self.assertIn(
+            "Approved export brand/assets/exports/logo-secondary-transparent-128.png must have approved SHA-256 a2d1109ed2e50f63f9f4a1d52d8acbda855226cff2715c3f2d2c0098ec462928",
+            errors,
+        )
+
+    def test_unmanaged_file_in_export_directory_is_rejected(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_asset_project(root)
+            _copy_approved_export_pack(root)
+            extra = root / "brand/assets/exports/unapproved.png"
+            Image.new("RGB", (16, 16), (249, 244, 242)).save(extra)
+
+            errors = validate_project(root)
+
+        self.assertIn(
+            "Unmanaged file in brand/assets/exports: brand/assets/exports/unapproved.png",
             errors,
         )
 
