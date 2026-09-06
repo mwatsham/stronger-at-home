@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+from io import BytesIO
 from pathlib import Path
 
 import PIL
@@ -44,6 +45,24 @@ SECONDARY_TRANSPARENT_SIZES = (1024, 512, 256, 128)
 SECONDARY_CONTAINED_SIZES = (1024, 512, 192, 180, 64, 32, 16)
 EMAIL_SIZE = (600, 188)
 REVIEW_SIZE = (1800, 2100)
+APPROVED_EXPORT_SHA256 = {
+    "brand/assets/exports/logo-email-transparent-600.png": "1d1282ff9f5df7eeda3b49976a4d104c77467f145957a93d6a583cff553cf7c6",
+    "brand/assets/exports/logo-primary-transparent-1024.png": "857c31f151052fe4ce4f589f7de80c11119c87b7fbe09bb37a20848b6108bc0d",
+    "brand/assets/exports/logo-primary-transparent-2048.png": "0328080f1f7ecc01a93108cc686fad88490f404c0d989671271bd7b16a96717c",
+    "brand/assets/exports/logo-primary-transparent-256.png": "cdeb1048b9b3f2240568a098bb178e5bced80d1ac12e0a3f749d25af20bf25c7",
+    "brand/assets/exports/logo-primary-transparent-512.png": "8159f4a14c38f6b334329c01bf86cb84cbd059d5503e83e3ec15bdf1bc0ab0ff",
+    "brand/assets/exports/logo-secondary-contained-1024.png": "35ee071a01c91998fb3c88c5ec15f6047e2dae2e1634a714895ea9ef7264bbe0",
+    "brand/assets/exports/logo-secondary-contained-16.png": "58024d77114572f8b7f93efb24d1cf982a19584d62ed68839ceeb438390e0574",
+    "brand/assets/exports/logo-secondary-contained-180.png": "ae8b91455206a2169ebba94c5b2e92796093784bfa71c6e76d867f98c388f91e",
+    "brand/assets/exports/logo-secondary-contained-192.png": "a9a72f62748b13b2e093583171aa948f22de6bb45c09510be58b3dfd7e7146d9",
+    "brand/assets/exports/logo-secondary-contained-32.png": "876a1a8339942d228a9b971779e9581661827ade976c2a4dfdc2eafa97cb35d0",
+    "brand/assets/exports/logo-secondary-contained-512.png": "13d4c724c28b02792177a22cac32c7553ec668b8b95300ee71d8aa358320997d",
+    "brand/assets/exports/logo-secondary-contained-64.png": "87d944d4741b0e309ec5fec5b6efd233ef43219740e2449fa06ee7d2a51b4eae",
+    "brand/assets/exports/logo-secondary-transparent-1024.png": "e1b6e546b866c0b2eb17a997a3e873104d1e863c0074437c12c7ff826e6ce67f",
+    "brand/assets/exports/logo-secondary-transparent-128.png": "a2d1109ed2e50f63f9f4a1d52d8acbda855226cff2715c3f2d2c0098ec462928",
+    "brand/assets/exports/logo-secondary-transparent-256.png": "62c00ac3fcc4256c2253fa1d9e65ff9799de4806caff7244b8d502b18eee2067",
+    "brand/assets/exports/logo-secondary-transparent-512.png": "6b886f09ada6314a55b4a7a6cf034e3267841d41fb97f9b36448a315bbc9c50c",
+}
 
 
 def _require_pinned_pillow() -> None:
@@ -134,8 +153,7 @@ def _fit_secondary(symbol: Image.Image, size: int) -> Image.Image:
     return canvas
 
 
-def _save_png(image: Image.Image, path: Path, *, print_master: bool = False) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
+def _png_bytes(image: Image.Image, *, print_master: bool = False) -> bytes:
     save_options = {
         "format": "PNG",
         "optimize": False,
@@ -143,7 +161,44 @@ def _save_png(image: Image.Image, path: Path, *, print_master: bool = False) -> 
     }
     if print_master:
         save_options["dpi"] = (300, 300)
-    image.save(path, **save_options)
+    output = BytesIO()
+    image.save(output, **save_options)
+    return output.getvalue()
+
+
+def _save_png(
+    image: Image.Image,
+    path: Path,
+    *,
+    print_master: bool = False,
+    approved_hash: str | None = None,
+) -> None:
+    payload = _png_bytes(image, print_master=print_master)
+    actual_hash = hashlib.sha256(payload).hexdigest()
+    if approved_hash is not None and actual_hash != approved_hash:
+        raise RuntimeError(
+            f"Generated logo bytes do not match approved SHA-256 for {path.name}: "
+            f"expected {approved_hash}, received {actual_hash}"
+        )
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(payload)
+
+
+def _save_approved_export(
+    image: Image.Image,
+    root: Path,
+    relative_path: Path,
+    *,
+    print_master: bool = False,
+) -> Path:
+    path = root / relative_path
+    _save_png(
+        image,
+        path,
+        print_master=print_master,
+        approved_hash=APPROVED_EXPORT_SHA256[relative_path.as_posix()],
+    )
+    return path
 
 
 def _font(root: Path, relative: Path, size: int) -> ImageFont.FreeTypeFont:
@@ -259,15 +314,17 @@ def generate_asset_pack(root: Path) -> tuple[Path, ...]:
 
     for width, size in PRIMARY_SIZES.items():
         image = transparent_primary.resize(size, Image.Resampling.LANCZOS)
-        path = root / EXPORT_DIRECTORY / f"logo-primary-transparent-{width}.png"
-        _save_png(image, path, print_master=width == 2048)
+        relative_path = EXPORT_DIRECTORY / f"logo-primary-transparent-{width}.png"
+        path = _save_approved_export(
+            image, root, relative_path, print_master=width == 2048
+        )
         paths.append(path)
         generated[f"primary-{width}"] = path
 
     for size in SECONDARY_TRANSPARENT_SIZES:
         image = _fit_secondary(transparent_symbol, size)
-        path = root / EXPORT_DIRECTORY / f"logo-secondary-transparent-{size}.png"
-        _save_png(image, path)
+        relative_path = EXPORT_DIRECTORY / f"logo-secondary-transparent-{size}.png"
+        path = _save_approved_export(image, root, relative_path)
         paths.append(path)
         generated[f"secondary-transparent-{size}"] = path
 
@@ -275,14 +332,17 @@ def generate_asset_pack(root: Path) -> tuple[Path, ...]:
         transparent = _fit_secondary(transparent_symbol, size)
         image = Image.new("RGB", (size, size), BACKGROUND)
         image.paste(transparent, (0, 0), transparent)
-        path = root / EXPORT_DIRECTORY / f"logo-secondary-contained-{size}.png"
-        _save_png(image, path)
+        relative_path = EXPORT_DIRECTORY / f"logo-secondary-contained-{size}.png"
+        path = _save_approved_export(image, root, relative_path)
         paths.append(path)
         generated[f"secondary-contained-{size}"] = path
 
     email = transparent_primary.resize(EMAIL_SIZE, Image.Resampling.LANCZOS)
-    email_path = root / EXPORT_DIRECTORY / "logo-email-transparent-600.png"
-    _save_png(email, email_path)
+    email_path = _save_approved_export(
+        email,
+        root,
+        EXPORT_DIRECTORY / "logo-email-transparent-600.png",
+    )
     paths.append(email_path)
     generated["email-600"] = email_path
 

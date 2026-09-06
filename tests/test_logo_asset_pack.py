@@ -6,6 +6,7 @@ from tempfile import TemporaryDirectory
 import unittest
 
 from PIL import Image
+from scripts.validate_brand import APPROVED_EXPORT_RECORDS
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -52,6 +53,30 @@ def load_generator():
 
 
 class LogoAssetPackTests(unittest.TestCase):
+    def test_generator_is_pinned_to_the_independently_approved_export_hashes(self):
+        generator = load_generator()
+
+        self.assertEqual(generator.APPROVED_EXPORT_SHA256, APPROVED_EXPORT_RECORDS)
+
+    def test_generator_refuses_to_write_drifted_approved_bytes(self):
+        generator = load_generator()
+        relative = "brand/assets/exports/logo-primary-transparent-2048.png"
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            self._copy_inputs(root)
+            original_hash = generator.APPROVED_EXPORT_SHA256[relative]
+            generator.APPROVED_EXPORT_SHA256[relative] = "0" * 64
+            try:
+                with self.assertRaisesRegex(
+                    RuntimeError,
+                    "Generated logo bytes do not match approved SHA-256",
+                ):
+                    generator.generate_asset_pack(root)
+            finally:
+                generator.APPROVED_EXPORT_SHA256[relative] = original_hash
+
+            self.assertFalse((root / relative).exists())
+
     def test_pack_generates_the_approved_png_matrix(self):
         generator = load_generator()
         with TemporaryDirectory() as directory:
