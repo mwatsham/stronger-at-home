@@ -4,7 +4,7 @@ import shutil
 from tempfile import TemporaryDirectory
 import unittest
 
-from PIL import Image
+from PIL import Image, ImageChops
 
 from scripts.validate_site import find_prohibited_content_categories, validate_site
 
@@ -125,6 +125,19 @@ class SiteValidationTests(unittest.TestCase):
         with Image.open(icon_path) as icon:
             self.assertEqual(icon.format, "PNG")
             self.assertEqual(icon.size, (64, 64))
+
+    def test_browser_tab_icon_artwork_is_centred(self):
+        icon_path = ROOT / "site/assets/images/stronger-at-home-favicon.png"
+
+        with Image.open(icon_path) as icon:
+            rgb_icon = icon.convert("RGB")
+            background = Image.new("RGB", rgb_icon.size, rgb_icon.getpixel((0, 0)))
+            difference = ImageChops.difference(rgb_icon, background).convert("L")
+            artwork = difference.point(lambda value: 255 if value > 12 else 0)
+            left, top, right, bottom = artwork.getbbox()
+
+        self.assertEqual(left, rgb_icon.width - right)
+        self.assertEqual(top, rgb_icon.height - bottom)
 
     def test_every_public_page_references_the_browser_tab_icon(self):
         expected = {

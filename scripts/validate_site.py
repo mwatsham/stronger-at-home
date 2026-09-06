@@ -74,7 +74,7 @@ APPROVED_PUBLIC_SOURCE_SHA256 = {
     "site/assets/fonts/OFL-source-serif.txt": "0fd8b796c1c6220a559a5682cfd00d1c8488b428369f7cb70deb671888cef85f",
     "site/assets/fonts/source-serif-4.ttf": "97b2d4da6e3cb494b5a1e66ae176914d852ccabef49e0c02c0df25f3e39aca0b",
     "site/assets/images/melanie-watsham-portrait.jpg": "9f5b50683414293d1fecb9b6ba0eb644259cd6007c4e309b51777a05651f5718",
-    "site/assets/images/stronger-at-home-favicon.png": "6c4e55e982387ea63e9eeffec7b933e8d3b93ed6b9944ea9344b2cb3d8017096",
+    "site/assets/images/stronger-at-home-favicon.png": "8bd1993f6ce86320dc8a7753a05aee047f11a23cffbd97e0e5149bb713640528",
     "site/assets/images/stronger-at-home-logo.png": EXPECTED_LOGO_SHA256,
     "site/assets/js/site.js": "3719a73b082b915082cc65fd4369e9e970e48629912377f52b9e44467ad42b07",
     "site/contact/index.php": "076e68030031a86325be823247946cabc38abcfd4feb812fab759cd43c548666",
