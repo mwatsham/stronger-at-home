@@ -18,8 +18,9 @@ unresolved entry is not permission to publish.
 | Supplied v2 PNG `41267865711ca55f9225df8370c50bca823f68ca966b8fc216852e65a36d0ef1` | rights confirmed | Project sponsor confirmed usage rights for this exact supplied image on 2026-08-04 | Evidence applies only to this exact file; all other launch gates remain in force. |
 | `brand/assets/source/logo-primary-raster-2048.png` historical raster artwork | deprecated; historically approved | Approved without changes by Melanie Watsham on 2026-08-04; superseded by the v2 wordmark | Preserve as immutable history; do not use as the current primary artwork. |
 | `brand/assets/source/logo-primary-raster-512.png` historical raster artwork | deprecated; historically approved | Approved without changes by Melanie Watsham on 2026-08-04; superseded by the v2 wordmark | Preserve as immutable history; do not use as the current primary artwork. |
-| `brand/assets/source/logo-primary-raster-v2-2048.png` exact current raster artwork | approved | Approved without changes by Melanie Watsham on 2026-08-05 | Do not export or use publicly until every separate launch gate is resolved. |
-| `brand/assets/source/logo-primary-raster-v2-512.png` exact current raster artwork | approved | Approved without changes by Melanie Watsham on 2026-08-05 | Do not export or use publicly until every separate launch gate is resolved. |
+| `brand/assets/source/logo-primary-raster-v2-2048.png` historical artwork | deprecated | Approved by Melanie Watsham on 2026-08-05; layout superseded by D-41 | Retain as historical evidence. |
+| `brand/assets/source/logo-primary-raster-v2-512.png` historical artwork | deprecated | Approved by Melanie Watsham on 2026-08-05; layout superseded by D-41 | Retain as historical evidence. |
+| V3 primary, transparent, email and review-profile artwork | approved | Project sponsor approved the 75% wordmark height, vertical centring and narrow gap on 2026-09-07 and requested adoption throughout the project; exact hashes are in the asset manifest | Current project artwork. Production website publication remains a separate release action. |
 
 ## cPanel verification record
 

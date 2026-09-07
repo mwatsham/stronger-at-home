@@ -1,6 +1,26 @@
 # Brand identity
 
-## Status and architecture
+## Current primary layout — v3
+
+Under D-41, the project sponsor approved the final review-profile composition
+on 7 September 2026 and requested its adoption throughout the project.
+The entire three-line wordmark is 75% of the symbol's visible height and is
+vertically centred beside it. The horizontal clear gap is 39/469 of the symbol
+height, approximately one quarter of the original gap. Scale each block
+proportionally: do not stretch, redraw, recolour or retype its contents.
+
+Use `source/logo-primary-raster-v3-2048.png` and
+`source/logo-primary-raster-v3-512.png` for opaque primary artwork. Current
+transparent primary exports and the email lockup share these proportions.
+The website uses the transparent 512 × 160 PNG. Review-profile images include
+the full wordmark on a light square or rectangular background.
+See [current artwork](assets/review/logo-raster-v3-preview.html).
+
+V2 sources and previous approval pages remain historical references. The
+standalone secondary marks and browser icons are unchanged. No SVG variants
+are permitted.
+
+## Naming and historical architecture
 
 D-17 is the approved naming architecture. The formal trading name is `Stronger
 at Home Physiotherapy`; `Stronger@Home` is reserved for the display wordmark,

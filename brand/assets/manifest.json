@@ -30,18 +30,18 @@
     },
     {
       "id": "logo_primary_raster_v2_2048",
-      "role": "primary_raster_logo_2048",
+      "role": "historical_v2_primary_raster_logo_2048",
       "path": "brand/assets/source/logo-primary-raster-v2-2048.png",
-      "status": "approved",
+      "status": "deprecated",
       "sha256": "4e8988e571269353aed86697468e0a60b838bc1e121c8e590f974d5124df3683",
       "reviewed_by": "Melanie Watsham",
       "reviewed_on": "2026-08-05"
     },
     {
       "id": "logo_primary_raster_v2_512",
-      "role": "primary_raster_logo_512",
+      "role": "historical_v2_primary_raster_logo_512",
       "path": "brand/assets/source/logo-primary-raster-v2-512.png",
-      "status": "approved",
+      "status": "deprecated",
       "sha256": "d557a0e8fd05efc86fcca2b3f63d807ad33f29527062697705a8e05616c6db39",
       "reviewed_by": "Melanie Watsham",
       "reviewed_on": "2026-08-05"
@@ -51,36 +51,36 @@
       "role": "logo_primary_transparent_2048",
       "path": "brand/assets/exports/logo-primary-transparent-2048.png",
       "status": "approved",
-      "sha256": "0328080f1f7ecc01a93108cc686fad88490f404c0d989671271bd7b16a96717c",
-      "reviewed_by": "Melanie Watsham",
-      "reviewed_on": "2026-09-06"
+      "sha256": "89918081a41f0f0a46ed00169336791701a442be53cfd54c2ee3fc1685ed4143",
+      "reviewed_by": "Project sponsor",
+      "reviewed_on": "2026-09-07"
     },
     {
       "id": "logo_primary_transparent_1024",
       "role": "logo_primary_transparent_1024",
       "path": "brand/assets/exports/logo-primary-transparent-1024.png",
       "status": "approved",
-      "sha256": "857c31f151052fe4ce4f589f7de80c11119c87b7fbe09bb37a20848b6108bc0d",
-      "reviewed_by": "Melanie Watsham",
-      "reviewed_on": "2026-09-06"
+      "sha256": "cae07ec98f6c9b9b1654a2544f8f19057f47efc06225125c7c36ee82d4e6cc69",
+      "reviewed_by": "Project sponsor",
+      "reviewed_on": "2026-09-07"
     },
     {
       "id": "logo_primary_transparent_512",
       "role": "logo_primary_transparent_512",
       "path": "brand/assets/exports/logo-primary-transparent-512.png",
       "status": "approved",
-      "sha256": "8159f4a14c38f6b334329c01bf86cb84cbd059d5503e83e3ec15bdf1bc0ab0ff",
-      "reviewed_by": "Melanie Watsham",
-      "reviewed_on": "2026-09-06"
+      "sha256": "1802be2b0ac8bfcaf60b83355ee9e3f12d2ba483f1efca39abe5fd7958c6221c",
+      "reviewed_by": "Project sponsor",
+      "reviewed_on": "2026-09-07"
     },
     {
       "id": "logo_primary_transparent_256",
       "role": "logo_primary_transparent_256",
       "path": "brand/assets/exports/logo-primary-transparent-256.png",
       "status": "approved",
-      "sha256": "cdeb1048b9b3f2240568a098bb178e5bced80d1ac12e0a3f749d25af20bf25c7",
-      "reviewed_by": "Melanie Watsham",
-      "reviewed_on": "2026-09-06"
+      "sha256": "9f0419db0de28ac12e9c0c749c421b70016df4c082a2c7ff3878223ddf6944fd",
+      "reviewed_by": "Project sponsor",
+      "reviewed_on": "2026-09-07"
     },
     {
       "id": "logo_secondary_transparent_1024",
@@ -186,9 +186,72 @@
       "role": "logo_email_transparent_600",
       "path": "brand/assets/exports/logo-email-transparent-600.png",
       "status": "approved",
-      "sha256": "1d1282ff9f5df7eeda3b49976a4d104c77467f145957a93d6a583cff553cf7c6",
+      "sha256": "8323977ec0b4ddef06d8d8ddeeebfdf8538b2c9900962335fb43efd8365c81ca",
+      "reviewed_by": "Project sponsor",
+      "reviewed_on": "2026-09-07"
+    },
+    {
+      "id": "logo_primary_raster_v3_2048",
+      "role": "primary_raster_logo_2048",
+      "path": "brand/assets/source/logo-primary-raster-v3-2048.png",
+      "status": "approved",
+      "sha256": "6ed84006b8ba2e8e765dc91e418cd625fbfca3f70d122d88bd862d5c3c474136",
+      "reviewed_by": "Project sponsor",
+      "reviewed_on": "2026-09-07"
+    },
+    {
+      "id": "logo_primary_raster_v3_512",
+      "role": "primary_raster_logo_512",
+      "path": "brand/assets/source/logo-primary-raster-v3-512.png",
+      "status": "approved",
+      "sha256": "f02084bbd2f10b0b3c62f6d9ad8dab507e74babd5c311f5ee1b861cf29d41efe",
+      "reviewed_by": "Project sponsor",
+      "reviewed_on": "2026-09-07"
+    },
+    {
+      "id": "layout_v3_transparent_master",
+      "role": "layout_v3_transparent_master",
+      "path": "brand/assets/source/logo-primary-transparent-v3-2048.png",
+      "status": "approved",
+      "sha256": "26ac6d721327ca06e4ec6d4c1476a0a3b56f988b35269525f94fb0aeb547196e",
+      "reviewed_by": "Project sponsor",
+      "reviewed_on": "2026-09-07"
+    },
+    {
+      "id": "layout_v2_transparent_archive",
+      "role": "historical_layout_source",
+      "path": "brand/assets/source/logo-primary-transparent-v2-2048.png",
+      "status": "deprecated",
+      "sha256": "0328080f1f7ecc01a93108cc686fad88490f404c0d989671271bd7b16a96717c",
       "reviewed_by": "Melanie Watsham",
       "reviewed_on": "2026-09-06"
+    },
+    {
+      "id": "stronger_at_home_review_logo_wide_1200_png",
+      "role": "review_profile_logo",
+      "path": "brand/assets/review/review-profile/stronger-at-home-review-logo-wide-1200.png",
+      "status": "approved",
+      "sha256": "010fa3d58792be53427004d7e5bccd3bea57f81fb9054ef2de6e2c0fd495d22e",
+      "reviewed_by": "Project sponsor",
+      "reviewed_on": "2026-09-07"
+    },
+    {
+      "id": "stronger_at_home_review_profile_1024_jpg",
+      "role": "review_profile_logo",
+      "path": "brand/assets/review/review-profile/stronger-at-home-review-profile-1024.jpg",
+      "status": "approved",
+      "sha256": "86e3b8015813fbd72aa57ae57b02890dcc6f2fffcf5f3d7216aeb1042575b168",
+      "reviewed_by": "Project sponsor",
+      "reviewed_on": "2026-09-07"
+    },
+    {
+      "id": "stronger_at_home_review_profile_1024_png",
+      "role": "review_profile_logo",
+      "path": "brand/assets/review/review-profile/stronger-at-home-review-profile-1024.png",
+      "status": "approved",
+      "sha256": "f75940451979ea9e5418d33b55841318f60e8becdd3238fc586868006eb565fc",
+      "reviewed_by": "Project sponsor",
+      "reviewed_on": "2026-09-07"
     }
   ]
 }
