@@ -460,6 +460,13 @@ main.homepage {
 
 .action-group-centred { justify-content: center; }
 
+.review-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  align-items: center;
+  gap: 1.5rem;
+}
+
 .contact-page {
   width: auto;
   min-height: 0;
