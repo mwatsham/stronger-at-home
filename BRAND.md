@@ -3,6 +3,11 @@
 Status: approved strategy, identity, v3 logo proportions and website design
 Approval owner: Melanie Watsham
 
+An additional stacked logo was approved by the project sponsor on 7 September
+2026 (D-43). See [approved exports](brand/assets/EXPORTS.md) for the transparent
+and pale-background 1600 × 1600 PNGs. The horizontal logo remains current;
+the website is unchanged.
+
 ## Current logo — v3, approved 7 September 2026
 
 The project sponsor approved the review-profile composition and instructed its

@@ -133,6 +133,16 @@
     "empowering"
   ],
   "identity_architecture": {
+    "stacked_variant": {
+      "status": "approved supplementary layout; does not replace horizontal logo",
+      "approved_by": "Project sponsor",
+      "approved_on": "2026-09-07",
+      "decision": "D-43",
+      "assets": [
+        "brand/assets/review/stacked-logo-proposal/stacked-transparent-1600.png",
+        "brand/assets/review/stacked-logo-proposal/stacked-pale-1600.png"
+      ]
+    },
     "status": "approved",
     "type": "raster-only primary lockup with governed derived exports",
     "current_primary_assets": [

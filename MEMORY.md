@@ -1,5 +1,38 @@
 # Durable project memory
 
+## 2026-09-07 — UK Trustpilot profile link
+
+The sponsor supplied https://uk.trustpilot.com/review/stronger-at-home.co.uk.
+Use that exact address for the local homepage's Trustpilot fallback link.
+The supplied widget configuration and Google link remain unchanged; the
+provider controls navigation inside its iframe. No live deployment was made.
+
+## 2026-09-07 — stacked logo approved as an additional variant
+
+The project sponsor approved the rendered stacked logo (D-43). Register the
+exact transparent and pale-background 1600 × 1600 PNGs without regenerating
+the artwork. The original review paths remain stable for traceability.
+This is supplementary to the horizontal logo, not a replacement, and does
+not authorise changes to the website or any live deployment.
+
+## 2026-09-07 — Google review link supplied
+
+The sponsor supplied https://g.page/r/CYqDnIzAeBQuEBM/review for the
+"Review us on Google" button proposed alongside Trustpilot. The local
+homepage uses this exact URL as a new-tab navigation link with no referrer,
+Google scripts or embedded content. The responsive combined layout is
+ready for visual review; no merge or deployment was requested for this step.
+The automated web reader did not resolve the short link's destination.
+
+## 2026-09-07 — Trustpilot Review Collector approved locally
+
+The project sponsor approved the homepage Review Collector layout and its
+privacy notice addition (D-42). The HTTPS loader runs on the homepage only;
+the supplied widget identifiers and locale are preserved. No invitation
+integration or appointment-form data transfer was added. The privacy draft
+label and content blocker are removed. Staging and production deployment
+still require separate authority; neither was changed by this approval.
+
 ## 2026-09-07 — v3 logo layout adopted throughout the project
 
 The project sponsor approved the final review-profile image and requested this

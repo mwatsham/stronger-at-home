@@ -761,6 +761,7 @@ class SiteValidationTests(unittest.TestCase):
             "meet-melanie",
             "appointments",
             "area-and-fees",
+            "share-your-experience",
             "request-an-appointment",
         ]
 
@@ -821,7 +822,9 @@ class SiteValidationTests(unittest.TestCase):
             "ATOCP",
             "guaranteed",
             "testimonial",
-            "review",
+            "5-star",
+            "five-star",
+            "aggregateRating",
             "referral suitability",
             "referral exclusion",
             "emergency",
@@ -989,7 +992,9 @@ class SiteValidationTests(unittest.TestCase):
             "guaranteed",
             "walk-in clinic",
             "testimonial",
-            "review",
+            "5-star",
+            "five-star",
+            "aggregaterating",
             "emergency",
         ):
             self.assertNotIn(text, combined)

@@ -24,6 +24,12 @@ APPROVED_EMAIL = "melanie@stronger-at-home.co.uk"
 APPROVED_EXTERNAL_URLS = {
     "https://ico.org.uk/make-a-complaint/data-protection-complaints/check-if-you-can-complain/",
 }
+APPROVED_EXTERNAL_RESOURCES = {
+    ("a", "href", "https://g.page/r/CYqDnIzAeBQuEBM/review"),
+    ("script", "src", "https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"),
+    ("a", "href", "https://uk.trustpilot.com/review/stronger-at-home.co.uk"),
+    ("a", "href", "https://legal.trustpilot.com/for-reviewers/end-user-privacy-terms"),
+}
 
 PRIMARY_PAGES = {
     Path("site/index.html"): "/",
@@ -52,7 +58,7 @@ EXPECTED_LOGO_SHA256 = "1802be2b0ac8bfcaf60b83355ee9e3f12d2ba483f1efca39abe5fd79
 # received content, behaviour and release review. Every regular file under
 # site/ belongs here, irrespective of its name or extension.
 APPROVED_PUBLIC_SOURCE_SHA256 = {
-    "site/.htaccess": "14210b8b14861742ae2dd46317e7c9c40007ad70f778e8378a19e2a07060f6fb",
+    "site/.htaccess": "9b3093a1981bc7a9bba174dc14d63fae794c6eb8dbafef823815f269f60b1748",
     "site/404.html": "f2dc1d1ac316f2092a70b9efe07a230c66613919521af7252002b8b78d25032f",
     "site/about/index.html": "b8eac3013886a7ba8ff3aa05cbea460ed6ba68e79544f5a3fdd0029123c17c93",
     "site/accessibility/index.html": "e0d250481b3556c02751fd322358102b52ecfe2a513d89e7c1c182ea332ebb08",
@@ -68,7 +74,7 @@ APPROVED_PUBLIC_SOURCE_SHA256 = {
     "site/api/src/ValidationResult.php": "2ceb38671310bd93cb04ebcbcd1341bcfbc15bf069229a5b375e258772ff1898",
     "site/appointments-and-fees/index.html": "adc355adeee6d4f5c5af09b1b75b641b95f8871cbad0d6eb9fa362790ce28673",
     "site/assets/css/brand-tokens.css": "9945f6e139a26124a0755d46e0bb4dc93f3e867d87278b0ff4988d0f92d40450",
-    "site/assets/css/site.css": "c4ace8b4e268671fd5536e64bec49efbfe0e200fa6267c3bb27931ff5253755e",
+    "site/assets/css/site.css": "eb41132ce74c82f5f84a1333f020f1d9742594cbba459aa769593026bd52a8c2",
     "site/assets/fonts/atkinson-hyperlegible-next.ttf": "5a455d1cfa099b601ab70751bb9673e8fe1854dc4500c80e1a220d0d75e31745",
     "site/assets/fonts/OFL-atkinson.txt": "09636801ed3e868736cc359bb1c819c5ef76529cbb41473cb1f602ef166dad0a",
     "site/assets/fonts/OFL-source-serif.txt": "0fd8b796c1c6220a559a5682cfd00d1c8488b428369f7cb70deb671888cef85f",
@@ -79,8 +85,8 @@ APPROVED_PUBLIC_SOURCE_SHA256 = {
     "site/assets/js/site.js": "3719a73b082b915082cc65fd4369e9e970e48629912377f52b9e44467ad42b07",
     "site/contact/index.php": "076e68030031a86325be823247946cabc38abcfd4feb812fab759cd43c548666",
     "site/how-i-can-help/index.html": "df39c329687fa332efb4da39c921e1d9779f109aeac7695c16473761ed4708d4",
-    "site/index.html": "5d26d5817ace2e06a0a0141eb0482b88f4b208977e35f4496d990dc8c952c332",
-    "site/privacy/index.html": "6972fc9481e2afe79a5acab79688e20e75537db5259bc02235ca5703ba7ccd4a",
+    "site/index.html": "36b38775239777efa68319c3c83595b6ba076814b24aa7508801cb23ddb6232d",
+    "site/privacy/index.html": "ab412e049bcd446e906a25c16e46597c9a0bd08084700f2044944e4a68627b58",
     "site/robots-staging.txt": "331ea9090db0c9f6f597bd9840fd5b171830f6e0b3ba1cb24dfa91f0c95aedc1",
     "site/robots.txt": "6806d9c899e6b514b73f45b56f6ff0eb6193e996027444ecebc88d4c31bbf294",
     "site/sitemap.xml": "e343bdfdc81a434ba772c17174e8f36fe79fdab8e3b52d03b63e3d7976469101",
@@ -157,7 +163,7 @@ EXPECTED_HTACCESS = (
     'Header always set X-Content-Type-Options "nosniff"\n'
     'Header always set Referrer-Policy "strict-origin-when-cross-origin"\n'
     'Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"\n'
-    'Header always set Content-Security-Policy "default-src \'self\'; img-src \'self\'; style-src \'self\'; script-src \'self\'; form-action \'self\'; base-uri \'self\'; frame-ancestors \'none\'"\n'
+    'Header always set Content-Security-Policy "default-src \'self\'; img-src \'self\'; style-src \'self\'; script-src \'self\' https://widget.trustpilot.com; frame-src https://widget.trustpilot.com; form-action \'self\'; base-uri \'self\'; frame-ancestors \'none\'"\n'
 )
 
 
@@ -433,6 +439,8 @@ def _validate_links(root: Path, parsed: dict[Path, SiteHTMLParser], errors: list
 
         for tag, attribute, value in parser.references:
             parts = urlsplit(value)
+            if (tag, attribute, value) in APPROVED_EXTERNAL_RESOURCES:
+                continue
             if parts.scheme in {"mailto", "tel"}:
                 approved = APPROVED_EMAIL if parts.scheme == "mailto" else APPROVED_PHONE
                 if parts.path != approved:

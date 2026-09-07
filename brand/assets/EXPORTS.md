@@ -9,6 +9,21 @@ provides a JPG for upload compatibility. Exact hashes are in
 
 ## Which file to use
 
+### Additional stacked version — approved 7 September 2026
+
+The project sponsor approved this additional layout under D-43. The house is
+centred above the three individually centred text lines, with their original
+letterforms, relative sizes and vertical spacing preserved. The full wordmark
+is 75% of the symbol height, with a 54px gap in the 1600 × 1600 artwork.
+
+- [Transparent stacked PNG](review/stacked-logo-proposal/stacked-transparent-1600.png): light, plain backgrounds.
+- [Pale-background stacked PNG](review/stacked-logo-proposal/stacked-pale-1600.png): square uploads and uncontrolled backgrounds.
+
+Both are approved, exact-byte assets registered in the manifest. Their
+original review paths are retained for traceability. This adds a choice:
+it does not replace the horizontal logo or change the website. The small
+endorsement may be difficult to read in thumbnails; check the destination's crop.
+
 | Use | Recommended file |
 |---|---|
 | Website or wide digital header on a light background | `exports/logo-primary-transparent-1024.png` or `exports/logo-primary-transparent-512.png` |

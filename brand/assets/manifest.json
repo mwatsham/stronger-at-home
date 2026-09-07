@@ -2,6 +2,24 @@
   "schema_version": "1.0",
   "assets": [
     {
+      "id": "logo_stacked_transparent_1600",
+      "role": "stacked_logo",
+      "path": "brand/assets/review/stacked-logo-proposal/stacked-transparent-1600.png",
+      "status": "approved",
+      "sha256": "90f92d70203bf55c362e03000b885cdbd76b4d77f0aabbb9cd811099358acb13",
+      "reviewed_by": "Project sponsor",
+      "reviewed_on": "2026-09-07"
+    },
+    {
+      "id": "logo_stacked_pale_1600",
+      "role": "stacked_logo",
+      "path": "brand/assets/review/stacked-logo-proposal/stacked-pale-1600.png",
+      "status": "approved",
+      "sha256": "87f7fe10e5c16b13d6d9bde81d1bc146929aa0325910cd39b059b9e56d2a4607",
+      "reviewed_by": "Project sponsor",
+      "reviewed_on": "2026-09-07"
+    },
+    {
       "id": "logo_primary_hybrid_historical",
       "role": "primary_hybrid_logo",
       "path": "brand/assets/source/logo-primary-hybrid.svg",
