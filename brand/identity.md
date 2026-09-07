@@ -1,5 +1,16 @@
 # Brand identity
 
+## Additional stacked layout — approved 7 September 2026
+
+D-43 approves a supplementary 1600 × 1600 PNG layout: the original house above
+the complete three-line wordmark, with the symbol and each line centred.
+The wordmark is 489px high, the symbol 652px high, and the gap 54px.
+Original lettering, relative text sizes, line spacing and colours are preserved.
+The transparent and pale-background files are linked in
+[approved exports](assets/EXPORTS.md). Their exact bytes are registered in the
+asset manifest. This approval does not replace the horizontal primary layout
+or authorise a website change.
+
 ## Current primary layout — v3
 
 Under D-41, the project sponsor approved the final review-profile composition

@@ -1,4 +1,5 @@
 import json
+import hashlib
 from pathlib import Path
 import re
 import shutil
@@ -11,6 +12,7 @@ from zipfile import ZipFile
 
 import scripts.package_site as package_module
 from scripts.package_site import package_site
+from scripts.validate_site import APPROVED_PUBLIC_SOURCE_SHA256
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -230,6 +232,25 @@ class SitePackageTests(unittest.TestCase):
                     (ROOT / "site/robots.txt").read_bytes(),
                 )
                 self.assertNotIn(b"X-Robots-Tag", package.read("public/.htaccess"))
+
+    def test_production_packaging_refuses_a_privacy_approval_blocker(self):
+        with TemporaryDirectory() as directory:
+            copy = Path(directory) / "draft-project"
+            shutil.copytree(ROOT, copy)
+            privacy = copy / "site/privacy/index.html"
+            privacy.write_text(
+                privacy.read_text(encoding="utf-8").replace(
+                    'id="privacy-trustpilot"',
+                    'id="privacy-trustpilot" data-production-blocker="privacy-approval"',
+                ),
+                encoding="utf-8",
+            )
+            # Isolate the explicit approval gate from source-fingerprint checks.
+            with patch.dict(APPROVED_PUBLIC_SOURCE_SHA256, {
+                "site/privacy/index.html": hashlib.sha256(privacy.read_bytes()).hexdigest()
+            }):
+                with self.assertRaisesRegex(ValueError, "Production blocker remains: privacy-approval"):
+                    package_site(copy, Path(directory) / "output", "production")
 
     def test_documented_command_line_entry_point_builds_the_staging_archive(self):
         with TemporaryDirectory() as directory:
