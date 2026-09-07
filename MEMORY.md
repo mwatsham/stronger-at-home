@@ -1,5 +1,18 @@
 # Durable project memory
 
+## 2026-09-07 — v3 logo layout adopted throughout the project
+
+The project sponsor approved the final review-profile image and requested this
+layout throughout the project. The complete wordmark is 75% of the symbol
+height, vertically centred, with a gap of 39/469 of the symbol height.
+The opaque primary pair, transparent exports, email and shared website asset
+now use v3. The square/wide review-profile PNGs and compatibility JPG are
+governed in the manifest. Old v2 sources and review pages remain historical.
+Standalone symbol exports and browser icons are unaffected.
+Approval is recorded as the project sponsor, not attributed to Melanie.
+The asset generator validates the immutable v3 transparent master and retains
+the cross-platform exact-byte checks. Production publication is separate.
+
 ## 2026-09-06 — transparent primary logo adopted in website source
 
 The project sponsor approved replacing the website header's opaque logo copy

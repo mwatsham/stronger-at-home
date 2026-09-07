@@ -15,9 +15,9 @@ PALE_SKY = (232, 241, 246)
 DEEP_NAVY = (32, 62, 85)
 WARM_SAND = (195, 162, 110)
 
-PRIMARY_SOURCE = Path("brand/assets/source/logo-primary-raster-v2-2048.png")
+PRIMARY_SOURCE = Path("brand/assets/source/logo-primary-transparent-v3-2048.png")
 PRIMARY_SOURCE_SHA256 = (
-    "4e8988e571269353aed86697468e0a60b838bc1e121c8e590f974d5124df3683"
+    "26ac6d721327ca06e4ec6d4c1476a0a3b56f988b35269525f94fb0aeb547196e"
 )
 PRIMARY_SOURCE_SIZE = (2048, 640)
 SYMBOL_SOURCE = Path(
@@ -47,11 +47,11 @@ SECONDARY_CONTAINED_SIZES = (1024, 512, 192, 180, 64, 32, 16)
 EMAIL_SIZE = (600, 188)
 REVIEW_SIZE = (1800, 2100)
 APPROVED_EXPORT_SHA256 = {
-    "brand/assets/exports/logo-email-transparent-600.png": "1d1282ff9f5df7eeda3b49976a4d104c77467f145957a93d6a583cff553cf7c6",
-    "brand/assets/exports/logo-primary-transparent-1024.png": "857c31f151052fe4ce4f589f7de80c11119c87b7fbe09bb37a20848b6108bc0d",
-    "brand/assets/exports/logo-primary-transparent-2048.png": "0328080f1f7ecc01a93108cc686fad88490f404c0d989671271bd7b16a96717c",
-    "brand/assets/exports/logo-primary-transparent-256.png": "cdeb1048b9b3f2240568a098bb178e5bced80d1ac12e0a3f749d25af20bf25c7",
-    "brand/assets/exports/logo-primary-transparent-512.png": "8159f4a14c38f6b334329c01bf86cb84cbd059d5503e83e3ec15bdf1bc0ab0ff",
+    "brand/assets/exports/logo-email-transparent-600.png": "8323977ec0b4ddef06d8d8ddeeebfdf8538b2c9900962335fb43efd8365c81ca",
+    "brand/assets/exports/logo-primary-transparent-1024.png": "cae07ec98f6c9b9b1654a2544f8f19057f47efc06225125c7c36ee82d4e6cc69",
+    "brand/assets/exports/logo-primary-transparent-2048.png": "89918081a41f0f0a46ed00169336791701a442be53cfd54c2ee3fc1685ed4143",
+    "brand/assets/exports/logo-primary-transparent-256.png": "9f0419db0de28ac12e9c0c749c421b70016df4c082a2c7ff3878223ddf6944fd",
+    "brand/assets/exports/logo-primary-transparent-512.png": "1802be2b0ac8bfcaf60b83355ee9e3f12d2ba483f1efca39abe5fd7958c6221c",
     "brand/assets/exports/logo-secondary-contained-1024.png": "35ee071a01c91998fb3c88c5ec15f6047e2dae2e1634a714895ea9ef7264bbe0",
     "brand/assets/exports/logo-secondary-contained-16.png": "58024d77114572f8b7f93efb24d1cf982a19584d62ed68839ceeb438390e0574",
     "brand/assets/exports/logo-secondary-contained-180.png": "ae8b91455206a2169ebba94c5b2e92796093784bfa71c6e76d867f98c388f91e",
@@ -79,6 +79,7 @@ def _verified_image(
     relative_path: Path,
     expected_hash: str,
     expected_size: tuple[int, int],
+    expected_mode: str = "RGB",
 ) -> Image.Image:
     path = root / relative_path
     actual_hash = hashlib.sha256(path.read_bytes()).hexdigest()
@@ -89,9 +90,9 @@ def _verified_image(
         )
     image = Image.open(path)
     image.load()
-    if image.size != expected_size or image.mode != "RGB":
+    if image.size != expected_size or image.mode != expected_mode:
         raise ValueError(
-            f"Approved source {relative_path} must be RGB "
+            f"Approved source {relative_path} must be {expected_mode} "
             f"{expected_size[0]} × {expected_size[1]}"
         )
     return image
@@ -270,7 +271,7 @@ def _render_review_sheet(root: Path, generated: dict[str, Path]) -> Image.Image:
     draw.text((80, 62), "Core logo asset pack", fill=DEEP_NAVY, font=title)
     draw.text(
         (82, 145),
-        "APPROVED BY MELANIE WATSHAM — 6 SEPTEMBER 2026",
+        "LAYOUT APPROVED BY PROJECT SPONSOR — 7 SEPTEMBER 2026",
         fill=DEEP_NAVY,
         font=body,
     )
@@ -279,7 +280,9 @@ def _render_review_sheet(root: Path, generated: dict[str, Path]) -> Image.Image:
     primary = Image.open(generated["primary-1024"])
     _draw_card(sheet, (70, 300, 600, 600), (255, 255, 255), "White", primary, root)
     _draw_card(sheet, (635, 300, 1165, 600), PALE_SKY, "Pale Sky", primary, root)
-    opaque = Image.open(root / PRIMARY_SOURCE)
+    opaque = Image.new("RGB", PRIMARY_SOURCE_SIZE, BACKGROUND)
+    transparent = Image.open(root / PRIMARY_SOURCE)
+    opaque.paste(transparent, (0, 0), transparent)
     _draw_card(sheet, (1200, 300, 1730, 600), DEEP_NAVY, "Opaque fallback", opaque, root)
 
     draw.text((80, 675), "Secondary mark", fill=DEEP_NAVY, font=heading)
@@ -306,7 +309,7 @@ def _render_review_sheet(root: Path, generated: dict[str, Path]) -> Image.Image:
     lines = (
         "• Transparent files: light, plain backgrounds only.",
         "• Opaque or contained files: dark, photographic or uncontrolled backgrounds.",
-        "• Exact approved primary files remain unchanged.",
+        "• Wordmark height: 75% of symbol; close spacing.",
         "• PNG only — no SVG, AI redraw or recolouring.",
     )
     y = 1825
@@ -323,6 +326,7 @@ def generate_asset_pack(root: Path) -> tuple[Path, ...]:
         PRIMARY_SOURCE,
         PRIMARY_SOURCE_SHA256,
         PRIMARY_SOURCE_SIZE,
+        "RGBA",
     )
     symbol_source = _verified_image(
         root,
@@ -330,7 +334,7 @@ def generate_asset_pack(root: Path) -> tuple[Path, ...]:
         SYMBOL_SOURCE_SHA256,
         SYMBOL_SOURCE_SIZE,
     )
-    transparent_primary = _remove_background(primary_source)
+    transparent_primary = primary_source
     transparent_symbol = _remove_background(symbol_source.crop(SYMBOL_CROP))
 
     paths: list[Path] = []

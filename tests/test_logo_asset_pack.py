@@ -32,7 +32,7 @@ EXPECTED_OUTPUTS = {
 }
 
 INPUTS = (
-    "brand/assets/source/logo-primary-raster-v2-2048.png",
+    "brand/assets/source/logo-primary-transparent-v3-2048.png",
     "docs/superpowers/specs/assets/home-physiotherapy-logo-approved-concept-v2.png",
     "brand/fonts/source-serif-4.ttf",
     "brand/fonts/atkinson-hyperlegible-next.ttf",
@@ -160,37 +160,32 @@ class LogoAssetPackTests(unittest.TestCase):
                         self.assertEqual(maximum, 255)
                         self.assertIsNotNone(alpha.getbbox())
 
-    def test_primary_transparency_removes_both_known_pale_mattes(self):
+    def test_primary_export_preserves_the_approved_v3_master_pixels(self):
         generator = load_generator()
         with TemporaryDirectory() as directory:
             root = Path(directory)
             self._copy_inputs(root)
             generator.generate_asset_pack(root)
+            with Image.open(root / generator.PRIMARY_SOURCE) as source:
+                with Image.open(root / "brand/assets/exports/logo-primary-transparent-2048.png") as output:
+                    self.assertEqual(source.mode, output.mode)
+                    self.assertEqual(source.size, output.size)
+                    self.assertEqual(source.tobytes(), output.tobytes())
 
-            approved = Image.open(
-                root / "brand/assets/source/logo-primary-raster-v2-2048.png"
-            ).convert("RGB")
-            transparent = Image.open(
-                root / "brand/assets/exports/logo-primary-transparent-2048.png"
-            ).convert("RGBA")
-            output_pixels = transparent.get_flattened_data()
-            pale_matte_alpha = {
-                output[3]
-                for source, output in zip(
-                    approved.get_flattened_data(), output_pixels, strict=True
-                )
-                if source == (249, 244, 242)
-            }
-            white_matte_alpha = {
-                output[3]
-                for source, output in zip(
-                    approved.get_flattened_data(), output_pixels, strict=True
-                )
-                if source == (255, 255, 255)
-            }
-
-            self.assertEqual(pale_matte_alpha, {0})
-            self.assertEqual(white_matte_alpha, {0})
+    def test_v3_wordmark_is_three_quarters_symbol_height_and_centred(self):
+        with Image.open(PROJECT_ROOT / "brand/assets/source/logo-primary-transparent-v3-2048.png") as source:
+            alpha = source.getchannel("A")
+            # The composition separates the two blocks at x=650.
+            symbol = alpha.crop((0, 0, 650, 640)).getbbox()
+            wordmark = alpha.crop((650, 0, 2048, 640)).getbbox()
+            self.assertIsNotNone(symbol)
+            self.assertIsNotNone(wordmark)
+            self.assertAlmostEqual(
+                (wordmark[3] - wordmark[1]) / (symbol[3] - symbol[1]), 0.75, delta=0.01
+            )
+            self.assertLessEqual(abs(sum(symbol[1::2]) - sum(wordmark[1::2])), 3)
+            gap = 650 + wordmark[0] - symbol[2]
+            self.assertAlmostEqual(gap / (symbol[3] - symbol[1]), 39 / 469, delta=0.01)
 
     def test_secondary_marks_are_centred_with_protective_clearspace(self):
         generator = load_generator()
@@ -273,8 +268,9 @@ class LogoAssetPackTests(unittest.TestCase):
             with self.subTest(relative=relative):
                 asset = entries[relative]
                 self.assertEqual(asset["status"], "approved")
-                self.assertEqual(asset["reviewed_by"], "Melanie Watsham")
-                self.assertEqual(asset["reviewed_on"], "2026-09-06")
+                revised = "/logo-primary-" in relative or "/logo-email-" in relative
+                self.assertEqual(asset["reviewed_by"], "Project sponsor" if revised else "Melanie Watsham")
+                self.assertEqual(asset["reviewed_on"], "2026-09-07" if revised else "2026-09-06")
                 self.assertEqual(
                     asset["sha256"],
                     hashlib.sha256((PROJECT_ROOT / relative).read_bytes()).hexdigest(),

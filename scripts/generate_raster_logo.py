@@ -138,9 +138,14 @@ def generate_candidate(root: Path) -> tuple[Path, Path]:
 
 
 def main() -> None:
-    master_path, small_path = generate_candidate(Path.cwd())
-    print(master_path)
-    print(small_path)
+    # The functions above reproduce historical v1/v2 approval records only.
+    # Default regeneration must use the current approved v3 asset system.
+    try:
+        from scripts.generate_logo_asset_pack import generate_asset_pack
+    except ImportError:
+        from generate_logo_asset_pack import generate_asset_pack
+    for path in generate_asset_pack(Path.cwd()):
+        print(path)
 
 
 if __name__ == "__main__":

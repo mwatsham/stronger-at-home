@@ -47,7 +47,7 @@ ALLOWED_BLOCKERS = {
     "credentials",
     "referral-suitability",
 }
-EXPECTED_LOGO_SHA256 = "8159f4a14c38f6b334329c01bf86cb84cbd059d5503e83e3ec15bdf1bc0ab0ff"
+EXPECTED_LOGO_SHA256 = "1802be2b0ac8bfcaf60b83355ee9e3f12d2ba483f1efca39abe5fd7958c6221c"
 # Update this sorted allowlist only after the complete public source change has
 # received content, behaviour and release review. Every regular file under
 # site/ belongs here, irrespective of its name or extension.

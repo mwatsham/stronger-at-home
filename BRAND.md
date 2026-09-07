@@ -1,7 +1,22 @@
 # Stronger at Home Physiotherapy
 
-Status: approved strategy, identity and website design; staging deployment and production publication blocked
+Status: approved strategy, identity, v3 logo proportions and website design
 Approval owner: Melanie Watsham
+
+## Current logo — v3, approved 7 September 2026
+
+The project sponsor approved the review-profile composition and instructed its
+use throughout the project (D-41). The entire three-line wordmark has 75% of the
+symbol's visible height, is vertically centred, and uses a narrow gap equal to
+39/469 of the symbol height. Current opaque artwork is
+`brand/assets/source/logo-primary-raster-v3-2048.png` and its 512px counterpart.
+The transparent primary exports, email artwork and shared website image use
+this layout. Square and wide review-profile files are available from
+`brand/assets/review/logo-raster-v3-preview.html`.
+
+The original symbol, letterforms and colours are preserved. The earlier v2
+primary layout is historical; the standalone secondary mark remains current.
+The dated adoption history below must not override this current layout.
 
 Experienced care. Personal progress. At home.
 

@@ -79,19 +79,21 @@ HISTORICAL_RASTER_ROLES = set(HISTORICAL_RASTER_SIZES)
 PRIMARY_LOGO_ROLES = set(PRIMARY_RASTER_SIZES) | {"primary_hybrid_logo"}
 REQUIRED_ASSET_PATHS = {
     "primary_hybrid_logo": "brand/assets/source/logo-primary-hybrid.svg",
-    "primary_raster_logo_2048": "brand/assets/source/logo-primary-raster-v2-2048.png",
-    "primary_raster_logo_512": "brand/assets/source/logo-primary-raster-v2-512.png",
+    "primary_raster_logo_2048": "brand/assets/source/logo-primary-raster-v3-2048.png",
+    "primary_raster_logo_512": "brand/assets/source/logo-primary-raster-v3-512.png",
     "historical_raster_logo_2048": "brand/assets/source/logo-primary-raster-2048.png",
     "historical_raster_logo_512": "brand/assets/source/logo-primary-raster-512.png",
 }
 CURRENT_PRIMARY_RASTER_RECORDS = {
     "primary_raster_logo_2048": {
-        "sha256": "4e8988e571269353aed86697468e0a60b838bc1e121c8e590f974d5124df3683",
-        "reviewed_on": "2026-08-05",
+        "sha256": "6ed84006b8ba2e8e765dc91e418cd625fbfca3f70d122d88bd862d5c3c474136",
+        "reviewed_on": "2026-09-07",
+        "reviewed_by": "Project sponsor",
     },
     "primary_raster_logo_512": {
-        "sha256": "d557a0e8fd05efc86fcca2b3f63d807ad33f29527062697705a8e05616c6db39",
-        "reviewed_on": "2026-08-05",
+        "sha256": "f02084bbd2f10b0b3c62f6d9ad8dab507e74babd5c311f5ee1b861cf29d41efe",
+        "reviewed_on": "2026-09-07",
+        "reviewed_by": "Project sponsor",
     },
 }
 HISTORICAL_RASTER_RECORDS = {
@@ -105,11 +107,11 @@ HISTORICAL_RASTER_RECORDS = {
     },
 }
 APPROVED_EXPORT_RECORDS = {
-    "brand/assets/exports/logo-email-transparent-600.png": "1d1282ff9f5df7eeda3b49976a4d104c77467f145957a93d6a583cff553cf7c6",
-    "brand/assets/exports/logo-primary-transparent-1024.png": "857c31f151052fe4ce4f589f7de80c11119c87b7fbe09bb37a20848b6108bc0d",
-    "brand/assets/exports/logo-primary-transparent-2048.png": "0328080f1f7ecc01a93108cc686fad88490f404c0d989671271bd7b16a96717c",
-    "brand/assets/exports/logo-primary-transparent-256.png": "cdeb1048b9b3f2240568a098bb178e5bced80d1ac12e0a3f749d25af20bf25c7",
-    "brand/assets/exports/logo-primary-transparent-512.png": "8159f4a14c38f6b334329c01bf86cb84cbd059d5503e83e3ec15bdf1bc0ab0ff",
+    "brand/assets/exports/logo-email-transparent-600.png": "8323977ec0b4ddef06d8d8ddeeebfdf8538b2c9900962335fb43efd8365c81ca",
+    "brand/assets/exports/logo-primary-transparent-1024.png": "cae07ec98f6c9b9b1654a2544f8f19057f47efc06225125c7c36ee82d4e6cc69",
+    "brand/assets/exports/logo-primary-transparent-2048.png": "89918081a41f0f0a46ed00169336791701a442be53cfd54c2ee3fc1685ed4143",
+    "brand/assets/exports/logo-primary-transparent-256.png": "9f0419db0de28ac12e9c0c749c421b70016df4c082a2c7ff3878223ddf6944fd",
+    "brand/assets/exports/logo-primary-transparent-512.png": "1802be2b0ac8bfcaf60b83355ee9e3f12d2ba483f1efca39abe5fd7958c6221c",
     "brand/assets/exports/logo-secondary-contained-1024.png": "35ee071a01c91998fb3c88c5ec15f6047e2dae2e1634a714895ea9ef7264bbe0",
     "brand/assets/exports/logo-secondary-contained-16.png": "58024d77114572f8b7f93efb24d1cf982a19584d62ed68839ceeb438390e0574",
     "brand/assets/exports/logo-secondary-contained-180.png": "ae8b91455206a2169ebba94c5b2e92796093784bfa71c6e76d867f98c388f91e",
@@ -277,8 +279,9 @@ def _validate_raster_approval_record(asset: dict[str, object]) -> list[str]:
             errors.append(f"{label} must be deprecated")
         else:
             errors.append(f"{label} must have status approved")
-    if asset.get("reviewed_by") != "Melanie Watsham":
-        errors.append(f"{label} must be reviewed by Melanie Watsham")
+    reviewer = record.get("reviewed_by", "Melanie Watsham")
+    if asset.get("reviewed_by") != reviewer:
+        errors.append(f"{label} must be reviewed by {reviewer}")
     if asset.get("reviewed_on") != record["reviewed_on"]:
         errors.append(
             f"{label} must have approval date {record['reviewed_on']}"
@@ -331,13 +334,16 @@ def _validate_asset_manifest(root: Path, manifest: object) -> list[str]:
             )
         if asset.get("status") != "approved":
             errors.append(f"Approved export {relative_path} must have status approved")
-        if asset.get("reviewed_by") != APPROVED_EXPORT_REVIEWER:
+        revised_primary = "/logo-primary-" in relative_path or "/logo-email-" in relative_path
+        reviewer = "Project sponsor" if revised_primary else APPROVED_EXPORT_REVIEWER
+        review_date = "2026-09-07" if revised_primary else APPROVED_EXPORT_DATE
+        if asset.get("reviewed_by") != reviewer:
             errors.append(
-                f"Approved export {relative_path} must be reviewed by {APPROVED_EXPORT_REVIEWER}"
+                f"Approved export {relative_path} must be reviewed by {reviewer}"
             )
-        if asset.get("reviewed_on") != APPROVED_EXPORT_DATE:
+        if asset.get("reviewed_on") != review_date:
             errors.append(
-                f"Approved export {relative_path} must have approval date {APPROVED_EXPORT_DATE}"
+                f"Approved export {relative_path} must have approval date {review_date}"
             )
         if asset.get("sha256") != approved_hash:
             errors.append(
@@ -436,9 +442,13 @@ def _validate_asset_manifest(root: Path, manifest: object) -> list[str]:
             isinstance(role, str) and role.startswith("logo_")
         ):
             if status == "approved":
-                if asset.get("reviewed_by") != "Melanie Watsham":
+                revised_primary = relative_path in APPROVED_EXPORT_RECORDS and (
+                    "/logo-primary-" in relative_path or "/logo-email-" in relative_path
+                )
+                expected_reviewer = "Project sponsor" if revised_primary else "Melanie Watsham"
+                if asset.get("reviewed_by") != expected_reviewer:
                     errors.append(
-                        f"Approved asset {asset_id or '<unknown>'} must be reviewed by Melanie Watsham"
+                        f"Approved asset {asset_id or '<unknown>'} must be reviewed by {expected_reviewer}"
                     )
                 if not _is_iso_date(asset.get("reviewed_on")):
                     errors.append(
