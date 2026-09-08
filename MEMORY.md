@@ -1,5 +1,17 @@
 # Durable project memory
 
+## 2026-09-08 — narrow header alignment approved
+
+The sponsor approved centring the existing horizontal logo/wordmark above
+the strapline on narrow screens across all pages. The shared stylesheet now
+constrains the logo link to the image's existing maximum width at 48rem and
+below. Artwork, displayed size, strapline, divider and desktop layout remain
+unchanged. After reviewing the preview, the sponsor authorised promotion to
+staging. Release through the normal develop/deploy-staging Git workflow;
+production remains unchanged.
+Browser regression coverage: `tests/header_alignment.cjs` (local PHP preview,
+Playwright and Chrome), eight routes including the error page at six widths.
+
 ## 2026-09-07 — UK Trustpilot profile link
 
 The sponsor supplied https://uk.trustpilot.com/review/stronger-at-home.co.uk.
