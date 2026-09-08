@@ -203,7 +203,10 @@ footer a {
     text-align: center;
   }
 
-  .brand-home { flex-basis: auto; }
+  .brand-home {
+    flex-basis: auto;
+    width: min(100%, 19.6875rem);
+  }
 
   .brand-strap {
     max-width: 24rem;
