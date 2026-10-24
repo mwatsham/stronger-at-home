@@ -19,8 +19,10 @@ from zipfile import BadZipFile, ZipFile, ZipInfo
 
 if __package__:
     from .package_site import package_site
+    from .informational_release import prepare_informational_public_tree
 else:
     from package_site import package_site
+    from informational_release import prepare_informational_public_tree
 
 
 ACCOUNT_HOME = "/home/v0398ees6dry"
@@ -208,11 +210,14 @@ def environment_bindings(environment: str, source_sha: str) -> str:
     )
 
 
-def deployment_script(environment: str, source_sha: str) -> str:
+def deployment_script(environment: str, source_sha: str, publication_mode: str = "enquiries") -> str:
     """Generate guarded, reversible cPanel deployment instructions."""
 
     settings = _environment(environment)
     _validate_source_sha(source_sha)
+    if publication_mode not in {"enquiries", "informational"}:
+        raise ValueError("Invalid publication mode")
+    config_check = "[[ -f \"$CONFIG_PATH\" && ! -L \"$CONFIG_PATH\" ]] || fail 'Missing external environment configuration.'" if publication_mode == "enquiries" else "# Informational artifact: no enquiry configuration is loaded or required."
     return f"""#!/bin/bash
 set -Eeuo pipefail
 umask 027
@@ -237,7 +242,7 @@ fail() {{
 [[ -d public && ! -L public && -f public/.htaccess && ! -L public/.htaccess ]] || fail 'Missing public release tree.'
 [[ -d public/api/src && ! -L public/api/src ]] || fail 'Missing application source tree.'
 [[ -d vendor && ! -L vendor && -f vendor/autoload.php && ! -L vendor/autoload.php ]] || fail 'Missing vendor release tree.'
-[[ -f "$CONFIG_PATH" && ! -L "$CONFIG_PATH" ]] || fail 'Missing external environment configuration.'
+{config_check}
 [[ ! -e "$RELEASE_DIRECTORY" && ! -L "$RELEASE_DIRECTORY" ]] || fail 'Release directory already exists.'
 [[ ! -e "$NEXT_DIRECTORY" && ! -L "$NEXT_DIRECTORY" ]] || fail 'Next document-root directory already exists.'
 
@@ -290,10 +295,13 @@ def build_git_release(
     environment: str,
     source_sha: str,
     build_timestamp: str,
+    publication_mode: str = "enquiries",
 ) -> Path:
     """Build one validated deployment-branch directory without partial output."""
 
     settings = _environment(environment)
+    if publication_mode not in {"enquiries", "informational"}:
+        raise ValueError("Invalid publication mode")
     validate_provenance(source_sha, build_timestamp)
     project_root = Path(project_root).resolve()
     output_directory = Path(output_directory).resolve()
@@ -312,6 +320,8 @@ def build_git_release(
         )
         release = temporary_root / "release"
         extract_approved_archive(archive, release)
+        if publication_mode == "informational":
+            prepare_informational_public_tree(release / "public")
 
         autoload = release / "vendor/autoload.php"
         if not autoload.is_file() or autoload.is_symlink():
@@ -319,7 +329,7 @@ def build_git_release(
         _configure_htaccess(
             release / "public/.htaccess",
             environment,
-            environment_bindings(environment, source_sha),
+            environment_bindings(environment, source_sha) if publication_mode == "enquiries" else "",
         )
 
         metadata = {
@@ -330,12 +340,14 @@ def build_git_release(
             "sourceBranch": settings["sourceBranch"],
             "sourceSha": source_sha,
         }
+        if publication_mode == "informational":
+            metadata.update(publicationMode="informational", icoStatus="pending")
         (release / ".cpanel.yml").write_text(
             CPANEL_CONFIGURATION,
             encoding="utf-8",
         )
         deploy = release / "deploy.sh"
-        deploy.write_text(deployment_script(environment, source_sha), encoding="utf-8")
+        deploy.write_text(deployment_script(environment, source_sha, publication_mode), encoding="utf-8")
         deploy.chmod(0o755)
         (release / "release.json").write_text(
             json.dumps(metadata, indent=2, sort_keys=True) + "\n",
@@ -346,12 +358,32 @@ def build_git_release(
     return output_directory
 
 
+def read_publication_mode(path: Path) -> str:
+    def unique_keys(pairs):
+        data = {}
+        for key, value in pairs:
+            if key in data:
+                raise ValueError("Duplicate key in publication mode file")
+            data[key] = value
+        return data
+
+    data = json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=unique_keys)
+    if not isinstance(data, dict) or set(data) != {"publicationMode", "icoStatus"}:
+        raise ValueError("Publication mode file must contain publicationMode and icoStatus only")
+    if data == {"publicationMode": "informational", "icoStatus": "pending"}:
+        return "informational"
+    if data == {"publicationMode": "enquiries", "icoStatus": "completed"}:
+        return "enquiries"
+    raise ValueError("Invalid or contradictory publication mode and ICO status")
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--environment", required=True)
     parser.add_argument("--source-sha", required=True)
     parser.add_argument("--build-timestamp", required=True)
     parser.add_argument("--output-directory", required=True, type=Path)
+    parser.add_argument("--publication-mode-file", type=Path)
     parser.add_argument(
         "--root",
         type=Path,
@@ -360,12 +392,14 @@ def main(argv: list[str] | None = None) -> int:
     )
     arguments = parser.parse_args(argv)
     try:
+        publication_mode = read_publication_mode(arguments.publication_mode_file) if arguments.publication_mode_file else "enquiries"
         release = build_git_release(
             arguments.root,
             arguments.output_directory,
             arguments.environment,
             arguments.source_sha,
             arguments.build_timestamp,
+            publication_mode=publication_mode,
         )
     except (BadZipFile, OSError, ValueError) as error:
         print(f"Release build failed: {error}", file=sys.stderr)

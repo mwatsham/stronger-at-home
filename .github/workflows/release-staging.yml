@@ -70,7 +70,7 @@ jobs:
           test "${{ github.sha }}" = "$(git rev-parse origin/develop)"
 
       - name: Build the staging release tree
-        run: python scripts/build_git_release.py --environment staging --source-sha "${{ github.sha }}" --build-timestamp "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" --output-directory release
+        run: python scripts/build_git_release.py --environment staging --source-sha "${{ github.sha }}" --build-timestamp "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" --output-directory release --publication-mode-file config/publication-mode.json
 
       - name: Re-verify develop before promotion
         run: |
