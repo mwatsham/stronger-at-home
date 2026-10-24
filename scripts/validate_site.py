@@ -57,6 +57,8 @@ EXPECTED_LOGO_SHA256 = "1802be2b0ac8bfcaf60b83355ee9e3f12d2ba483f1efca39abe5fd79
 # Update this sorted allowlist only after the complete public source change has
 # received content, behaviour and release review. Every regular file under
 # site/ belongs here, irrespective of its name or extension.
+# The 2026-10-24 CSS/contact/selector refinement records user-authorised local
+# implementation, not final visual sign-off or staging/production authority.
 APPROVED_PUBLIC_SOURCE_SHA256 = {
     "site/.htaccess": "9b3093a1981bc7a9bba174dc14d63fae794c6eb8dbafef823815f269f60b1748",
     "site/404.html": "f2dc1d1ac316f2092a70b9efe07a230c66613919521af7252002b8b78d25032f",
@@ -74,7 +76,7 @@ APPROVED_PUBLIC_SOURCE_SHA256 = {
     "site/api/src/ValidationResult.php": "2ceb38671310bd93cb04ebcbcd1341bcfbc15bf069229a5b375e258772ff1898",
     "site/appointments-and-fees/index.html": "adc355adeee6d4f5c5af09b1b75b641b95f8871cbad0d6eb9fa362790ce28673",
     "site/assets/css/brand-tokens.css": "9945f6e139a26124a0755d46e0bb4dc93f3e867d87278b0ff4988d0f92d40450",
-    "site/assets/css/site.css": "f37aa8ece745bffef914764a637ae39db4f30990d5765740922526a57b44c168",
+    "site/assets/css/site.css": "2c996c24e54e934fe8a83f8c6019159b083df338a4aee7273b4cb1aec5b74c97",
     "site/assets/fonts/atkinson-hyperlegible-next.ttf": "5a455d1cfa099b601ab70751bb9673e8fe1854dc4500c80e1a220d0d75e31745",
     "site/assets/fonts/OFL-atkinson.txt": "09636801ed3e868736cc359bb1c819c5ef76529cbb41473cb1f602ef166dad0a",
     "site/assets/fonts/OFL-source-serif.txt": "0fd8b796c1c6220a559a5682cfd00d1c8488b428369f7cb70deb671888cef85f",
@@ -82,8 +84,8 @@ APPROVED_PUBLIC_SOURCE_SHA256 = {
     "site/assets/images/melanie-watsham-portrait.jpg": "9f5b50683414293d1fecb9b6ba0eb644259cd6007c4e309b51777a05651f5718",
     "site/assets/images/stronger-at-home-favicon.png": "8bd1993f6ce86320dc8a7753a05aee047f11a23cffbd97e0e5149bb713640528",
     "site/assets/images/stronger-at-home-logo.png": EXPECTED_LOGO_SHA256,
-    "site/assets/js/site.js": "3719a73b082b915082cc65fd4369e9e970e48629912377f52b9e44467ad42b07",
-    "site/contact/index.php": "076e68030031a86325be823247946cabc38abcfd4feb812fab759cd43c548666",
+    "site/assets/js/site.js": "f1fc2a93c1e797ba49b3fa1e05d83eda4d2c6b56bc3a8858c9838cfa9a5cf7fa",
+    "site/contact/index.php": "2212898c460ef8ef6b5f0ae48d6ec26ce898b4527c3c8613348d0760e5dcaf56",
     "site/how-i-can-help/index.html": "df39c329687fa332efb4da39c921e1d9779f109aeac7695c16473761ed4708d4",
     "site/index.html": "36b38775239777efa68319c3c83595b6ba076814b24aa7508801cb23ddb6232d",
     "site/privacy/index.html": "ab412e049bcd446e906a25c16e46597c9a0bd08084700f2044944e4a68627b58",

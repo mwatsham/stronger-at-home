@@ -100,12 +100,12 @@ $escape = static fn(string $value): string => htmlspecialchars($value, ENT_QUOTE
       </div>
     </section>
 
-    <section class="contact-form-section" aria-labelledby="appointment-request-heading">
+    <section id="appointment-request" class="contact-form-section" aria-labelledby="appointment-request-heading">
       <div class="section-heading narrow-heading">
         <p class="eyebrow">Website enquiry</p>
         <h2 id="appointment-request-heading">Request an appointment</h2>
       </div>
-      <form id="appointment-request" class="appointment-form" method="post" action="/api/enquiry.php" novalidate>
+      <form class="appointment-form" method="post" action="/api/enquiry.php" novalidate>
         <p>Use this form to request an appointment. Melanie will contact you directly to confirm availability.</p>
         <p class="notice">Please do not include detailed or urgent medical information.</p>
         <div id="form-feedback" class="form-status" data-form-status data-flash-kind="<?= $escape($kind) ?>" role="status" aria-live="polite" tabindex="-1"><?= $escape($statusMessage) ?></div>
@@ -150,7 +150,7 @@ $escape = static fn(string $value): string => htmlspecialchars($value, ENT_QUOTE
           <?php if (isset($errors['message'])): ?><p class="field-error" id="message-error"><?= $escape($errors['message']) ?></p><?php endif; ?>
         </div>
         <div class="form-field form-field-checkbox">
-          <label><input id="privacy-acknowledged" name="privacy_acknowledged" type="checkbox" value="1" required <?= isset($errors['privacy_acknowledged']) ? 'aria-invalid="true" aria-describedby="privacy-error"' : '' ?>> I have read the <a href="/privacy/">privacy notice</a>. <span aria-hidden="true">(required)</span></label>
+          <label><input id="privacy-acknowledged" name="privacy_acknowledged" type="checkbox" value="1" required <?= isset($errors['privacy_acknowledged']) ? 'aria-invalid="true" aria-describedby="privacy-error"' : '' ?>> <span>I have read the <a href="/privacy/">privacy notice</a>. <span aria-hidden="true">(required)</span></span></label>
           <?php if (isset($errors['privacy_acknowledged'])): ?><p class="field-error" id="privacy-error"><?= $escape($errors['privacy_acknowledged']) ?></p><?php endif; ?>
         </div>
         <div class="honeypot" aria-hidden="true">
