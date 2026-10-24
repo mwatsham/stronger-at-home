@@ -1,5 +1,107 @@
 # Durable project memory
 
+## 2026-09-08 — narrow header alignment approved
+
+The sponsor approved centring the existing horizontal logo/wordmark above
+the strapline on narrow screens across all pages. The shared stylesheet now
+constrains the logo link to the image's existing maximum width at 48rem and
+below. Artwork, displayed size, strapline, divider and desktop layout remain
+unchanged. After reviewing the preview, the sponsor authorised promotion to
+staging. Release through the normal develop/deploy-staging Git workflow;
+production remains unchanged.
+Browser regression coverage: `tests/header_alignment.cjs` (local PHP preview,
+Playwright and Chrome), eight routes including the error page at six widths.
+
+## 2026-09-07 — UK Trustpilot profile link
+
+The sponsor supplied https://uk.trustpilot.com/review/stronger-at-home.co.uk.
+Use that exact address for the local homepage's Trustpilot fallback link.
+The supplied widget configuration and Google link remain unchanged; the
+provider controls navigation inside its iframe. No live deployment was made.
+
+## 2026-09-07 — stacked logo approved as an additional variant
+
+The project sponsor approved the rendered stacked logo (D-43). Register the
+exact transparent and pale-background 1600 × 1600 PNGs without regenerating
+the artwork. The original review paths remain stable for traceability.
+This is supplementary to the horizontal logo, not a replacement, and does
+not authorise changes to the website or any live deployment.
+
+## 2026-09-07 — Google review link supplied
+
+The sponsor supplied https://g.page/r/CYqDnIzAeBQuEBM/review for the
+"Review us on Google" button proposed alongside Trustpilot. The local
+homepage uses this exact URL as a new-tab navigation link with no referrer,
+Google scripts or embedded content. The responsive combined layout is
+ready for visual review; no merge or deployment was requested for this step.
+The automated web reader did not resolve the short link's destination.
+
+## 2026-09-07 — Trustpilot Review Collector approved locally
+
+The project sponsor approved the homepage Review Collector layout and its
+privacy notice addition (D-42). The HTTPS loader runs on the homepage only;
+the supplied widget identifiers and locale are preserved. No invitation
+integration or appointment-form data transfer was added. The privacy draft
+label and content blocker are removed. Staging and production deployment
+still require separate authority; neither was changed by this approval.
+
+## 2026-09-07 — v3 logo layout adopted throughout the project
+
+The project sponsor approved the final review-profile image and requested this
+layout throughout the project. The complete wordmark is 75% of the symbol
+height, vertically centred, with a gap of 39/469 of the symbol height.
+The opaque primary pair, transparent exports, email and shared website asset
+now use v3. The square/wide review-profile PNGs and compatibility JPG are
+governed in the manifest. Old v2 sources and review pages remain historical.
+Standalone symbol exports and browser icons are unaffected.
+Approval is recorded as the project sponsor, not attributed to Melanie.
+The asset generator validates the immutable v3 transparent master and retains
+the cross-platform exact-byte checks. Production publication is separate.
+
+## 2026-09-06 — transparent primary logo adopted in website source
+
+The project sponsor approved replacing the website header's opaque logo copy
+with the exact approved 512 × 160 transparent primary export. The public path,
+rendered dimensions, scale, spacing, alt text and surrounding markup remain
+unchanged. The header's light, plain `#F9F4F2` background complies with the
+approved transparency boundary. Asset syncing and site validation now require
+the exact approved transparent bytes.
+
+The project sponsor subsequently approved the rendered composition for website
+use. Neither staging nor production release is authorised by this change.
+
+## 2026-09-06 — approved core logo asset pack
+
+Melanie Watsham approved the exact treatments shown in the logo asset pack
+comparison. The governed PNG-only pack contains transparent primary lockups,
+transparent and contained standalone secondary marks, and an email-sized
+lockup. The generator verifies the approved source hashes and creates the pack
+deterministically without redrawing, recolouring or changing the source
+geometry. Every public export is recorded by exact SHA-256 in the asset
+manifest.
+
+Transparent exports are permitted only on light, plain backgrounds. Use the
+approved opaque primary or contained secondary mark on dark, photographic or
+uncontrolled backgrounds. The standalone symbol is now allowed within this
+exact pack, superseding its earlier Stage 1 prohibition. No website adoption or
+deployment was authorised by the asset approval.
+
+## 2026-09-04 — privacy retention and notice review
+
+The project sponsor approved a 12-month retention period after last contact for
+website enquiries that do not become patient records. If an adult becomes a
+patient, relevant correspondence may form part of the patient record, normally
+retained for eight years after the last treatment. The revised notice must
+identify the lawful bases, service providers, international processing,
+individual rights and ICO complaint route. Melanie Watsham approved the initial
+rendering on 4 September 2026. Independent review then identified additional
+transparency wording for legal obligations and claims, international-transfer
+safeguards, the right to object and required form fields. Melanie approved the
+independently reviewed revision on 4 September 2026, so its visible draft label
+and `privacy-approval` production blocker were removed. ICO data protection fee
+self-assessment and any required sole-trader registration remain a separate
+launch action.
+
 ## 2026-09-03 — website packaging and publication gates
 
 The approved public website tree is exact-fingerprinted. Its deterministic
@@ -16,8 +118,12 @@ The public site and content-review checklist omit payment-method wording under
 the project sponsor's current scope ruling. The approved individual quotation
 and agreed fixed-price wording remains public. Unverified professional
 credential and referral wording is omitted rather than treated as current
-publication content. Production remains blocked by exactly two content gates:
-the final professional portrait and approval of the privacy retention wording.
+publication content. The privacy notice was initially approved on 4 September
+2026, then revised after independent review and approved by Melanie on the same
+date. The supplied professional portrait is integrated as a faithful,
+metadata-free 1020 × 1190 web crop with no generative alteration. The automated
+portrait blocker is removed and the rendered treatment is approved, while full
+staging sign-off remains a human publication gate.
 
 ## 2026-09-03 — website design
 
@@ -31,8 +137,11 @@ The approved visual direction is the calm-editorial homepage composition. The
 site will use lightweight static pages and a small server-side enquiry handler,
 with no CMS, analytics, online payments, accounts, calendar integration or
 clinical database. Staging review precedes any production release. Credentials,
-referral suitability, the final portrait, privacy wording and deployment-time
-mail configuration remain separate publication dependencies.
+referral suitability and deployment-time mail configuration remain separate
+publication dependencies. The supplied portrait has since replaced the
+temporary placeholder and its rendered treatment is approved. The privacy wording
+was initially approved on 4 September 2026, then independently reviewed, revised
+and approved again on the same date.
 
 ## 2026-09-02 — appointment enquiries
 

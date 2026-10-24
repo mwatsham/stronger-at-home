@@ -10,7 +10,7 @@ if (button && navigation) {
   });
 }
 
-const form = document.querySelector('#appointment-request');
+const form = document.querySelector('form.appointment-form');
 if (form) {
   const email = form.querySelector('#email');
   const phone = form.querySelector('#phone');

@@ -1,0 +1,24 @@
+{
+  "status": "approved",
+  "reviewed_by": "Project sponsor",
+  "reviewed_on": "2026-09-07",
+  "decision": "D-43",
+  "source": "../../source/logo-primary-transparent-v2-2048.png",
+  "source_sha256": "0328080f1f7ecc01a93108cc686fad88490f404c0d989671271bd7b16a96717c",
+  "canvas": [
+    1600,
+    1600
+  ],
+  "symbol": [
+    524,
+    652
+  ],
+  "wordmark": [
+    1360,
+    489
+  ],
+  "gap": 54,
+  "wordmark_height_ratio": 0.75,
+  "alignment": "symbol and each existing text line centred",
+  "restrictions": "PNG only. No redraw, retyping or recolouring. Supplementary variant; horizontal logo and website unchanged."
+}

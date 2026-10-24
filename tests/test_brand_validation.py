@@ -58,13 +58,13 @@ VALID_HYBRID_SVG = """\
 
 RASTER_ASSETS = {
     "primary_raster_logo_2048": {
-        "id": "logo_primary_raster_v2_2048",
-        "filename": "logo-primary-raster-v2-2048.png",
+        "id": "logo_primary_raster_v3_2048",
+        "filename": "logo-primary-raster-v3-2048.png",
         "size": (2048, 640),
     },
     "primary_raster_logo_512": {
-        "id": "logo_primary_raster_v2_512",
-        "filename": "logo-primary-raster-v2-512.png",
+        "id": "logo_primary_raster_v3_512",
+        "filename": "logo-primary-raster-v3-512.png",
         "size": (512, 160),
     },
     "historical_raster_logo_2048": {
@@ -109,11 +109,28 @@ def _write_default_rasters(root: Path) -> list[dict[str, object]]:
                 "path": f"brand/assets/source/{configuration['filename']}",
                 "status": "deprecated" if is_historical else "approved",
                 "sha256": hashlib.sha256(asset_path.read_bytes()).hexdigest(),
-                "reviewed_by": "Melanie Watsham",
-                "reviewed_on": "2026-08-04" if is_historical else "2026-08-05",
+                "reviewed_by": "Melanie Watsham" if is_historical else "Project sponsor",
+                "reviewed_on": "2026-08-04" if is_historical else "2026-09-07",
             }
         )
     return assets
+
+
+def _copy_approved_export_pack(root: Path) -> None:
+    manifest_path = root / "brand/assets/manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    approved_manifest = json.loads(
+        (PROJECT_ROOT / "brand/assets/manifest.json").read_text(encoding="utf-8")
+    )
+    for asset in approved_manifest["assets"]:
+        if not asset["path"].startswith("brand/assets/exports/"):
+            continue
+        source = PROJECT_ROOT / asset["path"]
+        destination = root / asset["path"]
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_bytes(source.read_bytes())
+        manifest["assets"].append(dict(asset))
+    _write_manifest(root, manifest["assets"])
 
 
 def write_asset_project(
@@ -367,15 +384,38 @@ class BrandValidationTests(unittest.TestCase):
         self.assertEqual(
             context["identity_architecture"]["current_primary_assets"],
             [
-                "brand/assets/source/logo-primary-raster-v2-2048.png",
-                "brand/assets/source/logo-primary-raster-v2-512.png",
+                "brand/assets/source/logo-primary-raster-v3-2048.png",
+                "brand/assets/source/logo-primary-raster-v3-512.png",
             ],
         )
         self.assertEqual(
             context["identity_architecture"]["exact_artwork_reviewed_on"],
-            "2026-08-05",
+            "2026-09-07",
+        )
+        self.assertEqual(
+            context["identity_architecture"]["approved_export_pack"],
+            {
+                "directory": "brand/assets/exports",
+                "format": "PNG only",
+                "standalone_symbol_allowed": True,
+                "transparent_backgrounds": "light, plain backgrounds only",
+                "dark_or_uncontrolled_backgrounds": "opaque or contained versions only",
+                "reviewed_by": "Project sponsor",
+                "reviewed_on": "2026-09-07",
+            },
+        )
+        self.assertEqual(
+            context["identity_architecture"]["website_logo"],
+            {
+                "asset": "brand/assets/exports/logo-primary-transparent-512.png",
+                "background": "light plain #F9F4F2 header",
+                "status": "approved for website use; release pending",
+                "approved_by": "Project sponsor",
+                "approved_on": "2026-09-07",
+            },
         )
         self.assertNotIn("public use before clearance", context["prohibitions"])
+        self.assertNotIn("standalone symbol in Stage 1", context["prohibitions"])
         self.assertIn(
             "use of registered trade mark symbol without registration",
             context["prohibitions"],
@@ -384,7 +424,7 @@ class BrandValidationTests(unittest.TestCase):
     def test_review_preview_spells_out_accessible_and_metadata_name(self):
         parser = PreviewMetadataParser()
         parser.feed(
-            (PROJECT_ROOT / "brand/assets/review/logo-raster-v2-preview.html")
+            (PROJECT_ROOT / "brand/assets/review/logo-raster-v3-preview.html")
             .read_text(encoding="utf-8")
         )
         self.assertEqual(
@@ -396,25 +436,25 @@ class BrandValidationTests(unittest.TestCase):
         )
         self.assertEqual(
             parser.image_alts[
-                "../source/logo-primary-raster-v2-2048.png"
+                "../source/logo-primary-raster-v3-2048.png"
             ],
             expected_alt,
         )
         self.assertEqual(
             parser.image_alts[
-                "../source/logo-primary-raster-v2-512.png"
+                "../source/logo-primary-raster-v3-512.png"
             ],
             expected_alt,
         )
 
-    def test_current_primary_roles_use_v2_paths(self):
+    def test_current_primary_roles_use_v3_paths(self):
         self.assertEqual(
             REQUIRED_ASSET_PATHS["primary_raster_logo_2048"],
-            "brand/assets/source/logo-primary-raster-v2-2048.png",
+            "brand/assets/source/logo-primary-raster-v3-2048.png",
         )
         self.assertEqual(
             REQUIRED_ASSET_PATHS["primary_raster_logo_512"],
-            "brand/assets/source/logo-primary-raster-v2-512.png",
+            "brand/assets/source/logo-primary-raster-v3-512.png",
         )
 
     def test_approved_primary_pairs_exceed_wcag_aa(self):
@@ -435,6 +475,21 @@ class BrandValidationTests(unittest.TestCase):
             )
             errors = validate_project(root)
         self.assertIn("Invalid decision status in DECISIONS.md: final", errors)
+
+    def test_superseded_decision_status_is_allowed(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "DECISIONS.md").write_text(
+                "| D-1 | Test | superseded | Owner | 2026-08-03 |",
+                encoding="utf-8",
+            )
+
+            errors = validate_project(root)
+
+        self.assertNotIn(
+            "Invalid decision status in DECISIONS.md: superseded",
+            errors,
+        )
 
     def test_source_serif_requires_its_licence_file(self):
         with TemporaryDirectory() as directory:
@@ -464,6 +519,7 @@ class BrandValidationTests(unittest.TestCase):
         with TemporaryDirectory() as directory:
             root = Path(directory)
             write_asset_project(root)
+            _copy_approved_export_pack(root)
 
             errors = validate_project(root)
 
@@ -593,10 +649,67 @@ class BrandValidationTests(unittest.TestCase):
             errors,
         )
 
+    def test_approved_export_bytes_cannot_be_reapproved_by_updating_manifest_hash(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_asset_project(root)
+            _copy_approved_export_pack(root)
+            relative = "brand/assets/exports/logo-secondary-transparent-128.png"
+            asset_path = root / relative
+            Image.new("RGBA", (128, 128), (32, 62, 85, 255)).save(asset_path)
+            manifest_path = root / "brand/assets/manifest.json"
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            entry = next(
+                asset for asset in manifest["assets"] if asset["path"] == relative
+            )
+            entry["sha256"] = hashlib.sha256(asset_path.read_bytes()).hexdigest()
+            _write_manifest(root, manifest["assets"])
+
+            errors = validate_project(root)
+
+        self.assertIn(
+            "Approved export brand/assets/exports/logo-secondary-transparent-128.png must have approved SHA-256 a2d1109ed2e50f63f9f4a1d52d8acbda855226cff2715c3f2d2c0098ec462928",
+            errors,
+        )
+
+    def test_unmanaged_file_in_export_directory_is_rejected(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_asset_project(root)
+            _copy_approved_export_pack(root)
+            extra = root / "brand/assets/exports/unapproved.png"
+            Image.new("RGB", (16, 16), (249, 244, 242)).save(extra)
+
+            errors = validate_project(root)
+
+        self.assertIn(
+            "Unmanaged file in brand/assets/exports: brand/assets/exports/unapproved.png",
+            errors,
+        )
+
     def test_approved_logo_requires_melanie_and_iso_review_date(self):
         with TemporaryDirectory() as directory:
             root = Path(directory)
             write_asset_project(root, status="approved")
+
+            errors = validate_project(root)
+
+        self.assertIn(
+            "Approved asset logo_primary_hybrid must be reviewed by Melanie Watsham",
+            errors,
+        )
+        self.assertIn(
+            "Approved asset logo_primary_hybrid must have an ISO review date", errors
+        )
+
+    def test_approved_derived_logo_requires_melanie_and_iso_review_date(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_asset_project(
+                root,
+                role="logo_secondary_transparent_512",
+                status="approved",
+            )
 
             errors = validate_project(root)
 
@@ -640,6 +753,22 @@ class BrandValidationTests(unittest.TestCase):
             "Approved asset logo_primary_hybrid must have an ISO review date", errors
         )
 
+    def test_superseded_status_remains_invalid_for_assets(self):
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_asset_project(
+                root,
+                role="supporting_document",
+                status="superseded",
+            )
+
+            errors = validate_project(root)
+
+        self.assertIn(
+            "Asset logo_primary_hybrid has invalid status: superseded",
+            errors,
+        )
+
     def test_historical_roles_require_original_paths(self):
         with TemporaryDirectory() as directory:
             root = Path(directory)
@@ -651,7 +780,7 @@ class BrandValidationTests(unittest.TestCase):
                 for asset in manifest["assets"]
                 if asset["role"] == "historical_raster_logo_2048"
             )
-            historical["path"] = "brand/assets/source/logo-primary-raster-v2-2048.png"
+            historical["path"] = "brand/assets/source/logo-primary-raster-v3-2048.png"
             _write_manifest(root, manifest["assets"])
             errors = validate_project(root)
         self.assertIn(
@@ -685,7 +814,7 @@ class BrandValidationTests(unittest.TestCase):
             )
             errors = validate_project(root)
         self.assertIn(
-            "Current primary raster asset logo_primary_raster_v2_2048 must have status approved",
+            "Current primary raster asset logo_primary_raster_v3_2048 must have status approved",
             errors,
         )
 
@@ -701,7 +830,7 @@ class BrandValidationTests(unittest.TestCase):
             )
             errors = validate_project(root)
         self.assertIn(
-            "Current primary raster asset logo_primary_raster_v2_512 must have approval date 2026-08-05",
+            "Current primary raster asset logo_primary_raster_v3_512 must have approval date 2026-09-07",
             errors,
         )
 
@@ -716,7 +845,7 @@ class BrandValidationTests(unittest.TestCase):
                 reviewed_on="2026-08-05",
             )
             asset_path = (
-                root / "brand/assets/source/logo-primary-raster-v2-2048.png"
+                root / "brand/assets/source/logo-primary-raster-v3-2048.png"
             )
             Image.new("RGB", (2048, 640), (249, 244, 242)).save(asset_path)
             manifest_path = root / "brand/assets/manifest.json"
@@ -730,7 +859,7 @@ class BrandValidationTests(unittest.TestCase):
             _write_manifest(root, manifest["assets"])
             errors = validate_project(root)
         self.assertIn(
-            "Current primary raster asset logo_primary_raster_v2_2048 must have approved SHA-256 4e8988e571269353aed86697468e0a60b838bc1e121c8e590f974d5124df3683",
+            "Current primary raster asset logo_primary_raster_v3_2048 must have approved SHA-256 6ed84006b8ba2e8e765dc91e418cd625fbfca3f70d122d88bd862d5c3c474136",
             errors,
         )
 
@@ -865,11 +994,11 @@ class BrandValidationTests(unittest.TestCase):
                 errors = validate_project(root)
             asset_id = configuration["id"]
             self.assertIn(
-                f"Current primary raster asset {asset_id} must be reviewed by Melanie Watsham",
+                f"Current primary raster asset {asset_id} must be reviewed by Project sponsor",
                 errors,
             )
             self.assertIn(
-                f"Current primary raster asset {asset_id} must have approval date 2026-08-05",
+                f"Current primary raster asset {asset_id} must have approval date 2026-09-07",
                 errors,
             )
 
@@ -882,8 +1011,8 @@ class BrandValidationTests(unittest.TestCase):
                     root,
                     role=role,
                     status="approved",
-                    reviewed_by="Melanie Watsham",
-                    reviewed_on="2026-08-05",
+                    reviewed_by="Project sponsor",
+                    reviewed_on="2026-09-07",
                 )
                 errors = validate_project(root)
             asset_id = configuration["id"]
@@ -958,8 +1087,8 @@ class BrandValidationTests(unittest.TestCase):
     def test_required_roles_reject_noncanonical_paths(self):
         expected_paths = {
             "primary_hybrid_logo": "brand/assets/source/logo-primary-hybrid.svg",
-            "primary_raster_logo_2048": "brand/assets/source/logo-primary-raster-v2-2048.png",
-            "primary_raster_logo_512": "brand/assets/source/logo-primary-raster-v2-512.png",
+            "primary_raster_logo_2048": "brand/assets/source/logo-primary-raster-v3-2048.png",
+            "primary_raster_logo_512": "brand/assets/source/logo-primary-raster-v3-512.png",
             "historical_raster_logo_2048": "brand/assets/source/logo-primary-raster-2048.png",
             "historical_raster_logo_512": "brand/assets/source/logo-primary-raster-512.png",
         }
@@ -987,11 +1116,11 @@ class BrandValidationTests(unittest.TestCase):
         with TemporaryDirectory() as directory:
             root = Path(directory)
             write_raster_asset(root, role="primary_raster_logo_512")
-            missing_path = root / "brand/assets/source/logo-primary-raster-v2-512.png"
+            missing_path = root / "brand/assets/source/logo-primary-raster-v3-512.png"
             missing_path.unlink()
             errors = validate_project(root)
         self.assertIn(
-            "Asset path does not exist: brand/assets/source/logo-primary-raster-v2-512.png",
+            "Asset path does not exist: brand/assets/source/logo-primary-raster-v3-512.png",
             errors,
         )
 

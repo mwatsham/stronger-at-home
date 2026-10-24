@@ -1,4 +1,5 @@
 import json
+import hashlib
 from pathlib import Path
 import re
 import shutil
@@ -11,6 +12,7 @@ from zipfile import ZipFile
 
 import scripts.package_site as package_module
 from scripts.package_site import package_site
+from scripts.validate_site import APPROVED_PUBLIC_SOURCE_SHA256
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -24,8 +26,8 @@ class SitePackageTests(unittest.TestCase):
 
             with ZipFile(archive) as package:
                 names = set(package.namelist())
-                self.assertEqual(len(names), 114)
-                self.assertEqual(sum(name.startswith("public/") for name in names), 30)
+                self.assertEqual(len(names), 116)
+                self.assertEqual(sum(name.startswith("public/") for name in names), 32)
                 self.assertEqual(sum(name.startswith("vendor/") for name in names), 84)
                 self.assertIn("public/robots.txt", names)
                 self.assertNotIn("public/robots-staging.txt", names)
@@ -74,6 +76,16 @@ class SitePackageTests(unittest.TestCase):
                     "/.ds_store",
                 ):
                     self.assertFalse(any(forbidden in f"/{name}" for name in lowered))
+
+    def test_package_supplies_cpanel_404_shtml_with_the_approved_error_page(self):
+        with TemporaryDirectory() as directory:
+            archive = package_site(ROOT, Path(directory), "staging")
+
+            with ZipFile(archive) as package:
+                self.assertEqual(
+                    package.read("public/404.shtml"),
+                    package.read("public/404.html"),
+                )
 
     def test_repeated_builds_are_byte_for_byte_deterministic(self):
         with TemporaryDirectory() as first, TemporaryDirectory() as second:
@@ -203,41 +215,42 @@ class SitePackageTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "Site validation failed.*approval drift"):
                 package_site(copy, Path(directory) / "output", "staging")
 
-    def test_production_package_is_blocked_by_unresolved_publication_gates(self):
+    def test_real_production_package_contains_the_portrait_and_excludes_staging_robots(self):
         with TemporaryDirectory() as directory:
-            with self.assertRaisesRegex(ValueError, "Production blocker remains: portrait"):
-                package_site(ROOT, Path(directory), "production")
-
-    def test_real_production_package_excludes_the_staging_robots_template(self):
-        expected_blockers = [
-            "Production blocker remains: portrait",
-            "Production blocker remains: privacy-approval",
-        ]
-        real_validate_site = package_module.validate_site
-
-        def allow_only_known_publication_blockers(project_root, environment):
-            errors = real_validate_site(project_root, environment)
-            self.assertEqual(errors, expected_blockers)
-            return []
-
-        with TemporaryDirectory() as directory, patch.object(
-            package_module,
-            "validate_site",
-            side_effect=allow_only_known_publication_blockers,
-        ):
             archive = package_site(ROOT, Path(directory), "production")
 
             with ZipFile(archive) as package:
                 names = set(package.namelist())
-                self.assertEqual(len(names), 114)
-                self.assertEqual(sum(name.startswith("public/") for name in names), 30)
+                self.assertEqual(len(names), 116)
+                self.assertEqual(sum(name.startswith("public/") for name in names), 32)
                 self.assertEqual(sum(name.startswith("vendor/") for name in names), 84)
                 self.assertNotIn("public/robots-staging.txt", names)
+                self.assertIn("public/assets/images/melanie-watsham-portrait.jpg", names)
+                self.assertNotIn("public/assets/images/portrait-placeholder.svg", names)
                 self.assertEqual(
                     package.read("public/robots.txt"),
                     (ROOT / "site/robots.txt").read_bytes(),
                 )
                 self.assertNotIn(b"X-Robots-Tag", package.read("public/.htaccess"))
+
+    def test_production_packaging_refuses_a_privacy_approval_blocker(self):
+        with TemporaryDirectory() as directory:
+            copy = Path(directory) / "draft-project"
+            shutil.copytree(ROOT, copy)
+            privacy = copy / "site/privacy/index.html"
+            privacy.write_text(
+                privacy.read_text(encoding="utf-8").replace(
+                    'id="privacy-trustpilot"',
+                    'id="privacy-trustpilot" data-production-blocker="privacy-approval"',
+                ),
+                encoding="utf-8",
+            )
+            # Isolate the explicit approval gate from source-fingerprint checks.
+            with patch.dict(APPROVED_PUBLIC_SOURCE_SHA256, {
+                "site/privacy/index.html": hashlib.sha256(privacy.read_bytes()).hexdigest()
+            }):
+                with self.assertRaisesRegex(ValueError, "Production blocker remains: privacy-approval"):
+                    package_site(copy, Path(directory) / "output", "production")
 
     def test_documented_command_line_entry_point_builds_the_staging_archive(self):
         with TemporaryDirectory() as directory:

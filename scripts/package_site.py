@@ -199,6 +199,7 @@ def package_site(project_root: Path, destination: Path, environment: str) -> Pat
     if environment == "staging" and robots_content is None:
         raise ValueError("staging robots snapshot is unavailable")
     entries = [entry for entry in entries if entry[0] != STAGING_ROBOTS_TEMPLATE]
+    entries.append(("public/404.shtml", public_snapshot["public/404.html"]))
 
     _validate_vendor_fingerprint(vendor_entries)
     vendor_entries = [

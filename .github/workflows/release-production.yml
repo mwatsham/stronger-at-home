@@ -76,7 +76,7 @@ jobs:
           echo "BUILD_TIMESTAMP=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_ENV"
 
       - name: Build the production release tree
-        run: python scripts/build_git_release.py --environment production --source-sha "$SOURCE_SHA" --build-timestamp "$BUILD_TIMESTAMP" --output-directory release
+        run: python scripts/build_git_release.py --environment production --source-sha "$SOURCE_SHA" --build-timestamp "$BUILD_TIMESTAMP" --output-directory release --publication-mode-file config/publication-mode.json
 
       - name: Re-verify main before promotion
         run: |
@@ -105,7 +105,7 @@ jobs:
 
           git -C "$release_worktree" config user.name "github-actions[bot]"
           git -C "$release_worktree" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C "$release_worktree" rm -r --ignore-unmatch .
+          git -C "$release_worktree" rm -rf --ignore-unmatch .
           cp -a release/. "$release_worktree/"
           git -C "$release_worktree" add --all
           git -C "$release_worktree" commit -m "deploy: production $SOURCE_SHA"

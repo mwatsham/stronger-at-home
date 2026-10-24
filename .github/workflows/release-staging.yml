@@ -70,7 +70,7 @@ jobs:
           test "${{ github.sha }}" = "$(git rev-parse origin/develop)"
 
       - name: Build the staging release tree
-        run: python scripts/build_git_release.py --environment staging --source-sha "${{ github.sha }}" --build-timestamp "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" --output-directory release
+        run: python scripts/build_git_release.py --environment staging --source-sha "${{ github.sha }}" --build-timestamp "$(date -u +'%Y-%m-%dT%H:%M:%SZ')" --output-directory release --publication-mode-file config/publication-mode.json
 
       - name: Re-verify develop before promotion
         run: |
@@ -99,7 +99,7 @@ jobs:
 
           git -C "$release_worktree" config user.name "github-actions[bot]"
           git -C "$release_worktree" config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git -C "$release_worktree" rm -r --ignore-unmatch .
+          git -C "$release_worktree" rm -rf --ignore-unmatch .
           cp -a release/. "$release_worktree/"
           git -C "$release_worktree" add --all
           git -C "$release_worktree" commit -m "deploy: stage ${{ github.sha }}"

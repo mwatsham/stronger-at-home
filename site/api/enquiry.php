@@ -45,7 +45,7 @@ if (!is_array($config)) {
     exit;
 }
 
-foreach (['environment', 'allowed_origin', 'recipient', 'sender', 'smtp_host', 'smtp_username', 'smtp_password', 'rate_limit_secret', 'rate_limit_directory'] as $requiredKey) {
+foreach (['environment', 'allowed_origin', 'recipient', 'sender', 'smtp_host', 'rate_limit_secret', 'rate_limit_directory'] as $requiredKey) {
     if (!isset($config[$requiredKey]) || !is_string($config[$requiredKey]) || trim($config[$requiredKey]) === '') {
         http_response_code(500);
         exit;

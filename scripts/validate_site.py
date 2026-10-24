@@ -21,6 +21,15 @@ FORMAL_NAME = "Stronger at Home Physiotherapy"
 FORMAL_IDENTITY = "Melanie Watsham trading as Stronger at Home Physiotherapy"
 APPROVED_PHONE = "+447843497871"
 APPROVED_EMAIL = "melanie@stronger-at-home.co.uk"
+APPROVED_EXTERNAL_URLS = {
+    "https://ico.org.uk/make-a-complaint/data-protection-complaints/check-if-you-can-complain/",
+}
+APPROVED_EXTERNAL_RESOURCES = {
+    ("a", "href", "https://g.page/r/CYqDnIzAeBQuEBM/review"),
+    ("script", "src", "https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"),
+    ("a", "href", "https://uk.trustpilot.com/review/stronger-at-home.co.uk"),
+    ("a", "href", "https://legal.trustpilot.com/for-reviewers/end-user-privacy-terms"),
+}
 
 PRIMARY_PAGES = {
     Path("site/index.html"): "/",
@@ -40,44 +49,46 @@ SITEMAP_URLS = {
 }
 
 ALLOWED_BLOCKERS = {
-    "portrait",
     "privacy-approval",
     "credentials",
     "referral-suitability",
 }
-EXPECTED_LOGO_SHA256 = "d557a0e8fd05efc86fcca2b3f63d807ad33f29527062697705a8e05616c6db39"
+EXPECTED_LOGO_SHA256 = "1802be2b0ac8bfcaf60b83355ee9e3f12d2ba483f1efca39abe5fd7958c6221c"
 # Update this sorted allowlist only after the complete public source change has
 # received content, behaviour and release review. Every regular file under
 # site/ belongs here, irrespective of its name or extension.
+# The 2026-10-24 CSS/contact/selector refinement records user-authorised local
+# implementation, not final visual sign-off or staging/production authority.
 APPROVED_PUBLIC_SOURCE_SHA256 = {
-    "site/.htaccess": "14210b8b14861742ae2dd46317e7c9c40007ad70f778e8378a19e2a07060f6fb",
-    "site/404.html": "3a5f600c98009883c9d2ea76cb5449978972352befc5f957e80b259b12f73cd8",
-    "site/about/index.html": "e931bce94118bbdb07885ee2c222b4c48a86843cca9d389b428b1e6289abe65c",
-    "site/accessibility/index.html": "8aa6edb4bcacb6ba770d495380723565a68c3b4ba28fe6916089c0f12b8edcce",
-    "site/api/enquiry.php": "cda64f5d2fbf19850a4db4922cc5b2465f1e5f70dfd735c7412f2ed66cf995c2",
+    "site/.htaccess": "9b3093a1981bc7a9bba174dc14d63fae794c6eb8dbafef823815f269f60b1748",
+    "site/404.html": "f2dc1d1ac316f2092a70b9efe07a230c66613919521af7252002b8b78d25032f",
+    "site/about/index.html": "b8eac3013886a7ba8ff3aa05cbea460ed6ba68e79544f5a3fdd0029123c17c93",
+    "site/accessibility/index.html": "e0d250481b3556c02751fd322358102b52ecfe2a513d89e7c1c182ea332ebb08",
+    "site/api/enquiry.php": "ed9d7ece29c3aca98e35d6382661daac6df33bed6a6c5339aceb519fbd05d270",
     "site/api/src/EnquiryController.php": "f58b674470922b4b741cc038ee7ce4efe8e021c5b53ca37a1cde7d5b21b56d06",
     "site/api/src/EnquiryMessage.php": "715d322e3bbe1d02c117e9ed698798c27bd2622ee603789d844b6a3b4d5fffc9",
     "site/api/src/EnquiryValidator.php": "e490d6c2257e3d6b23bba898d9887fc7507636f17649511f2699b02409026076",
     "site/api/src/FileRateLimiter.php": "582eef482c4d8f0677760e708589bf38b57e53e260da1d780d822402ac444348",
     "site/api/src/MailTransport.php": "215635fb7295bd51f9865e5559cb2b649f49249771e54902c44eb05415ac825b",
-    "site/api/src/PhpMailerTransport.php": "891bd63401873ca013464a727dcaf988fea4702ad71fa38c899c1db8868dab02",
+    "site/api/src/PhpMailerTransport.php": "2fb41428112e7b70cf31e8d984ef370ee6d8055456a346c406530c6d5df95dff",
     "site/api/src/RateLimit.php": "2e1f975f955d86222f2474b66ecaaa2074279a30ce445a8401b2a6b4753aff7a",
     "site/api/src/Response.php": "47fe950982fd6a7bb84bcf50e7346b644a46b6b8cee414fc44dd7f44f67214c1",
     "site/api/src/ValidationResult.php": "2ceb38671310bd93cb04ebcbcd1341bcfbc15bf069229a5b375e258772ff1898",
-    "site/appointments-and-fees/index.html": "f55b5d4325ac53509e0e3acd3555f82debb84924027fd58a2b6fa96ddbb4f6e9",
+    "site/appointments-and-fees/index.html": "adc355adeee6d4f5c5af09b1b75b641b95f8871cbad0d6eb9fa362790ce28673",
     "site/assets/css/brand-tokens.css": "9945f6e139a26124a0755d46e0bb4dc93f3e867d87278b0ff4988d0f92d40450",
-    "site/assets/css/site.css": "bb3502e55df18c4250f0e07656b2c401072b2a52e014528de6943fa9b7719d66",
+    "site/assets/css/site.css": "2c996c24e54e934fe8a83f8c6019159b083df338a4aee7273b4cb1aec5b74c97",
     "site/assets/fonts/atkinson-hyperlegible-next.ttf": "5a455d1cfa099b601ab70751bb9673e8fe1854dc4500c80e1a220d0d75e31745",
     "site/assets/fonts/OFL-atkinson.txt": "09636801ed3e868736cc359bb1c819c5ef76529cbb41473cb1f602ef166dad0a",
     "site/assets/fonts/OFL-source-serif.txt": "0fd8b796c1c6220a559a5682cfd00d1c8488b428369f7cb70deb671888cef85f",
     "site/assets/fonts/source-serif-4.ttf": "97b2d4da6e3cb494b5a1e66ae176914d852ccabef49e0c02c0df25f3e39aca0b",
-    "site/assets/images/portrait-placeholder.svg": "ebb4e3a1644ae864495f6b540b282426d7bf0c41f0089c9798b0d65b151d96a5",
+    "site/assets/images/melanie-watsham-portrait.jpg": "9f5b50683414293d1fecb9b6ba0eb644259cd6007c4e309b51777a05651f5718",
+    "site/assets/images/stronger-at-home-favicon.png": "8bd1993f6ce86320dc8a7753a05aee047f11a23cffbd97e0e5149bb713640528",
     "site/assets/images/stronger-at-home-logo.png": EXPECTED_LOGO_SHA256,
-    "site/assets/js/site.js": "3719a73b082b915082cc65fd4369e9e970e48629912377f52b9e44467ad42b07",
-    "site/contact/index.php": "a08d203bcfa1162932f562e68fe40d9d6206fa603f7cdf5759d61fec15e97f0a",
-    "site/how-i-can-help/index.html": "b2f3910b4b3e7dd751ba98fde53ee9f47c0b96fd1b2e5c1dcc2e0a2d13c8b264",
-    "site/index.html": "a1c21cfeedba232a6224cfd4793b09fa2bb217e4635ed1b63a3cd16886b559c7",
-    "site/privacy/index.html": "a87bba67ed9864a6dfee6c5aaf0c21d236a390255dd045e40206d3ebcbd99597",
+    "site/assets/js/site.js": "f1fc2a93c1e797ba49b3fa1e05d83eda4d2c6b56bc3a8858c9838cfa9a5cf7fa",
+    "site/contact/index.php": "2212898c460ef8ef6b5f0ae48d6ec26ce898b4527c3c8613348d0760e5dcaf56",
+    "site/how-i-can-help/index.html": "df39c329687fa332efb4da39c921e1d9779f109aeac7695c16473761ed4708d4",
+    "site/index.html": "36b38775239777efa68319c3c83595b6ba076814b24aa7508801cb23ddb6232d",
+    "site/privacy/index.html": "ab412e049bcd446e906a25c16e46597c9a0bd08084700f2044944e4a68627b58",
     "site/robots-staging.txt": "331ea9090db0c9f6f597bd9840fd5b171830f6e0b3ba1cb24dfa91f0c95aedc1",
     "site/robots.txt": "6806d9c899e6b514b73f45b56f6ff0eb6193e996027444ecebc88d4c31bbf294",
     "site/sitemap.xml": "e343bdfdc81a434ba772c17174e8f36fe79fdab8e3b52d03b63e3d7976469101",
@@ -154,7 +165,7 @@ EXPECTED_HTACCESS = (
     'Header always set X-Content-Type-Options "nosniff"\n'
     'Header always set Referrer-Policy "strict-origin-when-cross-origin"\n'
     'Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"\n'
-    'Header always set Content-Security-Policy "default-src \'self\'; img-src \'self\'; style-src \'self\'; script-src \'self\'; form-action \'self\'; base-uri \'self\'; frame-ancestors \'none\'"\n'
+    'Header always set Content-Security-Policy "default-src \'self\'; img-src \'self\'; style-src \'self\'; script-src \'self\' https://widget.trustpilot.com; frame-src https://widget.trustpilot.com; form-action \'self\'; base-uri \'self\'; frame-ancestors \'none\'"\n'
 )
 
 
@@ -430,6 +441,8 @@ def _validate_links(root: Path, parsed: dict[Path, SiteHTMLParser], errors: list
 
         for tag, attribute, value in parser.references:
             parts = urlsplit(value)
+            if (tag, attribute, value) in APPROVED_EXTERNAL_RESOURCES:
+                continue
             if parts.scheme in {"mailto", "tel"}:
                 approved = APPROVED_EMAIL if parts.scheme == "mailto" else APPROVED_PHONE
                 if parts.path != approved:
@@ -439,8 +452,13 @@ def _validate_links(root: Path, parsed: dict[Path, SiteHTMLParser], errors: list
                 errors.append(f"Unsupported link scheme in {relative_path.as_posix()}: {value}")
                 continue
             if parts.scheme in {"http", "https"}:
-                if f"{parts.scheme}://{parts.netloc}" != CANONICAL_ORIGIN:
+                if (
+                    f"{parts.scheme}://{parts.netloc}" != CANONICAL_ORIGIN
+                    and value not in APPROVED_EXTERNAL_URLS
+                ):
                     errors.append(f"External URL is not approved in {relative_path.as_posix()}: {value}")
+                    continue
+                if value in APPROVED_EXTERNAL_URLS:
                     continue
                 target_route = parts.path or "/"
             else:
@@ -475,6 +493,39 @@ def _actual_image_size(path: Path) -> tuple[int, int] | None:
         if len(data) < 24 or data[:8] != b"\x89PNG\r\n\x1a\n" or data[12:16] != b"IHDR":
             return None
         return struct.unpack(">II", data[16:24])
+    if path.suffix.lower() in {".jpg", ".jpeg"}:
+        data = path.read_bytes()
+        if len(data) < 4 or data[:2] != b"\xff\xd8":
+            return None
+        offset = 2
+        start_of_frame_markers = {
+            0xC0, 0xC1, 0xC2, 0xC3, 0xC5, 0xC6, 0xC7,
+            0xC9, 0xCA, 0xCB, 0xCD, 0xCE, 0xCF,
+        }
+        while offset + 4 <= len(data):
+            if data[offset] != 0xFF:
+                return None
+            while offset < len(data) and data[offset] == 0xFF:
+                offset += 1
+            if offset >= len(data):
+                return None
+            marker = data[offset]
+            offset += 1
+            if marker in {0xD8, 0xD9}:
+                continue
+            if marker == 0xDA:
+                return None
+            if offset + 2 > len(data):
+                return None
+            segment_length = struct.unpack(">H", data[offset:offset + 2])[0]
+            if segment_length < 2 or offset + segment_length > len(data):
+                return None
+            if marker in start_of_frame_markers:
+                if segment_length < 7:
+                    return None
+                height, width = struct.unpack(">HH", data[offset + 3:offset + 7])
+                return width, height
+            offset += segment_length
     if path.suffix.lower() == ".svg":
         try:
             root = ET.parse(path).getroot()
@@ -510,7 +561,7 @@ def _validate_images(root: Path, parsed: dict[Path, SiteHTMLParser], errors: lis
                 errors.append(f"Image dimensions for {source} must be {actual[0]} × {actual[1]}")
 
     logo = root / "site/assets/images/stronger-at-home-logo.png"
-    brand_logo = root / "brand/assets/source/logo-primary-raster-v2-512.png"
+    brand_logo = root / "brand/assets/exports/logo-primary-transparent-512.png"
     if logo.is_file():
         logo_hash = hashlib.sha256(logo.read_bytes()).hexdigest()
         if logo_hash != EXPECTED_LOGO_SHA256:
@@ -599,6 +650,20 @@ def _validate_contacts_and_claims(
 
     privacy = parsed.get(Path("site/privacy/index.html"))
     if privacy is not None:
+        for required_section in (
+            "privacy-controller",
+            "privacy-information",
+            "privacy-lawful-basis",
+            "privacy-sharing",
+            "privacy-retention",
+            "privacy-rights",
+            "privacy-objection",
+            "privacy-complaints",
+        ):
+            if required_section not in privacy.ids:
+                errors.append(
+                    f"Privacy notice is missing required section: {required_section}"
+                )
         for required in (
             FORMAL_IDENTITY,
             "11 Mospey Crescent Epsom Surrey KT17 4LZ",
@@ -607,9 +672,25 @@ def _validate_contacts_and_claims(
             "detailed or urgent medical information",
             "secure session identifier",
             "rate limit",
+            "Article 6(1)(b)",
+            "Article 6(1)(c)",
+            "Article 6(1)(f)",
+            "Article 9(2)(h)",
+            "Article 9(2)(f)",
+            "GoDaddy",
+            "Titan",
+            "UK-US Data Bridge",
+            "UK International Data Transfer Agreement",
+            "standard data protection clauses under Article 46(2)(c)",
+            "preferred contact method, postcode, short enquiry and privacy acknowledgement are required",
+            "request more information or a copy of the relevant safeguards",
+            "12 months after the last contact",
+            "eight years after the last treatment",
+            "Information Commissioner’s Office",
+            "No solely automated decision-making",
         ):
             if required not in privacy.visible_text:
-                errors.append(f"Privacy draft is missing required information: {required}")
+                errors.append(f"Privacy notice is missing required information: {required}")
     contact = parsed.get(Path("site/contact/index.php"))
     if contact is not None:
         hrefs = {
@@ -695,10 +776,10 @@ def _validate_blockers(
     for blocker in sorted(blockers - ALLOWED_BLOCKERS):
         errors.append(f"Unapproved publication blocker: {blocker}")
     home = parsed.get(Path("site/index.html"))
-    if home is not None and "/assets/images/portrait-placeholder.svg" in {
+    if home is not None and "/assets/images/melanie-watsham-portrait.jpg" not in {
         str(image.get("src") or "") for image in home.images
-    } and "portrait" not in blockers:
-        errors.append("Portrait placeholder must carry the portrait publication blocker")
+    }:
+        errors.append("Homepage must publish the approved Melanie portrait")
     privacy = parsed.get(Path("site/privacy/index.html"))
     if privacy is not None and "Draft for approval" in privacy.visible_text and "privacy-approval" not in blockers:
         errors.append("Draft privacy notice must carry the privacy-approval publication blocker")

@@ -1,7 +1,27 @@
 # Stronger at Home Physiotherapy
 
-Status: approved strategy, identity and website design; staging deployment and production publication blocked
+Status: approved strategy, identity, v3 logo proportions and website design
 Approval owner: Melanie Watsham
+
+An additional stacked logo was approved by the project sponsor on 7 September
+2026 (D-43). See [approved exports](brand/assets/EXPORTS.md) for the transparent
+and pale-background 1600 × 1600 PNGs. The horizontal logo remains current;
+the website is unchanged.
+
+## Current logo — v3, approved 7 September 2026
+
+The project sponsor approved the review-profile composition and instructed its
+use throughout the project (D-41). The entire three-line wordmark has 75% of the
+symbol's visible height, is vertically centred, and uses a narrow gap equal to
+39/469 of the symbol height. Current opaque artwork is
+`brand/assets/source/logo-primary-raster-v3-2048.png` and its 512px counterpart.
+The transparent primary exports, email artwork and shared website image use
+this layout. Square and wide review-profile files are available from
+`brand/assets/review/logo-raster-v3-preview.html`.
+
+The original symbol, letterforms and colours are preserved. The earlier v2
+primary layout is historical; the standalone secondary mark remains current.
+The dated adoption history below must not override this current layout.
 
 Experienced care. Personal progress. At home.
 
@@ -52,6 +72,16 @@ verified, and professional credentials must not be claimed until their
 wording is verified in `brand/clearance.md`. No patient, referral, website,
 social, uniform, vehicle or signage templates are included in this stage.
 
+Melanie Watsham approved the core PNG logo export pack on 2026-09-06. It adds
+exact transparent primary lockups, transparent and contained standalone marks,
+and an email-sized lockup without changing either approved primary source file.
+Transparent exports are restricted to light, plain backgrounds; opaque or
+contained artwork is required on dark, photographic or uncontrolled
+backgrounds. The pack is governed by `brand/assets/manifest.json` and explained
+in `brand/assets/EXPORTS.md`. The project sponsor approved website-header use of
+the exact transparent 512 × 160 export and its rendered composition on
+2026-09-06. Staging or production release remains a separate gate.
+
 The reassurance-first, five-page website design was approved by the project
 sponsor on 2026-09-03. It uses `Request an appointment` as its primary action,
 addresses the adult patient directly and adopts the calm-editorial homepage
@@ -67,9 +97,12 @@ robots and requires a reversible cPanel runbook, an external safe-recipient
 configuration and separate deployment authority. No hosting change has been
 made. The public site and its human content-review checklist intentionally
 contain no payment-method wording; the approved individual quotation and agreed
-fixed-price wording remains. Only the final professional portrait and approved
-privacy retention wording remain as production content blockers; unverified
-credential and referral wording stays omitted.
+fixed-price wording remains. The privacy notice was independently reviewed,
+revised and approved on 2026-09-04, and its approval blocker was removed. The
+supplied professional portrait is now integrated as a faithful, non-generative
+web crop, its rendered homepage treatment is approved, and it has no automated
+production blocker. The full staging candidate still requires human sign-off;
+unverified credential and referral wording stays omitted.
 
 Start with [strategy](brand/strategy.md), [messaging](brand/messaging.md),
 [identity](brand/identity.md), [clearance](brand/clearance.md), and the

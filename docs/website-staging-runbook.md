@@ -123,7 +123,8 @@ An authorised operator must verify without revealing values that:
   `https://staging.stronger-at-home.co.uk`;
 - the recipient is the sponsor-approved safe staging recipient and is not
   `melanie@stronger-at-home.co.uk`;
-- authenticated SMTP settings come from the protected operator source;
+- GoDaddy cPanel relay settings are `localhost`, port `25`, authentication
+  disabled and encryption `none`; SMTP credentials are not required or used;
 - a strong independent rate-limit secret is configured; and
 - `rate_limit_directory` is
   `/home/v0398ees6dry/private/stronger-at-home/staging/rate-limit`.

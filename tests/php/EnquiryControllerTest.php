@@ -193,6 +193,7 @@ final class FakePhpMailer extends PHPMailer\PHPMailer\PHPMailer
 $mailConfig = [
     'smtp_host' => 'smtp.example.test',
     'smtp_port' => 587,
+    'smtp_auth' => true,
     'smtp_username' => 'mailer@example.test',
     'smtp_password' => 'test-password',
     'smtp_encryption' => 'tls',
@@ -216,6 +217,27 @@ assert_same('Stronger at Home Physiotherapy', $fakeMailer->FromName, 'sender use
 assert_same('melanie@stronger-at-home.co.uk', $fakeMailer->getToAddresses()[0][0], 'recipient is deployment configured');
 assert_same('alex@example.com', $fakeMailer->getReplyToAddresses()[0][0], 'validated email is reply-to');
 assert_same('text/html', $fakeMailer->ContentType, 'message has an HTML body');
+assert_same(10, $fakeMailer->Timeout, 'SMTP connections have a bounded timeout');
+
+$relayConfig = [
+    'smtp_host' => 'localhost',
+    'smtp_port' => 25,
+    'smtp_auth' => false,
+    'smtp_encryption' => 'none',
+    'sender' => 'website@stronger-at-home.co.uk',
+    'recipient' => 'safe-recipient@example.test',
+];
+$relayMailer = new FakePhpMailer(true);
+$relayTransport = new PhpMailerTransport($relayConfig, static fn(): FakePhpMailer => $relayMailer);
+$relayTransport->send(EnquiryMessage::from($post));
+assert_same('smtp', $relayMailer->Mailer, 'relay delivery still uses SMTP');
+assert_true(!$relayMailer->SMTPAuth, 'relay delivery does not attempt SMTP authentication');
+assert_same('', $relayMailer->Username, 'relay delivery does not configure a username');
+assert_same('', $relayMailer->Password, 'relay delivery does not configure a password');
+assert_same('', $relayMailer->SMTPSecure, 'relay delivery does not request transport encryption');
+assert_true(!$relayMailer->SMTPAutoTLS, 'relay delivery does not opportunistically negotiate TLS');
+assert_same(25, $relayMailer->Port, 'relay delivery uses the configured port');
+assert_same(10, $relayMailer->Timeout, 'relay connections have a bounded timeout');
 
 $fakeMailer = new FakePhpMailer(true);
 $fakeMailer->fail = true;
@@ -240,6 +262,56 @@ try {
 }
 assert_true($configurationRejected, 'empty SMTP credentials are rejected');
 
+$invalidMailConfig = $mailConfig;
+$invalidMailConfig['smtp_auth'] = 'false';
+$configurationRejected = false;
+try {
+    new PhpMailerTransport($invalidMailConfig);
+} catch (InvalidArgumentException) {
+    $configurationRejected = true;
+}
+assert_true($configurationRejected, 'non-boolean SMTP authentication mode is rejected');
+
+$invalidMailConfig = $mailConfig;
+$invalidMailConfig['smtp_encryption'] = 'none';
+$configurationRejected = false;
+try {
+    new PhpMailerTransport($invalidMailConfig);
+} catch (InvalidArgumentException) {
+    $configurationRejected = true;
+}
+assert_true($configurationRejected, 'authenticated SMTP without encryption is rejected');
+
+$invalidMailConfig = $relayConfig;
+$invalidMailConfig['smtp_encryption'] = 'tls';
+$configurationRejected = false;
+try {
+    new PhpMailerTransport($invalidMailConfig);
+} catch (InvalidArgumentException) {
+    $configurationRejected = true;
+}
+assert_true($configurationRejected, 'unauthenticated relay with encryption is rejected');
+
+$invalidMailConfig = $relayConfig;
+$invalidMailConfig['smtp_host'] = 'smtp.remote.example';
+$configurationRejected = false;
+try {
+    new PhpMailerTransport($invalidMailConfig);
+} catch (InvalidArgumentException) {
+    $configurationRejected = true;
+}
+assert_true($configurationRejected, 'unauthenticated plaintext SMTP is restricted to localhost');
+
+$invalidMailConfig = $relayConfig;
+$invalidMailConfig['smtp_port'] = 2525;
+$configurationRejected = false;
+try {
+    new PhpMailerTransport($invalidMailConfig);
+} catch (InvalidArgumentException) {
+    $configurationRejected = true;
+}
+assert_true($configurationRejected, 'unauthenticated local relay is restricted to port 25');
+
 $projectRoot = dirname(__DIR__, 2);
 $exampleConfigPath = $projectRoot . '/config/site.example.php';
 $entryPointPath = $projectRoot . '/site/api/enquiry.php';
@@ -248,9 +320,13 @@ assert_true(is_file($entryPointPath), 'HTTP entry point exists');
 
 $configSource = file_get_contents($exampleConfigPath);
 assert_true(is_string($configSource), 'configuration contract can be read');
-foreach (['SMTP_HOST', 'SMTP_USERNAME', 'SMTP_PASSWORD', 'RATE_LIMIT_SECRET', 'RATE_LIMIT_DIRECTORY'] as $environmentName) {
+foreach (['SMTP_HOST', 'SMTP_AUTH', 'SMTP_USERNAME', 'SMTP_PASSWORD', 'RATE_LIMIT_SECRET', 'RATE_LIMIT_DIRECTORY'] as $environmentName) {
     assert_true(str_contains($configSource, $environmentName), $environmentName . ' is deployment configured');
 }
+putenv('SMTP_AUTH=0');
+$parsedExampleConfig = require $exampleConfigPath;
+putenv('SMTP_AUTH');
+assert_same(false, $parsedExampleConfig['smtp_auth'], 'configuration accepts zero as an explicit false authentication value');
 
 $entryPointSource = file_get_contents($entryPointPath);
 assert_true(is_string($entryPointSource), 'HTTP entry point can be read');

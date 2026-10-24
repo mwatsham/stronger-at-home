@@ -4,6 +4,8 @@ import shutil
 from tempfile import TemporaryDirectory
 import unittest
 
+from PIL import Image, ImageChops
+
 from scripts.validate_site import find_prohibited_content_categories, validate_site
 
 
@@ -15,18 +17,39 @@ PUBLIC_PAGES = {
     "site/appointments-and-fees/index.html": "/appointments-and-fees/",
     "site/contact/index.php": "/contact/",
 }
+BRANDED_PAGE_PATHS = (
+    "site/index.html",
+    "site/about/index.html",
+    "site/how-i-can-help/index.html",
+    "site/appointments-and-fees/index.html",
+    "site/contact/index.php",
+    "site/privacy/index.html",
+    "site/accessibility/index.html",
+    "site/404.html",
+)
 
 
 class LandmarkParser(HTMLParser):
     def __init__(self):
         super().__init__()
-        self.tags, self.links, self.text, self.h1_count = [], [], [], 0
+        self.tags, self.links, self.icon_links, self.images, self.text, self.h1_count = (
+            [],
+            [],
+            [],
+            [],
+            [],
+            0,
+        )
 
     def handle_starttag(self, tag, attrs):
         attributes = dict(attrs)
         self.tags.append(tag)
         if tag == "a" and attributes.get("href"):
             self.links.append(attributes["href"])
+        if tag == "link" and "icon" in attributes.get("rel", "").split():
+            self.icon_links.append(attributes)
+        if tag == "img":
+            self.images.append(attributes)
         if tag == "h1":
             self.h1_count += 1
 
@@ -48,6 +71,123 @@ class FormParser(HTMLParser):
 
 
 class SiteValidationTests(unittest.TestCase):
+    def test_every_public_page_uses_the_approved_compact_editorial_header(self):
+        for relative_path in BRANDED_PAGE_PATHS:
+            with self.subTest(relative_path=relative_path):
+                html = (ROOT / relative_path).read_text(encoding="utf-8")
+                header = html.split('<header class="site-header">', 1)[1].split(
+                    "</header>", 1
+                )[0]
+
+                self.assertEqual(header.count('class="site-identity"'), 1)
+                self.assertEqual(header.count('class="brand-home"'), 1)
+                self.assertEqual(header.count('class="brand-strap"'), 1)
+                self.assertEqual(header.count('class="site-navigation"'), 1)
+                self.assertEqual(header.count("Home physiotherapy for adults"), 1)
+                self.assertEqual(header.count("Epsom and surrounding areas"), 1)
+                self.assertEqual(
+                    header.count(
+                        'aria-label="Stronger at Home Physiotherapy, home"'
+                    ),
+                    1,
+                )
+                self.assertEqual(
+                    header.count(
+                        'alt="Stronger at Home Physiotherapy by Melanie Watsham"'
+                    ),
+                    1,
+                )
+                self.assertLess(
+                    header.index('class="site-identity"'),
+                    header.index('class="site-navigation"'),
+                )
+                self.assertLess(
+                    header.index('class="menu-button"'),
+                    header.index('id="primary-navigation"'),
+                )
+
+    def test_compact_editorial_header_styles_preserve_logo_scale_and_link_affordance(self):
+        stylesheet = (ROOT / "site/assets/css/site.css").read_text(encoding="utf-8")
+
+        self.assertIn("background: #F9F4F2;", stylesheet)
+        self.assertIn("width: min(100%, 19.6875rem);", stylesheet)
+        self.assertIn(".brand-strap", stylesheet)
+        self.assertIn(".site-navigation", stylesheet)
+        self.assertIn("#primary-navigation a:not(.button):hover", stylesheet)
+        self.assertIn("#primary-navigation a:not(.button):focus-visible", stylesheet)
+        self.assertIn('#primary-navigation a[aria-current="page"]', stylesheet)
+        self.assertIn("text-decoration: underline;", stylesheet)
+
+    def test_website_header_uses_the_exact_approved_transparent_logo(self):
+        site_logo = ROOT / "site/assets/images/stronger-at-home-logo.png"
+        approved_logo = (
+            ROOT / "brand/assets/exports/logo-primary-transparent-512.png"
+        )
+
+        self.assertEqual(site_logo.read_bytes(), approved_logo.read_bytes())
+        with Image.open(site_logo) as image:
+            self.assertEqual(image.mode, "RGBA")
+            self.assertEqual(image.size, (512, 160))
+
+    def test_browser_tab_icon_is_a_square_png(self):
+        icon_path = ROOT / "site/assets/images/stronger-at-home-favicon.png"
+
+        self.assertTrue(icon_path.is_file())
+        with Image.open(icon_path) as icon:
+            self.assertEqual(icon.format, "PNG")
+            self.assertEqual(icon.size, (64, 64))
+
+    def test_browser_tab_icon_artwork_is_centred(self):
+        icon_path = ROOT / "site/assets/images/stronger-at-home-favicon.png"
+
+        with Image.open(icon_path) as icon:
+            rgb_icon = icon.convert("RGB")
+            background = Image.new("RGB", rgb_icon.size, rgb_icon.getpixel((0, 0)))
+            difference = ImageChops.difference(rgb_icon, background).convert("L")
+            artwork = difference.point(lambda value: 255 if value > 12 else 0)
+            left, top, right, bottom = artwork.getbbox()
+
+        self.assertEqual(left, rgb_icon.width - right)
+        self.assertEqual(top, rgb_icon.height - bottom)
+
+    def test_every_public_page_references_the_browser_tab_icon(self):
+        expected = {
+            "rel": "icon",
+            "type": "image/png",
+            "sizes": "64x64",
+            "href": "/assets/images/stronger-at-home-favicon.png",
+        }
+
+        for relative_path in BRANDED_PAGE_PATHS:
+            with self.subTest(relative_path=relative_path):
+                parser = LandmarkParser()
+                parser.feed((ROOT / relative_path).read_text(encoding="utf-8"))
+                self.assertEqual(parser.icon_links, [expected])
+
+    def test_desktop_navigation_evenly_spaces_standard_links_and_keeps_cta_separate(self):
+        stylesheet = (ROOT / "site/assets/css/site.css").read_text(encoding="utf-8")
+
+        desktop_start = stylesheet.index("@media (min-width: 61rem)")
+        mobile_start = stylesheet.index("@media (max-width: 48rem)")
+        desktop_rules = stylesheet[desktop_start:mobile_start]
+
+        self.assertIn("#primary-navigation a:not(.button)", desktop_rules)
+        self.assertIn("flex: 1 1 0;", desktop_rules)
+        self.assertIn("min-width: 0;", desktop_rules)
+        self.assertIn("text-align: center;", desktop_rules)
+        self.assertIn("white-space: nowrap;", desktop_rules)
+        self.assertIn("#primary-navigation .button", desktop_rules)
+        self.assertIn("flex: 0 0 auto;", desktop_rules)
+
+    def test_primary_navigation_marks_the_current_page(self):
+        for relative_path, route in PUBLIC_PAGES.items():
+            with self.subTest(relative_path=relative_path):
+                html = (ROOT / relative_path).read_text(encoding="utf-8")
+                header = html.split('<header class="site-header">', 1)[1].split(
+                    "</header>", 1
+                )[0]
+                self.assertIn(f'aria-current="page" href="{route}"', header)
+
     def test_policy_helper_does_not_flag_benign_registered_or_card_context(self):
         for text in (
             "Your enquiry is registered when submitted.",
@@ -59,15 +199,24 @@ class SiteValidationTests(unittest.TestCase):
     def test_development_site_has_no_structural_errors(self):
         self.assertEqual(validate_site(ROOT, "development"), [])
 
-    def test_production_rejects_unresolved_publication_gates(self):
-        errors = validate_site(ROOT, "production")
-        self.assertEqual(
-            errors,
-            [
-                "Production blocker remains: portrait",
-                "Production blocker remains: privacy-approval",
-            ],
-        )
+    def test_production_has_no_automated_publication_blockers(self):
+        self.assertEqual(validate_site(ROOT, "production"), [])
+
+    def test_privacy_notice_covers_legal_claims_transfers_and_required_fields(self):
+        html = (ROOT / "site/privacy/index.html").read_text(encoding="utf-8")
+        for required in (
+            "Article 6(1)(c)",
+            "Article 6(1)(f)",
+            "Article 9(2)(f)",
+            "UK-US Data Bridge",
+            "UK International Data Transfer Agreement",
+            "standard data protection clauses under Article 46(2)(c)",
+            'id="privacy-objection"',
+            "preferred contact method, postcode, short enquiry and privacy acknowledgement are required",
+            "request more information or a copy of the relevant safeguards",
+        ):
+            with self.subTest(required=required):
+                self.assertIn(required, html)
 
     def test_staging_is_not_indexable(self):
         text = (ROOT / "site/robots-staging.txt").read_text(encoding="utf-8")
@@ -353,6 +502,64 @@ class SiteValidationTests(unittest.TestCase):
 
             self.assertIn("Contact page must publish the approved phone and email routes", errors)
 
+    def test_validator_requires_every_privacy_notice_section(self):
+        required_sections = (
+            "privacy-controller",
+            "privacy-information",
+            "privacy-lawful-basis",
+            "privacy-sharing",
+            "privacy-retention",
+            "privacy-rights",
+            "privacy-objection",
+            "privacy-complaints",
+        )
+        for missing in required_sections:
+            with self.subTest(missing=missing), TemporaryDirectory() as directory:
+                copy = Path(directory) / "project"
+                shutil.copytree(ROOT, copy)
+                privacy = copy / "site/privacy/index.html"
+                html = privacy.read_text(encoding="utf-8")
+                target = f'id="{missing}"'
+                self.assertIn(target, html)
+                privacy.write_text(
+                    html.replace(target, f'id="{missing}-removed"', 1),
+                    encoding="utf-8",
+                )
+
+                errors = validate_site(copy, "development")
+
+                self.assertIn(
+                    f"Privacy notice is missing required section: {missing}",
+                    errors,
+                )
+
+    def test_validator_allows_the_official_ico_complaints_link(self):
+        errors = validate_site(ROOT, "development")
+
+        self.assertFalse(
+            any(error.startswith("External URL is not approved") for error in errors),
+            errors,
+        )
+
+    def test_validator_still_rejects_other_external_links(self):
+        with TemporaryDirectory() as directory:
+            copy = Path(directory) / "project"
+            shutil.copytree(ROOT, copy)
+            privacy = copy / "site/privacy/index.html"
+            html = privacy.read_text(encoding="utf-8").replace(
+                "https://ico.org.uk/make-a-complaint/data-protection-complaints/check-if-you-can-complain/",
+                "https://example.com/complaints/",
+                1,
+            )
+            privacy.write_text(html, encoding="utf-8")
+
+            errors = validate_site(copy, "development")
+
+            self.assertIn(
+                "External URL is not approved in site/privacy/index.html: https://example.com/complaints/",
+                errors,
+            )
+
     def test_validator_checks_sitemap_and_staging_crawl_policy(self):
         with TemporaryDirectory() as directory:
             copy = Path(directory) / "project"
@@ -554,6 +761,7 @@ class SiteValidationTests(unittest.TestCase):
             "meet-melanie",
             "appointments",
             "area-and-fees",
+            "share-your-experience",
             "request-an-appointment",
         ]
 
@@ -564,7 +772,26 @@ class SiteValidationTests(unittest.TestCase):
                 section_ids.append(attributes.split('id="', 1)[1].split('"', 1)[0])
 
         self.assertEqual(section_ids, ids)
-        self.assertIn("Physiotherapy to help you feel stronger at home", html)
+        self.assertIn("Experienced care. Personal progress. At home.", html)
+
+    def test_homepage_uses_the_approved_promise_led_opening(self):
+        html = (ROOT / "site/index.html").read_text(encoding="utf-8")
+        introduction = html.split('<section id="introduction"', 1)[1].split(
+            '<section id="how-i-can-help"', 1
+        )[0]
+
+        heading = "Experienced care. Personal progress. At home."
+        explanation = (
+            "Personal physiotherapy visits for adults recovering strength, "
+            "mobility, balance and confidence."
+        )
+        self.assertEqual(introduction.count(f"<h1>{heading}</h1>"), 1)
+        self.assertEqual(introduction.count(f'<p class="lead">{explanation}</p>'), 1)
+        self.assertLess(introduction.index(heading), introduction.index(explanation))
+        self.assertNotIn("Physiotherapy to help you feel stronger at home", introduction)
+        self.assertIn("Request an appointment", introduction)
+        self.assertIn("Call Melanie", introduction)
+        self.assertIn("20+ years of NHS experience", introduction)
         self.assertIn("20+ years of NHS experience", html)
 
     def test_homepage_intro_uses_appointment_request_as_primary_action(self):
@@ -595,7 +822,9 @@ class SiteValidationTests(unittest.TestCase):
             "ATOCP",
             "guaranteed",
             "testimonial",
-            "review",
+            "5-star",
+            "five-star",
+            "aggregateRating",
             "referral suitability",
             "referral exclusion",
             "emergency",
@@ -607,11 +836,57 @@ class SiteValidationTests(unittest.TestCase):
         for claim in prohibited_claims:
             self.assertNotIn(claim.lower(), html.lower(), claim)
 
-    def test_development_portrait_is_a_production_blocker(self):
+    def test_homepage_uses_the_approved_web_portrait(self):
+        portrait = ROOT / "site/assets/images/melanie-watsham-portrait.jpg"
         html = (ROOT / "site/index.html").read_text(encoding="utf-8")
+        parser = LandmarkParser()
+        parser.feed(html)
 
-        self.assertIn('data-production-blocker="portrait"', html)
-        self.assertIn("Professional portrait to be supplied", html)
+        self.assertTrue(portrait.is_file())
+        with Image.open(portrait) as image:
+            self.assertEqual(image.format, "JPEG")
+            self.assertEqual(image.size, (1020, 1190))
+            self.assertEqual(image.mode, "RGB")
+            self.assertEqual(len(image.getexif()), 0)
+
+        matching_images = [
+            image
+            for image in parser.images
+            if image.get("src") == "/assets/images/melanie-watsham-portrait.jpg"
+        ]
+        self.assertEqual(
+            matching_images,
+            [
+                {
+                    "src": "/assets/images/melanie-watsham-portrait.jpg",
+                    "alt": "Melanie Watsham, physiotherapist",
+                    "width": "1020",
+                    "height": "1190",
+                }
+            ],
+        )
+        self.assertNotIn('data-production-blocker="portrait"', html)
+        self.assertNotIn("Professional portrait to be supplied", html)
+
+    def test_portrait_frame_uses_nested_rounded_corners(self):
+        stylesheet = (ROOT / "site/assets/css/site.css").read_text(encoding="utf-8")
+
+        self.assertRegex(
+            stylesheet,
+            r"\.portrait-frame \{[^}]*border-radius: 1rem;[^}]*\}",
+        )
+        self.assertRegex(
+            stylesheet,
+            r"\.portrait-frame img \{[^}]*border-radius: 0\.5rem;[^}]*\}",
+        )
+
+    def test_hero_trust_point_does_not_add_a_rule_beneath_the_primary_action(self):
+        stylesheet = (ROOT / "site/assets/css/site.css").read_text(encoding="utf-8")
+        trust_point_rule = stylesheet.split(".trust-point {", 1)[1].split("}", 1)[0]
+
+        self.assertIn("margin: 1.5rem 0 0;", trust_point_rule)
+        self.assertNotIn("border-top:", trust_point_rule)
+        self.assertNotIn("padding-top:", trust_point_rule)
 
     def test_mobile_menu_is_a_javascript_enhancement_with_an_accurate_disclosure_control(self):
         stylesheet = (ROOT / "site/assets/css/site.css").read_text(encoding="utf-8")
@@ -717,7 +992,9 @@ class SiteValidationTests(unittest.TestCase):
             "guaranteed",
             "walk-in clinic",
             "testimonial",
-            "review",
+            "5-star",
+            "five-star",
+            "aggregaterating",
             "emergency",
         ):
             self.assertNotIn(text, combined)

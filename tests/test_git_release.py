@@ -355,6 +355,28 @@ class DeploymentScriptTests(unittest.TestCase):
         )
         self.assertFalse(next_path.exists())
 
+    def test_deployed_private_autoloader_loads_enquiry_application_classes(self):
+        account_home, repository_root, _, release_path, _ = self.prepare_account()
+
+        deployment = self.run_deployment(
+            repository_root / "deploy.sh", repository_root, account_home
+        )
+
+        self.assertEqual(deployment.returncode, 0, deployment.stderr)
+        runtime_check = subprocess.run(
+            [
+                "php",
+                "-r",
+                "$loader = require $argv[1]; "
+                "exit(class_exists('StrongerAtHome\\\\Enquiry\\\\EnquiryController') ? 0 : 1);",
+                str(release_path / "vendor/autoload.php"),
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(runtime_check.returncode, 0, runtime_check.stderr)
+
     def test_second_move_failure_restores_previous_document_root(self):
         account_home, repository_root, document_root, release_path, next_path = (
             self.prepare_account()

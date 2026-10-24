@@ -57,6 +57,7 @@ $escape = static fn(string $value): string => htmlspecialchars($value, ENT_QUOTE
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/png" sizes="64x64" href="/assets/images/stronger-at-home-favicon.png">
   <title>Contact | Stronger at Home Physiotherapy</title>
   <meta name="description" content="Contact Stronger at Home Physiotherapy to request an appointment or ask about a home visit.">
   <link rel="canonical" href="https://stronger-at-home.co.uk/contact/">
@@ -71,17 +72,22 @@ $escape = static fn(string $value): string => htmlspecialchars($value, ENT_QUOTE
 <body>
   <a class="skip-link" href="#main-content">Skip to main content</a>
   <header class="site-header">
-    <a href="/" aria-label="Stronger at Home Physiotherapy, home">
-      <img src="/assets/images/stronger-at-home-logo.png" alt="Stronger at Home Physiotherapy by Melanie Watsham" width="512" height="160">
-    </a>
-    <button class="menu-button" type="button" aria-expanded="false" aria-controls="primary-navigation">Menu</button>
-    <nav id="primary-navigation" aria-label="Primary">
-      <a href="/">Home</a><a href="/about/">About Melanie</a>
-      <a href="/how-i-can-help/">How I can help</a>
-      <a href="/appointments-and-fees/">Appointments &amp; fees</a>
-      <a href="/contact/">Contact</a>
-      <a class="button" href="/contact/#appointment-request">Request an appointment</a>
-    </nav>
+    <div class="site-identity">
+      <a class="brand-home" href="/" aria-label="Stronger at Home Physiotherapy, home">
+        <img src="/assets/images/stronger-at-home-logo.png" alt="Stronger at Home Physiotherapy by Melanie Watsham" width="512" height="160">
+      </a>
+      <p class="brand-strap"><strong>Home physiotherapy for adults</strong><span>Epsom and surrounding areas</span></p>
+    </div>
+    <div class="site-navigation">
+      <button class="menu-button" type="button" aria-expanded="false" aria-controls="primary-navigation">Menu</button>
+      <nav id="primary-navigation" aria-label="Primary">
+        <a href="/">Home</a><a href="/about/">About Melanie</a>
+        <a href="/how-i-can-help/">How I can help</a>
+        <a href="/appointments-and-fees/">Appointments &amp; fees</a>
+        <a aria-current="page" href="/contact/">Contact</a>
+        <a class="button" href="/contact/#appointment-request">Request an appointment</a>
+      </nav>
+    </div>
   </header>
   <main id="main-content" class="contact-page">
     <section class="page-intro contact-intro" aria-labelledby="contact-heading">
@@ -94,12 +100,12 @@ $escape = static fn(string $value): string => htmlspecialchars($value, ENT_QUOTE
       </div>
     </section>
 
-    <section class="contact-form-section" aria-labelledby="appointment-request-heading">
+    <section id="appointment-request" class="contact-form-section" aria-labelledby="appointment-request-heading">
       <div class="section-heading narrow-heading">
         <p class="eyebrow">Website enquiry</p>
         <h2 id="appointment-request-heading">Request an appointment</h2>
       </div>
-      <form id="appointment-request" class="appointment-form" method="post" action="/api/enquiry.php" novalidate>
+      <form class="appointment-form" method="post" action="/api/enquiry.php" novalidate>
         <p>Use this form to request an appointment. Melanie will contact you directly to confirm availability.</p>
         <p class="notice">Please do not include detailed or urgent medical information.</p>
         <div id="form-feedback" class="form-status" data-form-status data-flash-kind="<?= $escape($kind) ?>" role="status" aria-live="polite" tabindex="-1"><?= $escape($statusMessage) ?></div>
@@ -144,7 +150,7 @@ $escape = static fn(string $value): string => htmlspecialchars($value, ENT_QUOTE
           <?php if (isset($errors['message'])): ?><p class="field-error" id="message-error"><?= $escape($errors['message']) ?></p><?php endif; ?>
         </div>
         <div class="form-field form-field-checkbox">
-          <label><input id="privacy-acknowledged" name="privacy_acknowledged" type="checkbox" value="1" required <?= isset($errors['privacy_acknowledged']) ? 'aria-invalid="true" aria-describedby="privacy-error"' : '' ?>> I have read the <a href="/privacy/">privacy notice</a>. <span aria-hidden="true">(required)</span></label>
+          <label><input id="privacy-acknowledged" name="privacy_acknowledged" type="checkbox" value="1" required <?= isset($errors['privacy_acknowledged']) ? 'aria-invalid="true" aria-describedby="privacy-error"' : '' ?>> <span>I have read the <a href="/privacy/">privacy notice</a>. <span aria-hidden="true">(required)</span></span></label>
           <?php if (isset($errors['privacy_acknowledged'])): ?><p class="field-error" id="privacy-error"><?= $escape($errors['privacy_acknowledged']) ?></p><?php endif; ?>
         </div>
         <div class="honeypot" aria-hidden="true">
