@@ -2,6 +2,40 @@
 
 ## Authority boundary and publication gates
 
+### Interim informational-only exception — approved 24 October 2026
+
+The owner approved publication with online appointment requests disabled while
+Melanie's ICO application is **pending**, not completed. The tracked
+`config/publication-mode.json` selects `informational` with `icoStatus: pending`
+in both release workflows. This is not a finding of legal compliance.
+
+For an artifact with `publicationMode: informational` and `icoStatus: pending`
+in `release.json`, defer only the ICO-completion, enquiry configuration,
+live-recipient and mail-test gates below. The generated contact page must be
+static, contain no form or PHP session startup, and preserve direct phone/email
+links. Every request to `/api/enquiry.php` must return generic HTTP 503 without
+cookies, reflected input, configuration loading, rate-limit storage or mail.
+The generated `.htaccess` must have no enquiry configuration/autoloader bindings.
+No dummy configuration or mail credentials should be installed for this mode.
+The generated deployment script omits only its private enquiry-config check;
+all target, dependency, atomic-swap and rollback safeguards remain required.
+
+Keep staging acceptance, green main, GitHub reviewer approval, final portrait,
+review of the revised informational privacy wording, exact-commit publication
+approval and separate cPanel mutation confirmations. All ordinary TLS, route,
+asset, security-header, accessibility and rollback checks still apply. Replace
+form acceptance/security/mail tests with disabled-endpoint and no-cookie checks;
+do not submit real personal information. Sections 2 and 6's enquiry-specific
+configuration and live email requirements apply only to enquiry-enabled releases.
+Do not infer public compliance from this technical restriction: hosting logs,
+the review widget and direct email/phone contact remain relevant.
+
+Re-enabling enquiries requires a separately approved Git change and release,
+completed ICO gate, verified private configuration and recipient, and all the
+enquiry-enabled tests below. There is no timer or automatic reactivation.
+
+### Standard enquiry-enabled release gates
+
 This runbook is for the first and later production publications from the
 generated `deploy-production` branch. It grants no authority by itself. Before
 any production mutation, require all of the following recorded gates:

@@ -156,6 +156,12 @@ or authorise publication.
 
 ## Required omissions and publication gates
 
+Interim release scope approved 24 October 2026: the ICO application remains
+pending. Informational Git artifacts disable the form and endpoint, retain
+direct contact links, and adapt the privacy wording. This does not mark the
+ICO checkbox below complete. See the informational-only exception in the
+production runbook; revised rendered copy still needs release review.
+
 - [ ] HCPC, CSP, AGILE and ATOCP wording remains absent until separately
   verified and approved.
 - [ ] Referral, eligibility, suitability, exclusion and restriction claims are
