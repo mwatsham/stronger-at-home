@@ -1,0 +1,10 @@
+{
+  "buildTimestamp": "2026-10-24T20:03:48Z",
+  "deploymentBranch": "deploy-production",
+  "environment": "production",
+  "hostname": "stronger-at-home.co.uk",
+  "icoStatus": "pending",
+  "publicationMode": "informational",
+  "sourceBranch": "main",
+  "sourceSha": "befbc22caf4f8867ce7ed7bfd737ee2d779fe66e"
+}
