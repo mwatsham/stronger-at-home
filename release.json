@@ -1,8 +1,10 @@
 {
-  "buildTimestamp": "2026-10-24T13:21:52Z",
+  "buildTimestamp": "2026-10-24T17:53:07Z",
   "deploymentBranch": "deploy-staging",
   "environment": "staging",
   "hostname": "staging.stronger-at-home.co.uk",
+  "icoStatus": "pending",
+  "publicationMode": "informational",
   "sourceBranch": "develop",
-  "sourceSha": "e6676113640a37ed1d52e67244a636c8aa8348cd"
+  "sourceSha": "a021a16ed053207104b7f17c0f414e1d3deeca8b"
 }
