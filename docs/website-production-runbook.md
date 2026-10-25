@@ -2,6 +2,27 @@
 
 ## Authority boundary and publication gates
 
+### Pending-registration enquiry exception — approved 24 October 2026
+
+The owner explicitly requested enabling enquiries while the ICO application and
+fee steps are still being completed, then approved native implementation on
+25 October 2026. This supersedes only the ICO-completion prerequisite for this
+requested enquiry release. It is not evidence of payment, exemption,
+registration, or legal compliance; the outstanding ICO checklist remains open.
+
+Tracked configuration and release metadata must state publicationMode enquiries,
+icoStatus pending and approvalException owner-pending-registration-2026-10-24.
+Bare enquiries/pending without that exact exception is rejected. Do not mark ICO
+status completed to enable the form. This identifier records owner authority,
+not a technical access credential. See the approved pending-registration design.
+
+All enquiry security, private configuration, verified recipient, mail receipt,
+staging acceptance and exact-artifact deployment gates remain. The former
+informational-only release's independent-review exception was one-release only:
+obtain fresh owner-only authorisation for this production release if no second
+reviewer is available. Keep PHP 8.3.36 unchanged as explicitly instructed.
+Do not modify account-wide PHP settings to match the older PHP 8.4 guidance below.
+
 ### Interim informational-only exception — approved 24 October 2026
 
 The owner approved publication with online appointment requests disabled while

@@ -156,7 +156,14 @@ or authorise publication.
 
 ## Required omissions and publication gates
 
-Interim release scope approved 24 October 2026: the ICO application remains
+Update approved 24 October 2026, implementation approved 25 October: the owner
+requested enquiries despite ICO application and fee steps still being completed.
+The pending-registration enquiry exception supersedes the informational-only
+restriction for the next approved release, not the outstanding ICO obligation.
+Keep the ICO completion checkbox unchecked. Retain the approved original form
+and enquiry privacy notice, with delivery and security verification before release.
+
+Earlier interim release scope approved 24 October 2026: the ICO application remains
 pending. Informational Git artifacts disable the form and endpoint, retain
 direct contact links, and adapt the privacy wording. This does not mark the
 ICO checkbox below complete. See the informational-only exception in the

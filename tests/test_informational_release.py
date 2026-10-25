@@ -139,13 +139,26 @@ class PublicationModeTests(unittest.TestCase):
             "--build-timestamp", "2026-10-24T12:00:00Z", "--output-directory", str(output),
             "--publication-mode-file", str(mode_path)], capture_output=True, text=True)
 
-    def test_tracked_mode_builds_disabled_production(self):
+    def test_informational_mode_still_builds_disabled_production(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "release"
+            mode = Path(directory) / "mode.json"
+            mode.write_text('{"publicationMode":"informational","icoStatus":"pending"}')
+            result = self.run_cli(mode, output)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(json.loads((output / "release.json").read_text())["publicationMode"], "informational")
+            self.assertNotIn("X-Robots-Tag", (output / "public/.htaccess").read_text())
+
+    def test_tracked_mode_builds_enquiries_with_pending_exception(self):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory) / "release"
             result = self.run_cli(ROOT / "config/publication-mode.json", output)
             self.assertEqual(result.returncode, 0, result.stderr)
-            self.assertEqual(json.loads((output / "release.json").read_text())["publicationMode"], "informational")
-            self.assertNotIn("X-Robots-Tag", (output / "public/.htaccess").read_text())
+            metadata = json.loads((output / "release.json").read_text())
+            self.assertEqual(metadata["publicationMode"], "enquiries")
+            self.assertEqual(metadata["icoStatus"], "pending")
+            self.assertEqual(metadata["approvalException"], "owner-pending-registration-2026-10-24")
+            self.assertIn("<form", (output / "public/contact/index.php").read_text())
 
     def test_invalid_and_missing_mode_fail_without_artifact(self):
         for value in (None, "{", '{}', '[]', '{"publicationMode":"enquiries","icoStatus":"pending"}',
@@ -158,6 +171,62 @@ class PublicationModeTests(unittest.TestCase):
                 output = Path(directory) / "release"
                 result = self.run_cli(mode, output)
                 self.assertEqual(result.returncode, 1, result.stderr)
+                self.assertFalse(output.exists())
+
+    def test_pending_exception_restores_enquiries_with_truthful_metadata_and_config_guard(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory).resolve()
+            mode = root / "mode.json"
+            mode.write_text(json.dumps({
+                "publicationMode": "enquiries", "icoStatus": "pending",
+                "approvalException": "owner-pending-registration-2026-10-24",
+            }))
+            output = root / "release"
+            result = self.run_cli(mode, output)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            metadata = json.loads((output / "release.json").read_text())
+            self.assertEqual(metadata["publicationMode"], "enquiries")
+            self.assertEqual(metadata["icoStatus"], "pending")
+            self.assertEqual(metadata["approvalException"], "owner-pending-registration-2026-10-24")
+            contact = (output / "public/contact/index.php").read_text()
+            self.assertIn('<form class="appointment-form"', contact)
+            self.assertIn('action="/api/enquiry.php"', contact)
+            self.assertIn("csrf_token", contact)
+            self.assertIn("Please do not include detailed or urgent medical information.", contact)
+            self.assertIn("The form asks", (output / "public/privacy/index.html").read_text())
+            self.assertNotIn("Online appointment requests are temporarily unavailable.",
+                             (output / "public/api/enquiry.php").read_text())
+            self.assertIn("SetEnv STRONGER_HOME_CONFIG", (output / "public/.htaccess").read_text())
+            self.assertNotIn("X-Robots-Tag", (output / "public/.htaccess").read_text())
+            # Execute the actual deploy script in a temporary account with no private config.
+            repo = root / "repositories/stronger-at-home-production"
+            repo.parent.mkdir()
+            shutil.move(output, repo)
+            deploy = repo / "deploy.sh"
+            deploy.write_text(deploy.read_text().replace("/home/v0398ees6dry", str(root)))
+            public = root / "public_html/stronger-at-home.co.uk"
+            public.mkdir(parents=True)
+            (public / "old.txt").write_text("previous")
+            deployed = subprocess.run(["bash", str(deploy)], cwd=repo,
+                                     env={**os.environ, "HOME": str(root)}, capture_output=True, text=True)
+            self.assertNotEqual(deployed.returncode, 0)
+            self.assertIn("Missing external environment configuration.", deployed.stderr)
+            self.assertEqual((public / "old.txt").read_text(), "previous")
+
+    def test_pending_exception_rejects_unknown_contradictory_and_duplicate_approval(self):
+        for value in (
+            '{"publicationMode":"enquiries","icoStatus":"pending","approvalException":"other"}',
+            '{"publicationMode":"enquiries","icoStatus":"completed","approvalException":"owner-pending-registration-2026-10-24"}',
+            '{"publicationMode":"informational","icoStatus":"pending","approvalException":"owner-pending-registration-2026-10-24"}',
+            '{"publicationMode":"enquiries","icoStatus":"pending","approvalException":"other","approvalException":"owner-pending-registration-2026-10-24"}',
+            '{"publicationMode":"enquiries","icoStatus":"pending","approvalException":"owner-pending-registration-2026-10-24","extra":true}',
+        ):
+            with self.subTest(value=value), tempfile.TemporaryDirectory() as directory:
+                mode = Path(directory) / "mode.json"
+                mode.write_text(value)
+                output = Path(directory) / "release"
+                result = self.run_cli(mode, output)
+                self.assertEqual(result.returncode, 1)
                 self.assertFalse(output.exists())
 
     def test_workflows_select_tracked_mode(self):
