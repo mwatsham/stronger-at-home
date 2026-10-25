@@ -7,7 +7,7 @@ readonly REPOSITORY_ROOT='/home/v0398ees6dry/repositories/stronger-at-home-produ
 readonly DOCUMENT_ROOT='/home/v0398ees6dry/public_html/stronger-at-home.co.uk'
 readonly CONFIG_PATH='/home/v0398ees6dry/private/stronger-at-home/production/site.php'
 readonly RELEASE_ROOT='/home/v0398ees6dry/stronger-at-home-releases/production'
-readonly SOURCE_SHA='befbc22caf4f8867ce7ed7bfd737ee2d779fe66e'
+readonly SOURCE_SHA='255601532ba45a1692f52d0ab380498742d9560d'
 readonly RELEASE_DIRECTORY="$RELEASE_ROOT/$SOURCE_SHA"
 readonly NEXT_DIRECTORY="$DOCUMENT_ROOT.next-$SOURCE_SHA"
 readonly PREVIOUS_DIRECTORY="$RELEASE_DIRECTORY/previous-public"
@@ -23,7 +23,7 @@ fail() {
 [[ -d public && ! -L public && -f public/.htaccess && ! -L public/.htaccess ]] || fail 'Missing public release tree.'
 [[ -d public/api/src && ! -L public/api/src ]] || fail 'Missing application source tree.'
 [[ -d vendor && ! -L vendor && -f vendor/autoload.php && ! -L vendor/autoload.php ]] || fail 'Missing vendor release tree.'
-# Informational artifact: no enquiry configuration is loaded or required.
+[[ -f "$CONFIG_PATH" && ! -L "$CONFIG_PATH" ]] || fail 'Missing external environment configuration.'
 [[ ! -e "$RELEASE_DIRECTORY" && ! -L "$RELEASE_DIRECTORY" ]] || fail 'Release directory already exists.'
 [[ ! -e "$NEXT_DIRECTORY" && ! -L "$NEXT_DIRECTORY" ]] || fail 'Next document-root directory already exists.'
 
