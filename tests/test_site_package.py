@@ -26,8 +26,8 @@ class SitePackageTests(unittest.TestCase):
 
             with ZipFile(archive) as package:
                 names = set(package.namelist())
-                self.assertEqual(len(names), 116)
-                self.assertEqual(sum(name.startswith("public/") for name in names), 32)
+                self.assertEqual(len(names), 117)
+                self.assertEqual(sum(name.startswith("public/") for name in names), 33)
                 self.assertEqual(sum(name.startswith("vendor/") for name in names), 84)
                 self.assertIn("public/robots.txt", names)
                 self.assertNotIn("public/robots-staging.txt", names)
@@ -221,8 +221,8 @@ class SitePackageTests(unittest.TestCase):
 
             with ZipFile(archive) as package:
                 names = set(package.namelist())
-                self.assertEqual(len(names), 116)
-                self.assertEqual(sum(name.startswith("public/") for name in names), 32)
+                self.assertEqual(len(names), 117)
+                self.assertEqual(sum(name.startswith("public/") for name in names), 33)
                 self.assertEqual(sum(name.startswith("vendor/") for name in names), 84)
                 self.assertNotIn("public/robots-staging.txt", names)
                 self.assertIn("public/assets/images/melanie-watsham-portrait.jpg", names)
