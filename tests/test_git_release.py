@@ -32,6 +32,19 @@ def write_regular_entry(archive: ZipFile, name: str, content: str) -> None:
 
 
 class GitReleaseTests(unittest.TestCase):
+    def test_google_verification_survives_production_release_packaging(self):
+        with TemporaryDirectory() as directory:
+            release = build_git_release(
+                ROOT, Path(directory) / "release", "production",
+                SOURCE_SHA, BUILD_TIMESTAMP,
+            )
+            verification = release / "public/googled25927956a9f99cc.html"
+            self.assertTrue(verification.is_file(), "Google verification must be served at the public root")
+            self.assertEqual(
+                verification.read_bytes(),
+                b"google-site-verification: googled25927956a9f99cc.html",
+            )
+
     def assert_release_tree(self, release: Path) -> None:
         self.assertEqual(
             {path.name for path in release.iterdir()},
