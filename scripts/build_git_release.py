@@ -26,6 +26,8 @@ else:
 
 
 ACCOUNT_HOME = "/home/v0398ees6dry"
+PENDING_REGISTRATION_APPROVAL = "owner-pending-registration-2026-10-24"
+PUBLICATION_MODES = {"enquiries", "informational", "enquiries-pending"}
 ENVIRONMENTS: Mapping[str, Mapping[str, str]] = MappingProxyType(
     {
         "staging": MappingProxyType(
@@ -215,9 +217,9 @@ def deployment_script(environment: str, source_sha: str, publication_mode: str =
 
     settings = _environment(environment)
     _validate_source_sha(source_sha)
-    if publication_mode not in {"enquiries", "informational"}:
+    if publication_mode not in PUBLICATION_MODES:
         raise ValueError("Invalid publication mode")
-    config_check = "[[ -f \"$CONFIG_PATH\" && ! -L \"$CONFIG_PATH\" ]] || fail 'Missing external environment configuration.'" if publication_mode == "enquiries" else "# Informational artifact: no enquiry configuration is loaded or required."
+    config_check = "[[ -f \"$CONFIG_PATH\" && ! -L \"$CONFIG_PATH\" ]] || fail 'Missing external environment configuration.'" if publication_mode != "informational" else "# Informational artifact: no enquiry configuration is loaded or required."
     return f"""#!/bin/bash
 set -Eeuo pipefail
 umask 027
@@ -300,7 +302,7 @@ def build_git_release(
     """Build one validated deployment-branch directory without partial output."""
 
     settings = _environment(environment)
-    if publication_mode not in {"enquiries", "informational"}:
+    if publication_mode not in PUBLICATION_MODES:
         raise ValueError("Invalid publication mode")
     validate_provenance(source_sha, build_timestamp)
     project_root = Path(project_root).resolve()
@@ -329,7 +331,7 @@ def build_git_release(
         _configure_htaccess(
             release / "public/.htaccess",
             environment,
-            environment_bindings(environment, source_sha) if publication_mode == "enquiries" else "",
+            environment_bindings(environment, source_sha) if publication_mode != "informational" else "",
         )
 
         metadata = {
@@ -342,6 +344,9 @@ def build_git_release(
         }
         if publication_mode == "informational":
             metadata.update(publicationMode="informational", icoStatus="pending")
+        elif publication_mode == "enquiries-pending":
+            metadata.update(publicationMode="enquiries", icoStatus="pending",
+                            approvalException=PENDING_REGISTRATION_APPROVAL)
         (release / ".cpanel.yml").write_text(
             CPANEL_CONFIGURATION,
             encoding="utf-8",
@@ -368,8 +373,13 @@ def read_publication_mode(path: Path) -> str:
         return data
 
     data = json.loads(path.read_text(encoding="utf-8"), object_pairs_hook=unique_keys)
-    if not isinstance(data, dict) or set(data) != {"publicationMode", "icoStatus"}:
-        raise ValueError("Publication mode file must contain publicationMode and icoStatus only")
+    if not isinstance(data, dict):
+        raise ValueError("Publication mode file must contain an object")
+    if data == {"publicationMode": "enquiries", "icoStatus": "pending",
+                "approvalException": PENDING_REGISTRATION_APPROVAL}:
+        return "enquiries-pending"
+    if set(data) != {"publicationMode", "icoStatus"}:
+        raise ValueError("Invalid publication mode fields or approval exception")
     if data == {"publicationMode": "informational", "icoStatus": "pending"}:
         return "informational"
     if data == {"publicationMode": "enquiries", "icoStatus": "completed"}:

@@ -1,4 +1,5 @@
 {
-  "publicationMode": "informational",
-  "icoStatus": "pending"
+  "publicationMode": "enquiries",
+  "icoStatus": "pending",
+  "approvalException": "owner-pending-registration-2026-10-24"
 }
