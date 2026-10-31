@@ -60,6 +60,7 @@ EXPECTED_LOGO_SHA256 = "1802be2b0ac8bfcaf60b83355ee9e3f12d2ba483f1efca39abe5fd79
 # The 2026-10-24 CSS/contact/selector refinement records user-authorised local
 # implementation, not final visual sign-off or staging/production authority.
 APPROVED_PUBLIC_SOURCE_SHA256 = {
+    "site/googled25927956a9f99cc.html": "727e794a60581a49b99dec5151b336be565cf40065a5e9013226dfb3ba81ad3b",
     "site/.htaccess": "9b3093a1981bc7a9bba174dc14d63fae794c6eb8dbafef823815f269f60b1748",
     "site/404.html": "f2dc1d1ac316f2092a70b9efe07a230c66613919521af7252002b8b78d25032f",
     "site/about/index.html": "2878395de0dd56268544a97210c8cacd3105eef9ae40c43658063bbaf70ae6a2",
