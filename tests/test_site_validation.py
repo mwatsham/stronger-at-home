@@ -71,6 +71,11 @@ class FormParser(HTMLParser):
 
 
 class SiteValidationTests(unittest.TestCase):
+    def test_approved_qualification_does_not_allow_other_credentials(self):
+        self.assertEqual(find_prohibited_content_categories("South African-qualified physiotherapist"), [])
+        for wording in ("qualified physiotherapist", "registered physiotherapist", "chartered physiotherapist"):
+            self.assertIn("registered or credential mark claim", find_prohibited_content_categories(wording))
+
     def test_every_public_page_uses_the_approved_compact_editorial_header(self):
         for relative_path in BRANDED_PAGE_PATHS:
             with self.subTest(relative_path=relative_path):
@@ -946,6 +951,11 @@ class SiteValidationTests(unittest.TestCase):
         )
 
         self.assertIn("20+ years of NHS experience", about)
+        self.assertIn("South African-qualified physiotherapist", about)
+        self.assertIn("over 22 years of experience across the NHS and private practice", about)
+        self.assertIn("Your assessment and treatment plan are shaped around your needs", about)
+        self.assertIn("My approach is warm, patient and encouraging.", about)
+        self.assertNotIn("22 years of NHS experience", about)
         for phrase in (
             "Recovery after surgery",
             "Following a hospital admission",
