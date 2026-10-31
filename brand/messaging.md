@@ -49,6 +49,14 @@ Do not publish fixed opening hours unless they are separately approved.
 
 ## Claims boundary
 
+On 2026-10-31, the project sponsor approved the revised first-person About
+Melanie introduction using the supplied facts: South African-qualified
+physiotherapist with over 22 years of combined NHS and private-practice
+experience. This does not mean 22 years of NHS experience. The wording focuses
+on individual needs, achievable everyday goals and supportive care without
+guaranteeing recovery. Approval covers the local website update; deployment
+requires separate authority.
+
 The approved claim is 20+ years of NHS experience. Do not promise or imply
 guaranteed outcomes. HCPC, CSP, AGILE and ATOCP wording remains to be confirmed
 and must not be presented as verified or public-facing until clearance records

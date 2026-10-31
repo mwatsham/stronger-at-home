@@ -63,7 +63,7 @@ APPROVED_PUBLIC_SOURCE_SHA256 = {
     "site/googled25927956a9f99cc.html": "727e794a60581a49b99dec5151b336be565cf40065a5e9013226dfb3ba81ad3b",
     "site/.htaccess": "9b3093a1981bc7a9bba174dc14d63fae794c6eb8dbafef823815f269f60b1748",
     "site/404.html": "f2dc1d1ac316f2092a70b9efe07a230c66613919521af7252002b8b78d25032f",
-    "site/about/index.html": "b8eac3013886a7ba8ff3aa05cbea460ed6ba68e79544f5a3fdd0029123c17c93",
+    "site/about/index.html": "2878395de0dd56268544a97210c8cacd3105eef9ae40c43658063bbaf70ae6a2",
     "site/accessibility/index.html": "e0d250481b3556c02751fd322358102b52ecfe2a513d89e7c1c182ea332ebb08",
     "site/api/enquiry.php": "ed9d7ece29c3aca98e35d6382661daac6df33bed6a6c5339aceb519fbd05d270",
     "site/api/src/EnquiryController.php": "f58b674470922b4b741cc038ee7ce4efe8e021c5b53ca37a1cde7d5b21b56d06",
@@ -140,7 +140,7 @@ PROHIBITED_PUBLIC_PATTERNS = {
         r"|\breferral(?:\s+is)?\s+required\b"
     ),
     "registered or credential mark claim": (
-        r"[®™]|\b(?:registered|chartered|licen[cs]ed|accredited|certified|qualified)\s+physiotherapist\b"
+        r"[®™]|\b(?:registered|chartered|licen[cs]ed|accredited|certified|(?<!South African-)qualified)\s+physiotherapist\b"
     ),
     "transaction method wording": (
         r"\b(?:payments?|cash|cheques?|bacs|paypal|invoices?)\b"
