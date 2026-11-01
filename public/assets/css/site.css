@@ -424,6 +424,24 @@ main.homepage {
 
 .narrow-heading { max-width: 36rem; }
 
+.about-biography { display: flow-root; }
+
+.about-biography .portrait-frame {
+  float: right;
+  width: 32%;
+  max-width: 20rem;
+  margin: 0.25rem 0 1.5rem 2rem;
+}
+
+@media (max-width: 760px) {
+  .about-biography .portrait-frame {
+    float: none;
+    width: 100%;
+    max-width: 19rem;
+    margin: 0 auto 1.5rem;
+  }
+}
+
 .card {
   padding: clamp(1.25rem, 3vw, 2rem);
   border: 1px solid var(--brand-colour-brand-warm-sand);

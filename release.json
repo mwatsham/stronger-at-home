@@ -1,11 +1,11 @@
 {
   "approvalException": "owner-pending-registration-2026-10-24",
-  "buildTimestamp": "2026-10-31T23:42:37Z",
+  "buildTimestamp": "2026-11-01T00:20:33Z",
   "deploymentBranch": "deploy-production",
   "environment": "production",
   "hostname": "stronger-at-home.co.uk",
   "icoStatus": "pending",
   "publicationMode": "enquiries",
   "sourceBranch": "main",
-  "sourceSha": "1c8fea216f195f6013e53840793eadd250f338a8"
+  "sourceSha": "9607f964660d9f1f87aa041a32e98cc03eded5d6"
 }
