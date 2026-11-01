@@ -63,7 +63,7 @@ APPROVED_PUBLIC_SOURCE_SHA256 = {
     "site/googled25927956a9f99cc.html": "727e794a60581a49b99dec5151b336be565cf40065a5e9013226dfb3ba81ad3b",
     "site/.htaccess": "9b3093a1981bc7a9bba174dc14d63fae794c6eb8dbafef823815f269f60b1748",
     "site/404.html": "f2dc1d1ac316f2092a70b9efe07a230c66613919521af7252002b8b78d25032f",
-    "site/about/index.html": "3a8ae0da1cf2e8735e62c553b33e45195b0a7b2b1b50b7277e65b40a64155052",
+    "site/about/index.html": "7687797d87ef9f40dc73b5a79a06d222c716d6da23ca7309820edff32882173b",
     "site/accessibility/index.html": "e0d250481b3556c02751fd322358102b52ecfe2a513d89e7c1c182ea332ebb08",
     "site/api/enquiry.php": "ed9d7ece29c3aca98e35d6382661daac6df33bed6a6c5339aceb519fbd05d270",
     "site/api/src/EnquiryController.php": "f58b674470922b4b741cc038ee7ce4efe8e021c5b53ca37a1cde7d5b21b56d06",
