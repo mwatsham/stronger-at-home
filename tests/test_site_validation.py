@@ -873,6 +873,24 @@ class SiteValidationTests(unittest.TestCase):
         self.assertNotIn('data-production-blocker="portrait"', html)
         self.assertNotIn("Professional portrait to be supplied", html)
 
+    def test_about_portrait_is_accessible_and_precedes_biography(self):
+        html = (ROOT / "site/about/index.html").read_text(encoding="utf-8")
+        parser = LandmarkParser()
+        parser.feed(html)
+        portraits = [image for image in parser.images
+                     if image.get("src") == "/assets/images/melanie-watsham-portrait.jpg"]
+        self.assertEqual(len(portraits), 1)
+        self.assertEqual(portraits[0]["alt"], "Melanie Watsham, physiotherapist")
+        self.assertEqual((portraits[0]["width"], portraits[0]["height"]), ("1020", "1190"))
+        self.assertLess(html.index("</h1>"), html.index('class="portrait-frame"'))
+        self.assertLess(html.index('class="portrait-frame"'), html.index('class="lead"'))
+
+    def test_about_portrait_has_contained_desktop_float_and_mobile_reset(self):
+        css = (ROOT / "site/assets/css/site.css").read_text(encoding="utf-8")
+        self.assertRegex(css, r"\.about-biography\s*\{[^}]*display: flow-root;")
+        self.assertRegex(css, r"\.about-biography \.portrait-frame\s*\{[^}]*float: right;")
+        self.assertRegex(css, r"(?s)@media\s*\(max-width: 760px\)\s*\{\s*\.about-biography \.portrait-frame\s*\{[^}]*float: none;[^}]*margin: 0 auto 1.5rem;")
+
     def test_portrait_frame_uses_nested_rounded_corners(self):
         stylesheet = (ROOT / "site/assets/css/site.css").read_text(encoding="utf-8")
 
