@@ -875,6 +875,7 @@ class SiteValidationTests(unittest.TestCase):
 
     def test_about_portrait_is_accessible_and_precedes_biography(self):
         html = (ROOT / "site/about/index.html").read_text(encoding="utf-8")
+        self.assertIn('/assets/css/site.css?v=about-portrait-20261101', html)
         parser = LandmarkParser()
         parser.feed(html)
         portraits = [image for image in parser.images
