@@ -787,8 +787,8 @@ class SiteValidationTests(unittest.TestCase):
 
         heading = "Experienced care. Personal progress. At home."
         explanation = (
-            "Personal physiotherapy visits for adults recovering strength, "
-            "mobility, balance and confidence."
+            "Personal physiotherapy visits for adults, supporting strength, "
+            "mobility, balance, breathing and confidence."
         )
         self.assertEqual(introduction.count(f"<h1>{heading}</h1>"), 1)
         self.assertEqual(introduction.count(f'<p class="lead">{explanation}</p>'), 1)
@@ -805,7 +805,7 @@ class SiteValidationTests(unittest.TestCase):
             '<section id="how-i-can-help"', 1
         )[0]
         primary_action = '<a class="button" href="/contact/#appointment-request">Request an appointment</a>'
-        secondary_action = '<a class="text-link" href="tel:+447843497871">Call Melanie</a>'
+        secondary_action = '<a class="text-link" href="tel:+447843497871">Call Melanie: 07843 497871</a>'
 
         self.assertIn(primary_action, introduction)
         self.assertIn(secondary_action, introduction)
@@ -875,7 +875,7 @@ class SiteValidationTests(unittest.TestCase):
 
     def test_about_portrait_is_accessible_and_precedes_biography(self):
         html = (ROOT / "site/about/index.html").read_text(encoding="utf-8")
-        self.assertIn('/assets/css/site.css?v=about-portrait-20261101', html)
+        self.assertIn('/assets/css/site.css?v=accessibility-20261107', html)
         parser = LandmarkParser()
         parser.feed(html)
         portraits = [image for image in parser.images
