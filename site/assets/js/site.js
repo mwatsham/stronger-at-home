@@ -27,12 +27,22 @@ if (form) {
   const updateContactRequirements = () => {
     const prefersEmail = preferredContact.value === 'email';
     const prefersPhone = preferredContact.value === 'phone';
+    email.required = prefersEmail;
+    phone.required = prefersPhone;
+    form.querySelector('#email-requirement').textContent = prefersEmail ? '(required)' : '(optional)';
+    form.querySelector('#phone-requirement').textContent = prefersPhone ? '(required)' : '(optional)';
     email.setCustomValidity(prefersEmail && !email.value.trim() ? 'Please provide an email address.' : '');
     phone.setCustomValidity(prefersPhone && !phone.value.trim() ? 'Please provide a phone number.' : '');
     [email, phone].forEach(field => {
       if (field.validity.valid) field.removeAttribute('aria-invalid');
     });
   };
+
+  // Set initial requirements without clearing any server-rendered error state.
+  email.required = preferredContact.value === 'email';
+  phone.required = preferredContact.value === 'phone';
+  form.querySelector('#email-requirement').textContent = email.required ? '(required)' : '(optional)';
+  form.querySelector('#phone-requirement').textContent = phone.required ? '(required)' : '(optional)';
 
   const clearStatusWhenFormIsValid = () => {
     if (!form.querySelector(':invalid')) {

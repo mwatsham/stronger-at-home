@@ -787,8 +787,8 @@ class SiteValidationTests(unittest.TestCase):
 
         heading = "Experienced care. Personal progress. At home."
         explanation = (
-            "Personal physiotherapy visits for adults recovering strength, "
-            "mobility, balance and confidence."
+            "Personal physiotherapy visits for adults, supporting strength, "
+            "mobility, balance, breathing and confidence."
         )
         self.assertEqual(introduction.count(f"<h1>{heading}</h1>"), 1)
         self.assertEqual(introduction.count(f'<p class="lead">{explanation}</p>'), 1)
@@ -805,7 +805,7 @@ class SiteValidationTests(unittest.TestCase):
             '<section id="how-i-can-help"', 1
         )[0]
         primary_action = '<a class="button" href="/contact/#appointment-request">Request an appointment</a>'
-        secondary_action = '<a class="text-link" href="tel:+447843497871">Call Melanie</a>'
+        secondary_action = '<a class="text-link" href="tel:+447843497871">Call Melanie: 07843 497871</a>'
 
         self.assertIn(primary_action, introduction)
         self.assertIn(secondary_action, introduction)
@@ -872,6 +872,25 @@ class SiteValidationTests(unittest.TestCase):
         )
         self.assertNotIn('data-production-blocker="portrait"', html)
         self.assertNotIn("Professional portrait to be supplied", html)
+
+    def test_about_portrait_is_accessible_and_precedes_biography(self):
+        html = (ROOT / "site/about/index.html").read_text(encoding="utf-8")
+        self.assertIn('/assets/css/site.css?v=accessibility-20261107', html)
+        parser = LandmarkParser()
+        parser.feed(html)
+        portraits = [image for image in parser.images
+                     if image.get("src") == "/assets/images/melanie-watsham-portrait.jpg"]
+        self.assertEqual(len(portraits), 1)
+        self.assertEqual(portraits[0]["alt"], "Melanie Watsham, physiotherapist")
+        self.assertEqual((portraits[0]["width"], portraits[0]["height"]), ("1020", "1190"))
+        self.assertLess(html.index("</h1>"), html.index('class="portrait-frame"'))
+        self.assertLess(html.index('class="portrait-frame"'), html.index('class="lead"'))
+
+    def test_about_portrait_has_contained_desktop_float_and_mobile_reset(self):
+        css = (ROOT / "site/assets/css/site.css").read_text(encoding="utf-8")
+        self.assertRegex(css, r"\.about-biography\s*\{[^}]*display: flow-root;")
+        self.assertRegex(css, r"\.about-biography \.portrait-frame\s*\{[^}]*float: right;")
+        self.assertRegex(css, r"(?s)@media\s*\(max-width: 760px\)\s*\{\s*\.about-biography \.portrait-frame\s*\{[^}]*float: none;[^}]*margin: 0 auto 1.5rem;")
 
     def test_portrait_frame_uses_nested_rounded_corners(self):
         stylesheet = (ROOT / "site/assets/css/site.css").read_text(encoding="utf-8")
