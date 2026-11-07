@@ -29,8 +29,8 @@ $kind = isset($flash['kind']) && is_string($flash['kind']) ? $flash['kind'] : ''
 $statusMessages = [
     'success' => 'Thank you. Your appointment request has been received. Melanie will contact you to discuss availability.',
     'validation' => 'Please check the highlighted fields and try again.',
-    'rate' => 'Please wait before trying again. You can also call Melanie on +447843497871 or email melanie@stronger-at-home.co.uk.',
-    'delivery' => 'Your request could not be sent. Please call Melanie on +447843497871 or email melanie@stronger-at-home.co.uk.',
+    'rate' => 'Please wait before trying again. You can also call Melanie on 07843 497871 or email melanie@stronger-at-home.co.uk.',
+    'delivery' => 'Your request could not be sent. Please call Melanie on 07843 497871 or email melanie@stronger-at-home.co.uk.',
 ];
 $statusMessage = $statusMessages[$kind] ?? '';
 
@@ -66,8 +66,8 @@ $escape = static fn(string $value): string => htmlspecialchars($value, ENT_QUOTE
   <meta property="og:url" content="https://stronger-at-home.co.uk/contact/">
   <meta property="og:type" content="website">
   <link rel="stylesheet" href="/assets/css/brand-tokens.css">
-  <link rel="stylesheet" href="/assets/css/site.css">
-  <script src="/assets/js/site.js" defer></script>
+  <link rel="stylesheet" href="/assets/css/site.css?v=accessibility-20261107">
+  <script src="/assets/js/site.js?v=accessibility-20261107" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -95,7 +95,7 @@ $escape = static fn(string $value): string => htmlspecialchars($value, ENT_QUOTE
       <h1 id="contact-heading">Contact Stronger at Home Physiotherapy</h1>
       <p class="lead">You can request an appointment by email, phone or this website enquiry form.</p>
       <div class="contact-methods" aria-label="Contact Melanie">
-        <a class="contact-method" href="tel:+447843497871"><span>Call Melanie</span>+447843497871</a>
+        <a class="contact-method" href="tel:+447843497871"><span>Call Melanie</span>07843 497871</a>
         <a class="contact-method" href="mailto:melanie@stronger-at-home.co.uk"><span>Email Melanie</span>melanie@stronger-at-home.co.uk</a>
       </div>
     </section>
@@ -105,6 +105,7 @@ $escape = static fn(string $value): string => htmlspecialchars($value, ENT_QUOTE
         <p class="eyebrow">Website enquiry</p>
         <h2 id="appointment-request-heading">Request an appointment</h2>
       </div>
+      <p class="form-contact-alternative">Prefer to speak to Melanie? <a class="text-link" href="tel:+447843497871">Call Melanie: 07843 497871</a></p>
       <form class="appointment-form" method="post" action="/api/enquiry.php" novalidate>
         <p>Use this form to request an appointment. Melanie will contact you directly to confirm availability.</p>
         <p class="notice">Please do not include detailed or urgent medical information.</p>
@@ -116,23 +117,23 @@ $escape = static fn(string $value): string => htmlspecialchars($value, ENT_QUOTE
           <?php if (isset($errors['name'])): ?><p class="field-error" id="name-error"><?= $escape($errors['name']) ?></p><?php endif; ?>
         </div>
         <div class="form-field">
-          <label for="email">Email address</label>
-          <input id="email" name="email" type="email" autocomplete="email" maxlength="254" aria-describedby="contact-method-hint<?= isset($errors['email']) ? ' email-error' : '' ?>" value="<?= $escape($values['email']) ?>"<?= isset($errors['email']) ? ' aria-invalid="true"' : '' ?>>
-          <?php if (isset($errors['email'])): ?><p class="field-error" id="email-error"><?= $escape($errors['email']) ?></p><?php endif; ?>
-        </div>
-        <div class="form-field">
-          <label for="phone">Phone number</label>
-          <input id="phone" name="phone" type="tel" autocomplete="tel" maxlength="30" aria-describedby="contact-method-hint<?= isset($errors['phone']) ? ' phone-error' : '' ?>" value="<?= $escape($values['phone']) ?>"<?= isset($errors['phone']) ? ' aria-invalid="true"' : '' ?>>
-          <?php if (isset($errors['phone'])): ?><p class="field-error" id="phone-error"><?= $escape($errors['phone']) ?></p><?php endif; ?>
-        </div>
-        <p class="field-hint" id="contact-method-hint">Please provide an email address or phone number, and select the way you would prefer Melanie to contact you.</p>
-        <div class="form-field">
           <label for="preferred-contact">Preferred contact method <span aria-hidden="true">(required)</span></label>
           <select id="preferred-contact" name="preferred_contact" required <?= isset($errors['preferred_contact']) ? 'aria-invalid="true" aria-describedby="preferred-contact-error"' : '' ?>>
             <option value="email"<?= $values['preferred_contact'] !== 'phone' ? ' selected' : '' ?>>Email</option>
             <option value="phone"<?= $values['preferred_contact'] === 'phone' ? ' selected' : '' ?>>Phone</option>
           </select>
           <?php if (isset($errors['preferred_contact'])): ?><p class="field-error" id="preferred-contact-error"><?= $escape($errors['preferred_contact']) ?></p><?php endif; ?>
+        </div>
+        <p class="field-hint" id="contact-method-hint">Choose how you would like Melanie to reply, then provide the matching email address or phone number. The other contact detail is optional.</p>
+        <div class="form-field">
+          <label for="email">Email address <span id="email-requirement">(required for email replies)</span></label>
+          <input id="email" name="email" type="email" autocomplete="email" maxlength="254" aria-describedby="contact-method-hint<?= isset($errors['email']) ? ' email-error' : '' ?>" value="<?= $escape($values['email']) ?>"<?= isset($errors['email']) ? ' aria-invalid="true"' : '' ?>>
+          <?php if (isset($errors['email'])): ?><p class="field-error" id="email-error"><?= $escape($errors['email']) ?></p><?php endif; ?>
+        </div>
+        <div class="form-field">
+          <label for="phone">Phone number <span id="phone-requirement">(required for phone replies)</span></label>
+          <input id="phone" name="phone" type="tel" autocomplete="tel" maxlength="30" aria-describedby="contact-method-hint<?= isset($errors['phone']) ? ' phone-error' : '' ?>" value="<?= $escape($values['phone']) ?>"<?= isset($errors['phone']) ? ' aria-invalid="true"' : '' ?>>
+          <?php if (isset($errors['phone'])): ?><p class="field-error" id="phone-error"><?= $escape($errors['phone']) ?></p><?php endif; ?>
         </div>
         <div class="form-field">
           <label for="postcode">Postcode <span aria-hidden="true">(required)</span></label>
