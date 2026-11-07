@@ -9,9 +9,9 @@ html { background: var(--brand-colour-background-warm); }
 
 body {
   margin: 0;
-  min-width: 20rem;
+  min-width: 0;
   background: var(--brand-colour-background-warm);
-  font-size: 1rem;
+  font-size: 1.125rem;
   line-height: var(--brand-typography-line-height-body);
 }
 
@@ -425,6 +425,10 @@ main.homepage {
 .narrow-heading { max-width: 36rem; }
 
 .about-biography { display: flow-root; }
+.about-biography p { max-width: 65ch; }
+#respiratory-physiotherapy > p { max-width: 65ch; }
+.form-contact-alternative { max-width: 46rem; margin-inline: auto; }
+.form-field label span[id$="-requirement"] { font-weight: normal; }
 
 .about-biography .portrait-frame {
   float: right;
@@ -570,7 +574,7 @@ main.homepage {
 
 .contact-method span,
 .field-hint {
-  font-size: 0.875rem;
+  font-size: 1rem;
   font-weight: var(--brand-typography-weight-regular);
 }
 
