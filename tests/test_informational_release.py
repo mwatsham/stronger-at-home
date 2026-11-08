@@ -106,6 +106,9 @@ class InformationalReleaseTests(unittest.TestCase):
                 shutil.copytree(self.release, repo)
                 deploy = repo / "deploy.sh"
                 deploy.write_text(deploy.read_text().replace("/home/v0398ees6dry", str(account)))
+                password = account / ".htpasswds/public_html/staging.stronger-at-home.co.uk/passwd"
+                password.parent.mkdir(parents=True)
+                password.write_text("melanie:synthetic-test-only\n")
                 public = account / "public_html/staging.stronger-at-home.co.uk"
                 public.mkdir(parents=True)
                 (public / "old.txt").write_text("previous")

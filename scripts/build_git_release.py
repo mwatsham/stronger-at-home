@@ -26,6 +26,22 @@ else:
 
 
 ACCOUNT_HOME = "/home/v0398ees6dry"
+STAGING_PASSWORD_FILE = f"{ACCOUNT_HOME}/.htpasswds/public_html/staging.stronger-at-home.co.uk/passwd"
+STAGING_AUTHENTICATION = f'''# Staging privacy: credentials remain outside every release.
+ErrorDocument 401 "Staging authentication required."
+ErrorDocument 403 "Use the HTTPS staging address."
+<If "%{{HTTPS}} == 'on'">
+    AuthType Basic
+    AuthName "Stronger at Home staging"
+    AuthBasicProvider file
+    AuthUserFile "{STAGING_PASSWORD_FILE}"
+    Require user melanie
+</If>
+<Else>
+    AuthType None
+    Require all denied
+</Else>
+'''
 PENDING_REGISTRATION_APPROVAL = "owner-pending-registration-2026-10-24"
 PUBLICATION_MODES = {"enquiries", "informational", "enquiries-pending"}
 ENVIRONMENTS: Mapping[str, Mapping[str, str]] = MappingProxyType(
@@ -220,6 +236,14 @@ def deployment_script(environment: str, source_sha: str, publication_mode: str =
     if publication_mode not in PUBLICATION_MODES:
         raise ValueError("Invalid publication mode")
     config_check = "[[ -f \"$CONFIG_PATH\" && ! -L \"$CONFIG_PATH\" ]] || fail 'Missing external environment configuration.'" if publication_mode != "informational" else "# Informational artifact: no enquiry configuration is loaded or required."
+    privacy_check = ""
+    if environment == "staging":
+        privacy_check = (
+            f"readonly STAGING_PASSWORD_FILE='{STAGING_PASSWORD_FILE}'\n"
+            '[[ -f "$STAGING_PASSWORD_FILE" && ! -L "$STAGING_PASSWORD_FILE" '
+            '&& -s "$STAGING_PASSWORD_FILE" && -r "$STAGING_PASSWORD_FILE" ]] '
+            "|| fail 'Missing or unsafe staging password file.'\n"
+        )
     return f"""#!/bin/bash
 set -Eeuo pipefail
 umask 027
@@ -245,7 +269,7 @@ fail() {{
 [[ -d public/api/src && ! -L public/api/src ]] || fail 'Missing application source tree.'
 [[ -d vendor && ! -L vendor && -f vendor/autoload.php && ! -L vendor/autoload.php ]] || fail 'Missing vendor release tree.'
 {config_check}
-[[ ! -e "$RELEASE_DIRECTORY" && ! -L "$RELEASE_DIRECTORY" ]] || fail 'Release directory already exists.'
+{privacy_check}[[ ! -e "$RELEASE_DIRECTORY" && ! -L "$RELEASE_DIRECTORY" ]] || fail 'Release directory already exists.'
 [[ ! -e "$NEXT_DIRECTORY" && ! -L "$NEXT_DIRECTORY" ]] || fail 'Next document-root directory already exists.'
 
 mkdir -p -- "$RELEASE_ROOT"
@@ -288,7 +312,8 @@ def _configure_htaccess(htaccess: Path, environment: str, bindings: str) -> None
         1,
     )
     separator = "" if content.endswith("\n") else "\n"
-    htaccess.write_text(content + separator + bindings, encoding="utf-8")
+    privacy = STAGING_AUTHENTICATION if environment == "staging" else ""
+    htaccess.write_text(content + separator + bindings + privacy, encoding="utf-8")
 
 
 def build_git_release(

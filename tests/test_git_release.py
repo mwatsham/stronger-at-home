@@ -32,6 +32,18 @@ def write_regular_entry(archive: ZipFile, name: str, content: str) -> None:
 
 
 class GitReleaseTests(unittest.TestCase):
+    def test_all_staging_modes_emit_external_user_authentication(self):
+        for mode in ("enquiries", "enquiries-pending", "informational"):
+            with self.subTest(mode=mode), TemporaryDirectory() as directory:
+                release = build_git_release(ROOT, Path(directory) / "release", "staging",
+                                            SOURCE_SHA, BUILD_TIMESTAMP, mode)
+                config = (release / "public/.htaccess").read_text()
+                self.assertIn("AuthType Basic", config)
+                self.assertIn('AuthUserFile "/home/v0398ees6dry/.htpasswds/public_html/staging.stronger-at-home.co.uk/passwd"', config)
+                self.assertIn("Require user melanie", config)
+                self.assertIn('ErrorDocument 401 "Staging authentication required."', config)
+                self.assertIn('X-Robots-Tag "noindex, nofollow"', config)
+
     def test_google_verification_survives_production_release_packaging(self):
         with TemporaryDirectory() as directory:
             release = build_git_release(
@@ -327,6 +339,10 @@ class DeploymentScriptTests(unittest.TestCase):
         config_path.parent.mkdir(parents=True)
         config_path.write_text("<?php return [];\n", encoding="utf-8")
 
+        password_file = account_home / ".htpasswds/public_html/staging.stronger-at-home.co.uk/passwd"
+        password_file.parent.mkdir(parents=True)
+        password_file.write_text("melanie:synthetic-test-only\n")
+
         document_root = account_home / "public_html/staging.stronger-at-home.co.uk"
         document_root.mkdir(parents=True)
         (document_root / "obsolete.txt").write_text("old release\n", encoding="utf-8")
@@ -367,6 +383,49 @@ class DeploymentScriptTests(unittest.TestCase):
             SOURCE_SHA + "\n",
         )
         self.assertFalse(next_path.exists())
+
+    def test_invalid_password_file_aborts_before_any_release_changes(self):
+        for invalid in ("missing", "empty", "unreadable", "symlink", "directory"):
+            with self.subTest(invalid=invalid):
+                account, repo, public, release, next_path = self.prepare_account()
+                password = account / ".htpasswds/public_html/staging.stronger-at-home.co.uk/passwd"
+                if invalid == "empty":
+                    password.write_text("")
+                elif invalid == "unreadable":
+                    password.chmod(0)
+                else:
+                    password.unlink()
+                    if invalid == "symlink":
+                        password.symlink_to(account / "private/stronger-at-home/staging/site.php")
+                    elif invalid == "directory":
+                        password.mkdir()
+                result = self.run_deployment(repo / "deploy.sh", repo, account)
+                self.assertNotEqual(result.returncode, 0, invalid)
+                self.assertIn("staging password file", result.stderr)
+                self.assertTrue((public / "obsolete.txt").is_file())
+                self.assertFalse(release.exists())
+                self.assertFalse(next_path.exists())
+
+    def test_subsequent_release_preserves_authentication_and_external_credentials(self):
+        account, repo, public, _, _ = self.prepare_account()
+        password = account / ".htpasswds/public_html/staging.stronger-at-home.co.uk/passwd"
+        original = password.read_bytes()
+        first = self.run_deployment(repo / "deploy.sh", repo, account)
+        self.assertEqual(first.returncode, 0, first.stderr)
+        first_config = (public / ".htaccess").read_text()
+        self.assertIn("Require user melanie", first_config)
+        second_sha = "1" * 40
+        second = build_git_release(ROOT, account / "second", "staging", second_sha, BUILD_TIMESTAMP)
+        shutil.rmtree(repo)
+        shutil.copytree(second, repo)
+        script = repo / "deploy.sh"
+        script.write_text(script.read_text().replace(ACCOUNT_HOME, str(account)))
+        result = self.run_deployment(script, repo, account)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual((public / ".htaccess").read_text(), first_config.replace(SOURCE_SHA, second_sha))
+        self.assertEqual(password.read_bytes(), original)
+        previous = account / "stronger-at-home-releases/staging" / second_sha / "previous-public/.htaccess"
+        self.assertEqual(previous.read_text(), first_config)
 
     def test_deployed_private_autoloader_loads_enquiry_application_classes(self):
         account_home, repository_root, _, release_path, _ = self.prepare_account()
