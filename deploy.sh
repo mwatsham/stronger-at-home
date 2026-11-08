@@ -7,7 +7,7 @@ readonly REPOSITORY_ROOT='/home/v0398ees6dry/repositories/stronger-at-home-stagi
 readonly DOCUMENT_ROOT='/home/v0398ees6dry/public_html/staging.stronger-at-home.co.uk'
 readonly CONFIG_PATH='/home/v0398ees6dry/private/stronger-at-home/staging/site.php'
 readonly RELEASE_ROOT='/home/v0398ees6dry/stronger-at-home-releases/staging'
-readonly SOURCE_SHA='d780571f4a439c96ee0e22232dce59eb324fee71'
+readonly SOURCE_SHA='8f2dc92f15639c836c0684d312554c42b6f8f125'
 readonly RELEASE_DIRECTORY="$RELEASE_ROOT/$SOURCE_SHA"
 readonly NEXT_DIRECTORY="$DOCUMENT_ROOT.next-$SOURCE_SHA"
 readonly PREVIOUS_DIRECTORY="$RELEASE_DIRECTORY/previous-public"
@@ -24,6 +24,8 @@ fail() {
 [[ -d public/api/src && ! -L public/api/src ]] || fail 'Missing application source tree.'
 [[ -d vendor && ! -L vendor && -f vendor/autoload.php && ! -L vendor/autoload.php ]] || fail 'Missing vendor release tree.'
 [[ -f "$CONFIG_PATH" && ! -L "$CONFIG_PATH" ]] || fail 'Missing external environment configuration.'
+readonly STAGING_PASSWORD_FILE='/home/v0398ees6dry/.htpasswds/public_html/staging.stronger-at-home.co.uk/passwd'
+[[ -f "$STAGING_PASSWORD_FILE" && ! -L "$STAGING_PASSWORD_FILE" && -s "$STAGING_PASSWORD_FILE" && -r "$STAGING_PASSWORD_FILE" ]] || fail 'Missing or unsafe staging password file.'
 [[ ! -e "$RELEASE_DIRECTORY" && ! -L "$RELEASE_DIRECTORY" ]] || fail 'Release directory already exists.'
 [[ ! -e "$NEXT_DIRECTORY" && ! -L "$NEXT_DIRECTORY" ]] || fail 'Next document-root directory already exists.'
 
