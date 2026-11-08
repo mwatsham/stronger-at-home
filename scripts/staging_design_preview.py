@@ -2,6 +2,7 @@
 
 import argparse
 from pathlib import Path
+import re
 import shutil
 
 
@@ -30,6 +31,31 @@ def include_staging_preview(project_root: Path, public_root: Path, environment: 
         )):
             raise ValueError("staging design preview contains an unsupported file")
     shutil.copytree(preview, public_root / "design-preview")
+    # The owner approved these layouts for main staging, not production.
+    # Keep the original site sources and production release tree untouched.
+    shutil.copytree(preview / "assets", public_root / "assets/approved-photos")
+    disclosure = '<p>Photographs include AI-edited uniform colours.</p>'
+    for page in ("index.html", "how-i-can-help/index.html"):
+        html = (preview / page).read_text()
+        html, count = re.subn(
+            r'<aside class="design-preview" aria-label="Design preview">.*?</aside>\s*',
+            '', html, count=1, flags=re.DOTALL,
+        )
+        if count != 1:
+            raise ValueError("approved layout must contain one preview banner")
+        html = html.replace('/design-preview/assets/', '/assets/approved-photos/')
+        html = html.replace('href="/design-preview/', 'href="/')
+        html = html.replace('</footer>', f'  {disclosure}\n  </footer>')
+        (public_root / page).write_text(html)
+    about = public_root / "about/index.html"
+    html = about.read_text()
+    original = '<img src="/assets/images/melanie-watsham-portrait.jpg" alt="Melanie Watsham, physiotherapist" width="1020" height="1190">'
+    replacement = '<img src="/assets/approved-photos/images/melanie-navy-portrait-preview.webp" alt="Melanie Watsham, physiotherapist" width="1161" height="1355">'
+    if html.count(original) != 1:
+        raise ValueError("About page must contain the expected portrait")
+    html = html.replace(original, replacement)
+    html = html.replace('</footer>', f'  {disclosure}\n  </footer>')
+    about.write_text(html)
 
 
 def main() -> None:
