@@ -55,4 +55,11 @@
 
 ## Planning status
 
-Verified existing account and current anonymous protection on 8 November 2026. No hosting mutations performed. Implementation awaits plan review; use native execution as in the established project workflow unless the owner requests otherwise.
+Verified existing account and current anonymous protection on 8 November 2026.
+Task 1 implemented and tested natively: 211 Python tests, PHP tests/lint,
+site/brand validators and JavaScript syntax checks passed. Production generated
+configuration and deployment scripts are byte-identical in all three modes.
+Independent review found an inherited-authorization issue; a failing native
+Apache regression was added and the fix preserves existing file-access denials.
+No hosting mutations performed. Task 2 remains behind separate release approval
+and owner-assisted hosted acceptance, including a subsequent deployment.

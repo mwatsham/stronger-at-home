@@ -31,6 +31,7 @@ STAGING_AUTHENTICATION = f'''# Staging privacy: credentials remain outside every
 ErrorDocument 401 "Staging authentication required."
 ErrorDocument 403 "Use the HTTPS staging address."
 <If "%{{HTTPS}} == 'on'">
+    AuthMerging And
     AuthType Basic
     AuthName "Stronger at Home staging"
     AuthBasicProvider file

@@ -60,6 +60,7 @@ class StagingApacheTests(unittest.TestCase):
                 + "".join(f'LoadModule {module}_module "{MODULES}/mod_{module}.so"\n' for module in modules)
                 + f'TypesConfig /etc/apache2/mime.types\nDocumentRoot "{public}"\n'
                 + f'<Directory "{public}">\nAllowOverride All\nRequire all granted\n</Directory>\n'
+                + '<FilesMatch "^\\.ht">\nRequire all denied\n</FilesMatch>\n'
                 + f'<VirtualHost 127.0.0.1:{https_port}>\nSSLEngine on\n'
                 + f'SSLCertificateFile "{root}/cert.pem"\nSSLCertificateKeyFile "{root}/key.pem"\n</VirtualHost>\n')
             syntax = subprocess.run([str(HTTPD), "-t", "-f", str(server_config)], capture_output=True, text=True)
@@ -108,6 +109,9 @@ class StagingApacheTests(unittest.TestCase):
                     self.assertEqual(body, b"protected-marker")
                 for user, password in (("melanie", "wrong"), ("other", "test-only-password")):
                     self.assertEqual(request("/index.html", user=user, password=password)[0], 401)
+                status, _, body = request("/.htaccess", user="melanie")
+                self.assertEqual(status, 403)
+                self.assertNotIn(b"AuthUserFile", body)
             finally:
                 process.terminate()
                 process.wait(timeout=5)
