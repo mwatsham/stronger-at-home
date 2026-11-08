@@ -41,7 +41,6 @@ def include_staging_preview(project_root: Path, public_root: Path, environment: 
         shutil.copytree(preview, public_root / "design-preview")
     # Main pages share the exact owner-approved staging composition.
     shutil.copytree(preview / "assets", public_root / "assets/approved-photos")
-    disclosure = '<p>Photographs include AI-edited uniform colours.</p>'
     for page in ("index.html", "how-i-can-help/index.html"):
         html = (preview / page).read_text()
         html, count = re.subn(
@@ -52,7 +51,6 @@ def include_staging_preview(project_root: Path, public_root: Path, environment: 
             raise ValueError("approved layout must contain one preview banner")
         html = html.replace('/design-preview/assets/', '/assets/approved-photos/')
         html = html.replace('href="/design-preview/', 'href="/')
-        html = html.replace('</footer>', f'  {disclosure}\n  </footer>')
         (public_root / page).write_text(html)
     about = public_root / "about/index.html"
     html = about.read_text()
@@ -61,7 +59,6 @@ def include_staging_preview(project_root: Path, public_root: Path, environment: 
     if html.count(original) != 1:
         raise ValueError("About page must contain the expected portrait")
     html = html.replace(original, replacement)
-    html = html.replace('</footer>', f'  {disclosure}\n  </footer>')
     about.write_text(html)
 
 

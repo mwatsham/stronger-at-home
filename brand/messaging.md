@@ -84,7 +84,7 @@ The approved public contacts are:
 
 - Mobile: `+447843497871`
 - Email: `melanie@stronger-at-home.co.uk`
-- Address: `11 Mospey Crescent, Epsom, Surrey, KT17 4LZ`
+- Service area: approximately 10 miles around Epsom, Surrey. Do not publish Melanie’s home address.
 - Preferred contact method: email
 - Website: `www.stronger-at-home.co.uk`
 

@@ -13,6 +13,17 @@ STAMP = '2026-11-08T12:00:00Z'
 
 
 class StagingDesignPreviewTests(unittest.TestCase):
+    def test_public_releases_exclude_removed_personal_and_editorial_references(self):
+        for environment in ('staging', 'production'):
+            with self.subTest(environment=environment), TemporaryDirectory() as directory:
+                release = build_git_release(ROOT, Path(directory) / 'release', environment, SHA, STAMP)
+                include_staging_preview(ROOT, release / 'public', environment, approved_production=True)
+                for page in (release / 'public').rglob('*'):
+                    if page.suffix in {'.html', '.php', '.css', '.js', '.json', '.xml', '.txt'}:
+                        content = page.read_text().lower()
+                        for removed in ('mospey', 'kt17 4lz', 'ai-edited', 'ai-generated', 'complaint'):
+                            self.assertNotIn(removed, content, str(page.relative_to(release)))
+
     def test_informational_fallback_is_not_overwritten_by_approved_photos(self):
         with TemporaryDirectory() as directory:
             release = build_git_release(ROOT, Path(directory) / 'release', 'production', SHA, STAMP, publication_mode='informational')
@@ -49,7 +60,7 @@ class StagingDesignPreviewTests(unittest.TestCase):
                 html = (public / page).read_text()
                 self.assertNotIn('href="/design-preview/', html)
                 self.assertNotIn('aria-label="Design preview"', html)
-                self.assertIn('AI-edited', html)
+                self.assertNotIn('AI-edited', html)
             home = (public / 'index.html').read_text()
             self.assertIn('/assets/approved-photos/images/melanie-navy-portrait-preview.webp', home)
             self.assertIn('treatment-section', home)
