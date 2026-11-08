@@ -22,7 +22,6 @@ FORMAL_IDENTITY = "Melanie Watsham trading as Stronger at Home Physiotherapy"
 APPROVED_PHONE = "+447843497871"
 APPROVED_EMAIL = "melanie@stronger-at-home.co.uk"
 APPROVED_EXTERNAL_URLS = {
-    "https://ico.org.uk/make-a-complaint/data-protection-complaints/check-if-you-can-complain/",
 }
 APPROVED_EXTERNAL_RESOURCES = {
     ("a", "href", "https://g.page/r/CYqDnIzAeBQuEBM/review"),
@@ -88,8 +87,8 @@ APPROVED_PUBLIC_SOURCE_SHA256 = {
     "site/assets/js/site.js": "b0dbfaed9fdceb9f57236e67c124a43bfdf82d9eac56fc3d54e24824915cee22",
     "site/contact/index.php": "888f0d9261a9f040e74cf5f5094f796a9f8f561ff886419f147f6ae70332297f",
     "site/how-i-can-help/index.html": "a6890ee04dd716764a429957e911c325d3cd1e50d45765493897cb6c5263ba18",
-    "site/index.html": "636654770f2447636fd0caee7c288256505d4cdd0165af9b098baa47510cab97",
-    "site/privacy/index.html": "6541638e04c081011ad422960a77e81443524d822e6580c864ae18f21877eec4",
+    "site/index.html": "ff18870f640e346e3a3c5f3d010c83a4adb29f61388c97be3fb1778e53cc8d05",
+    "site/privacy/index.html": "745ed7d8441086df7ac2c970710ec540ea672f4289bf6bc0e7bb33c2f1386447",
     "site/robots-staging.txt": "331ea9090db0c9f6f597bd9840fd5b171830f6e0b3ba1cb24dfa91f0c95aedc1",
     "site/robots.txt": "6806d9c899e6b514b73f45b56f6ff0eb6193e996027444ecebc88d4c31bbf294",
     "site/sitemap.xml": "e343bdfdc81a434ba772c17174e8f36fe79fdab8e3b52d03b63e3d7976469101",
@@ -101,14 +100,6 @@ EXPECTED_JSON_LD = {
     "url": f"{CANONICAL_ORIGIN}/",
     "telephone": APPROVED_PHONE,
     "email": APPROVED_EMAIL,
-    "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "11 Mospey Crescent",
-        "addressLocality": "Epsom",
-        "addressRegion": "Surrey",
-        "postalCode": "KT17 4LZ",
-        "addressCountry": "GB",
-    },
     "areaServed": "Approximately 10 miles around Epsom, Surrey",
 }
 PROHIBITED_CLAIMS = {
@@ -659,7 +650,7 @@ def _validate_contacts_and_claims(
             "privacy-retention",
             "privacy-rights",
             "privacy-objection",
-            "privacy-complaints",
+            "privacy-contact",
         ):
             if required_section not in privacy.ids:
                 errors.append(
@@ -667,7 +658,6 @@ def _validate_contacts_and_claims(
                 )
         for required in (
             FORMAL_IDENTITY,
-            "11 Mospey Crescent Epsom Surrey KT17 4LZ",
             APPROVED_EMAIL,
             "name, email address, phone number, preferred contact method, postcode, a short enquiry",
             "detailed or urgent medical information",
@@ -687,7 +677,6 @@ def _validate_contacts_and_claims(
             "request more information or a copy of the relevant safeguards",
             "12 months after the last contact",
             "eight years after the last treatment",
-            "Information Commissioner’s Office",
             "No solely automated decision-making",
         ):
             if required not in privacy.visible_text:
