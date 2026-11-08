@@ -1,25 +1,32 @@
-"""Include the approved static design experiment in staging releases only."""
+"""Package approved imagery; production promotion requires an explicit opt-in."""
 
 import argparse
+import json
 from pathlib import Path
 import re
 import shutil
 
 
-def include_staging_preview(project_root: Path, public_root: Path, environment: str) -> None:
+def include_staging_preview(project_root: Path, public_root: Path, environment: str, *, approved_production: bool = False) -> None:
     if environment not in {"staging", "production"}:
         raise ValueError("environment must be staging or production")
-    if environment == "production":
+    if environment == "production" and not approved_production:
         return
     project_root = Path(project_root).resolve()
     public_root = Path(public_root)
     if public_root.is_symlink() or not public_root.is_dir():
         raise ValueError("preview requires a regular public release directory")
+    # Never restore enquiry CTAs over the disabled-enquiries fallback.
+    metadata = json.loads((public_root.parent / "release.json").read_text())
+    if metadata.get("publicationMode") == "informational":
+        return
     htaccess = public_root / ".htaccess"
     if htaccess.is_symlink() or not htaccess.is_file():
         raise ValueError("preview requires existing staging protection")
-    if "AuthType Basic" not in htaccess.read_text():
+    if environment == "staging" and "AuthType Basic" not in htaccess.read_text():
         raise ValueError("preview requires existing staging protection")
+    if environment == "production" and "AuthType Basic" in htaccess.read_text():
+        raise ValueError("production must not inherit staging authentication")
     preview = project_root / "design-previews/seamless-photo"
     if preview.parent.is_symlink() or preview.is_symlink():
         raise ValueError("staging design preview must not be a symlink")
@@ -30,9 +37,9 @@ def include_staging_preview(project_root: Path, public_root: Path, environment: 
             not item.is_file() or item.suffix not in {".html", ".css", ".webp"}
         )):
             raise ValueError("staging design preview contains an unsupported file")
-    shutil.copytree(preview, public_root / "design-preview")
-    # The owner approved these layouts for main staging, not production.
-    # Keep the original site sources and production release tree untouched.
+    if environment == "staging":
+        shutil.copytree(preview, public_root / "design-preview")
+    # Main pages share the exact owner-approved staging composition.
     shutil.copytree(preview / "assets", public_root / "assets/approved-photos")
     disclosure = '<p>Photographs include AI-edited uniform colours.</p>'
     for page in ("index.html", "how-i-can-help/index.html"):
@@ -63,8 +70,9 @@ def main() -> None:
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
     parser.add_argument("--public-directory", type=Path, required=True)
     parser.add_argument("--environment", choices=("staging", "production"), required=True)
+    parser.add_argument("--approved-production", action="store_true", help="Apply the owner-approved imagery to production without preview routes")
     args = parser.parse_args()
-    include_staging_preview(args.root, args.public_directory, args.environment)
+    include_staging_preview(args.root, args.public_directory, args.environment, approved_production=args.approved_production)
 
 
 if __name__ == "__main__":

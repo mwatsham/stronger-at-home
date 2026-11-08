@@ -13,6 +13,31 @@ STAMP = '2026-11-08T12:00:00Z'
 
 
 class StagingDesignPreviewTests(unittest.TestCase):
+    def test_informational_fallback_is_not_overwritten_by_approved_photos(self):
+        with TemporaryDirectory() as directory:
+            release = build_git_release(ROOT, Path(directory) / 'release', 'production', SHA, STAMP, publication_mode='informational')
+            before = {p.relative_to(release): p.read_bytes() for p in release.rglob('*') if p.is_file()}
+            include_staging_preview(ROOT, release / 'public', 'production', approved_production=True)
+            self.assertEqual(before, {p.relative_to(release): p.read_bytes() for p in release.rglob('*') if p.is_file()})
+
+    def test_explicit_production_promotion_matches_accepted_staging_pages(self):
+        with TemporaryDirectory() as directory:
+            staging = build_git_release(ROOT, Path(directory) / 'staging', 'staging', SHA, STAMP)
+            production = build_git_release(ROOT, Path(directory) / 'production', 'production', SHA, STAMP)
+            security = (production / 'public/.htaccess').read_bytes()
+            contact = (production / 'public/contact/index.php').read_bytes()
+            include_staging_preview(ROOT, staging / 'public', 'staging')
+            include_staging_preview(ROOT, production / 'public', 'production', approved_production=True)
+            for page in ('index.html', 'about/index.html', 'how-i-can-help/index.html'):
+                self.assertEqual((staging / 'public' / page).read_bytes(), (production / 'public' / page).read_bytes())
+            for asset in (staging / 'public/assets/approved-photos').rglob('*'):
+                if asset.is_file():
+                    self.assertEqual(asset.read_bytes(), (production / asset.relative_to(staging)).read_bytes())
+            self.assertEqual(security, (production / 'public/.htaccess').read_bytes())
+            self.assertNotIn(b'AuthType Basic', security)
+            self.assertEqual(contact, (production / 'public/contact/index.php').read_bytes())
+            self.assertFalse((production / 'public/design-preview').exists())
+
     def test_main_staging_uses_approved_photos_and_keeps_protection(self):
         with TemporaryDirectory() as directory:
             release = build_git_release(ROOT, Path(directory) / 'release', 'staging', SHA, STAMP)
