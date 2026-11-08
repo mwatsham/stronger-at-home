@@ -37,7 +37,8 @@ class StagingDesignPreviewTests(unittest.TestCase):
             preview = release / 'public/design-preview'
             self.assertTrue((preview / 'index.html').is_file(), 'Staging must serve the review page')
             self.assertTrue((preview / 'how-i-can-help/index.html').is_file())
-            for name in ('home-exercise', 'mat-exercise', 'breathing-support'):
+            self.assertIn('/design-preview/assets/images/melanie-navy-portrait-preview.webp', (preview / 'index.html').read_text())
+            for name in ('home-exercise', 'mat-exercise', 'breathing-support', 'melanie-navy-portrait'):
                 asset = f'assets/images/{name}-preview.webp'
                 self.assertEqual((preview / asset).read_bytes(), (ROOT / 'design-previews/seamless-photo' / asset).read_bytes())
 
