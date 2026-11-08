@@ -516,7 +516,7 @@ class SiteValidationTests(unittest.TestCase):
             "privacy-retention",
             "privacy-rights",
             "privacy-objection",
-            "privacy-complaints",
+            "privacy-contact",
         )
         for missing in required_sections:
             with self.subTest(missing=missing), TemporaryDirectory() as directory:
@@ -538,7 +538,7 @@ class SiteValidationTests(unittest.TestCase):
                     errors,
                 )
 
-    def test_validator_allows_the_official_ico_complaints_link(self):
+    def test_validator_allows_the_approved_external_links(self):
         errors = validate_site(ROOT, "development")
 
         self.assertFalse(
@@ -552,8 +552,8 @@ class SiteValidationTests(unittest.TestCase):
             shutil.copytree(ROOT, copy)
             privacy = copy / "site/privacy/index.html"
             html = privacy.read_text(encoding="utf-8").replace(
-                "https://ico.org.uk/make-a-complaint/data-protection-complaints/check-if-you-can-complain/",
-                "https://example.com/complaints/",
+                '</footer>',
+                '<a href="https://example.com/unapproved/">Unapproved</a></footer>',
                 1,
             )
             privacy.write_text(html, encoding="utf-8")
@@ -561,7 +561,7 @@ class SiteValidationTests(unittest.TestCase):
             errors = validate_site(copy, "development")
 
             self.assertIn(
-                "External URL is not approved in site/privacy/index.html: https://example.com/complaints/",
+                "External URL is not approved in site/privacy/index.html: https://example.com/unapproved/",
                 errors,
             )
 
