@@ -18,7 +18,7 @@ file.
   `/home/v0398ees6dry/public_html/staging.stronger-at-home.co.uk`
 - External configuration:
   `/home/v0398ees6dry/private/stronger-at-home/staging/site.php`
-- Required cPanel runtime: PHP 8.4
+- Retain the currently approved cPanel runtime: PHP 8.3.36
 - Guarded profile: `test-123reg`
 - Protected audit file: `/private/tmp/sah-cpanel-audit.jsonl`
 
@@ -26,6 +26,39 @@ The generated deployment branch is the only deployable input. Do not edit it,
 the cPanel checkout, or the document root by hand. The previously published
 manual package stays live until a Git deployment succeeds and all staging
 checks pass.
+
+## Staging password protection (8 November 2026)
+
+Every generated staging release requires the Directory Privacy user `melanie`.
+The external credential file is
+`/home/v0398ees6dry/.htpasswds/public_html/staging.stronger-at-home.co.uk/passwd`.
+It stays outside Git, the public directory and release artifacts. Never read,
+copy, log or export its contents. Manage passwords through Directory Privacy,
+not User Manager/Web Disk. Production receives no authentication directives.
+
+Before activation, verify the authorised user and credential-file metadata using
+supported cPanel read operations. The deployment aborts before copying or
+swapping anything if the password file is missing, empty, unreadable, not a
+regular file or a symlink. This applies in all publication modes, including
+informational mode. Do not disable existing protection to make a release pass.
+
+Use the **HTTPS** staging URL. Plain HTTP deliberately returns 403 without a
+password prompt; do not depend on a rewrite redirect occurring before Apache
+authentication. HTTPS unauthenticated pages, assets, robots and API routes must
+return 401 with a Basic challenge and no application output. The 401 response
+uses a literal message, not a protected error page. Ask the owner to verify
+Melanie's login in their own browser; never request her password in chat.
+
+After login, perform the usual navigation, noindex and security checks below.
+Do not submit an enquiry unless separately authorised. Check production remains
+public. After a separately approved subsequent staging deployment, repeat both
+anonymous and owner-assisted authenticated checks; until then, live persistence
+is not yet proven, even if local repeated-deployment tests pass.
+
+Rollback artifacts **must retain these staging rules**. Never activate an old
+unprotected artifact: regenerate the earlier content with the current protected
+builder and obtain normal release approvals. Failed atomic swaps restore the
+existing protected public tree automatically.
 
 ## 1. Verify the reviewed deployment commit
 
@@ -100,11 +133,11 @@ Those known failures are not runtime or target evidence.
 
 An authorised human must use the enabled cPanel interfaces without changing
 anything: open **Software > Select PHP Version** (CloudLinux PHP Selector) and
-record that the current account runtime is PHP 8.4. In its **Options** view,
+record that the current account runtime remains PHP 8.3.36. In its **Options** view,
 record that `display_errors` is **Off**. Then open **File Manager** only to
 record current metadata for the exact staging document root and existing
 external configuration; do not change either. Do not use MultiPHP Manager.
-Stop if Select PHP Version is absent, does not show 8.4, cannot be shown to
+Stop if Select PHP Version is absent, does not show the approved runtime, cannot be shown to
 govern the staging host, or shows `display_errors` On. Browser automation is not
 permitted for these cPanel checks.
 
@@ -208,7 +241,10 @@ Do not manually rename, copy, patch, or delete either tree.
 Stop and begin rollback on the first failed check. Use fictitious details and a
 message containing no health or private information for every form test.
 
-- Request the HTTPS homepage and require a valid certificate, no mixed content,
+- First verify anonymous HTTPS home/contact/assets/API return 401 and HTTP
+  returns 403 without a password challenge. The following content checks are
+  performed after owner-assisted authentication over HTTPS.
+- Request the authenticated HTTPS homepage and require a valid certificate, no mixed content,
   status 200, the staging host, and no redirect to production.
 - Request `/robots.txt` and require the exact deny-all response:
 
