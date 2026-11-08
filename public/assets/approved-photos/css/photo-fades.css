@@ -1,0 +1,78 @@
+/* Exploratory layout only. Source: main 7dcae1e, 7 November 2026. */
+.design-preview {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: .5rem 1.75rem;
+  padding: .5rem 1.25rem;
+  background: var(--brand-colour-background-strong);
+  color: var(--brand-colour-text-inverse);
+  font-size: .85rem;
+}
+.design-preview nav { display: flex; flex-wrap: wrap; gap: 1rem; }
+.design-preview a { padding-block: .5rem; text-underline-offset: .2em; }
+.design-preview small { opacity: .85; font-size: inherit; }
+
+.treatment-section,
+.services-introduction {
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, .88fr);
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 4rem);
+}
+.treatment-copy { min-width: 0; }
+.treatment-section .section-heading { margin-bottom: 1.5rem; }
+#benefits-at-home .benefit-list { grid-template-columns: 1fr; gap: .85rem; }
+#benefits-at-home .benefit-list > div { border: 0; }
+#benefits-at-home .benefit-list h3 { margin: 0 0 .3rem; font-size: 1.3rem; }
+#benefits-at-home .benefit-list p { max-width: 43ch; }
+
+.treatment-photo {
+  --photo-ground: var(--brand-colour-background-warm);
+  position: relative;
+  width: 100%;
+  max-width: 32rem;
+  justify-self: end;
+  margin: 0;
+  padding-block: 1.25rem;
+  background: var(--photo-ground);
+  isolation: isolate;
+}
+.section-soft .treatment-photo { --photo-ground: var(--brand-colour-background-soft); }
+.treatment-photo img { display: block; width: 100%; height: auto; }
+.treatment-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, var(--photo-ground) 0%, transparent 17%, transparent 94%, var(--photo-ground) 100%),
+    linear-gradient(180deg, var(--photo-ground) 0%, transparent 7%, transparent 94%, var(--photo-ground) 100%);
+}
+.services-introduction { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); margin-bottom: 2rem; }
+.services-introduction .section-heading { margin-bottom: 0; }
+.treatment-photo--landscape { max-width: 38rem; }
+.treatment-photo--landscape::after {
+  background:
+    linear-gradient(90deg, var(--photo-ground) 0%, transparent 12%, transparent 96%, var(--photo-ground) 100%),
+    linear-gradient(180deg, var(--photo-ground) 0%, transparent 4%, transparent 98%, var(--photo-ground) 100%);
+}
+.respiratory-treatment .treatment-copy p { max-width: 60ch; }
+.respiratory-treatment { scroll-margin-top: 1.5rem; }
+
+@media (max-width: 48rem) {
+  .treatment-section, .services-introduction { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
+  .treatment-photo { max-width: 27rem; justify-self: center; }
+  .treatment-photo--landscape { max-width: 38rem; }
+  .treatment-photo::after {
+    background:
+      linear-gradient(90deg, var(--photo-ground) 0%, transparent 8%, transparent 94%, var(--photo-ground) 100%),
+      linear-gradient(180deg, var(--photo-ground) 0%, transparent 6%, transparent 95%, var(--photo-ground) 100%);
+  }
+  .treatment-photo--landscape::after {
+    background:
+      linear-gradient(90deg, var(--photo-ground) 0%, transparent 7%, transparent 97%, var(--photo-ground) 100%),
+      linear-gradient(180deg, var(--photo-ground) 0%, transparent 3%, transparent 98%, var(--photo-ground) 100%);
+  }
+}
