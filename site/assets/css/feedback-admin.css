@@ -1,0 +1,17 @@
+@font-face{font-family:Atkinson;src:url('/assets/fonts/atkinson-hyperlegible-next.ttf') format('truetype');font-display:swap}
+*{box-sizing:border-box}body{margin:0;background:#f8f3e8;color:#203f52;font:1.125rem/1.6 Atkinson,Arial,sans-serif}
+header{display:flex;justify-content:space-between;gap:1rem;padding:1.5rem 5%;border-bottom:1px solid #bba375;flex-wrap:wrap}
+a{color:inherit;text-underline-offset:.2em}header a{font-size:1.4rem;font-weight:700}
+main{max-width:1200px;margin:auto;padding:2rem 1.25rem 4rem}h1{font:700 clamp(2rem,4vw,3rem)/1.2 Georgia,serif;margin:.25rem 0 1rem}
+h2{font:700 1.6rem/1.3 Georgia,serif}h3{font-size:1rem}.eyebrow{text-transform:uppercase;letter-spacing:.08em;font-size:.85rem;font-weight:bold}
+.heading{display:flex;justify-content:space-between;gap:1rem;align-items:center}.workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:2rem;align-items:start}
+.editor,.quote-card,.login{background:#fffdf8;padding:1.5rem;border:1px solid #bba375;border-radius:1rem}.login{max-width:32rem;margin:2rem auto}
+.quote-card{margin:0 0 1.5rem}.badge{font-size:.9rem;font-weight:bold}.notice{padding:1rem;border-left:4px solid #9d762f;background:#fffdf8}
+label{display:block;font-weight:bold;margin:1rem 0 .4rem}label span,.hint{font-size:1rem;font-weight:normal}
+input:not([type=hidden]),textarea{font:inherit;color:inherit;border:1px solid #637b88;border-radius:.4rem;padding:.65rem;width:100%;background:white}
+input[type=number]{max-width:8rem}.check{display:flex;align-items:start;gap:.6rem;font-size:1rem;font-weight:normal}
+.check input{width:1.25rem;height:1.25rem;flex-shrink:0;margin-top:.25rem}
+button{font:700 1.05rem/1.4 Atkinson,Arial,sans-serif;border:2px solid #203f52;background:#203f52;color:white;border-radius:2rem;padding:.7rem 1.3rem;margin:1rem .5rem .25rem 0;cursor:pointer;min-height:48px}
+.secondary{background:transparent;color:#203f52}blockquote{margin:1rem 0;font-size:1.25rem;overflow-wrap:anywhere;white-space:normal}blockquote footer{font-size:1rem}summary{cursor:pointer;padding:.8rem 0}
+:focus-visible{outline:3px solid #9d762f;outline-offset:4px}.skip{position:absolute;top:-100px}.skip:focus{top:0;background:white;padding:1rem}
+@media(max-width:760px){.workspace{grid-template-columns:1fr}.heading{align-items:start}header span{font-size:1rem}}
