@@ -21,6 +21,8 @@
 {"@context":"https://schema.org","@type":"LocalBusiness","name":"Stronger at Home Physiotherapy","url":"https://stronger-at-home.co.uk/","telephone":"+447843497871","email":"melanie@stronger-at-home.co.uk","areaServed":"Approximately 10 miles around Epsom, Surrey"}
   </script>
   <link rel="stylesheet" href="/assets/approved-photos/css/photo-fades.css">
+  <link rel="stylesheet" href="/assets/css/feedback-carousel.css">
+  <script src="/assets/js/feedback-carousel.js" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -158,6 +160,19 @@
     </section>
 
     <section id="share-your-experience" class="section section-soft" aria-labelledby="reviews-heading">
+      <div class="feedback-carousel" data-feedback-carousel role="region" aria-roledescription="carousel" aria-labelledby="feedback-heading" hidden>
+        <p class="eyebrow">Feedback shared directly</p>
+        <h2 id="feedback-heading">In their words</h2>
+        <p class="feedback-note">Selected feedback shared with permission.</p>
+        <blockquote aria-live="off"><p data-quote></p><footer data-attribution></footer></blockquote>
+        <div class="feedback-controls" data-controls>
+          <button type="button" data-previous aria-label="Previous feedback quote">Previous</button>
+          <span class="feedback-count" data-count></span>
+          <button type="button" data-next aria-label="Next feedback quote">Next</button>
+          <button type="button" data-toggle>Pause</button>
+        </div>
+        <p class="feedback-announcement" data-announcement role="status" aria-live="polite" aria-atomic="true"></p>
+      </div>
       <div class="section-heading narrow-heading">
         <h2 id="reviews-heading">Share your experience</h2>
         <p>You can leave an honest review of Stronger at Home Physiotherapy on Trustpilot or Google. Reviews are public, so please avoid sharing private medical information.</p>
