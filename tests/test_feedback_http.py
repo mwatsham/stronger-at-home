@@ -90,6 +90,24 @@ class FeedbackHTTPTests(unittest.TestCase):
         self.assertIn('Sign in',body)
         self.assertNotIn('Manage feedback',body)
 
+    def test_browser_form_policy_preserves_same_origin_login(self):
+        _, body, headers = self.get('/feedback/admin/')
+        # no-referrer makes browser navigation POSTs send Origin: null.
+        # Same-origin keeps the local form origin without leaking referrers off-site.
+        self.assertEqual(headers['Referrer-Policy'], 'same-origin')
+        status, body, _ = self.request('/feedback/admin/', {
+            'action':'login', 'csrf':self.token(body), 'username':'melanie',
+            'password':self.password}, headers={'Origin':self.origin})
+        self.assertEqual(status, 200)
+        self.assertIn('Manage feedback', body)
+
+    def test_null_origin_still_rejected_with_valid_token(self):
+        _, body, _ = self.get('/feedback/admin/')
+        status, _, _ = self.request('/feedback/admin/', {
+            'action':'login', 'csrf':self.token(body), 'username':'melanie',
+            'password':self.password}, headers={'Origin':'null'})
+        self.assertEqual(status, 403)
+
     def test_rejected_saves_preserve_unsaved_wording(self):
         self.login()
         for revision, order, expected in [(0, -1, 422), (99, 0, 409)]:

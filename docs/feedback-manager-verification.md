@@ -27,4 +27,8 @@ Melanie-only private feedback administration and published-quote carousel. No pu
 
 ## Before any hosted rollout
 
+### Local browser login correction
+
+The in-app browser exposed a header-policy mismatch: a valid session cookie and CSRF token accompanied an `Origin: null` form POST under `Referrer-Policy: no-referrer`. The origin check correctly rejected it, but the generic expired-form message was misleading. Changed the response policy to `same-origin`, retaining strict Origin and CSRF checks and suppressing off-site referrers. Added same-origin login and rejected-null-origin regression tests; the new policy test failed before the fix and passed afterwards. All 231 Python tests pass. Browser form submission now reaches password authentication rather than the expired-form rejection. Temporary diagnostics were removed when rebuilding the local preview. Existing local credentials, hosted sites and hosting settings remain unchanged.
+
 Provision separate private staging/production configurations and credentials through a separately approved operation, test staging behind its existing password protection, and obtain release approval. Back up the private quote store independently of code releases. Do not publish demonstration quotes.

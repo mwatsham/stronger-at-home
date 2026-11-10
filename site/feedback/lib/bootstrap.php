@@ -36,6 +36,7 @@ function feedbackHeaders(): void
     header('Cache-Control: no-store, max-age=0');
     header('X-Robots-Tag: noindex, nofollow');
     header('X-Content-Type-Options: nosniff');
-    header('Referrer-Policy: no-referrer');
+    // Keep Origin on same-origin form POSTs; disclose no referrer off-site.
+    header('Referrer-Policy: same-origin');
     header("Content-Security-Policy: default-src 'self'; style-src 'self'; script-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'");
 }

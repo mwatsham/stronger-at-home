@@ -95,7 +95,7 @@ APPROVED_PUBLIC_SOURCE_SHA256 = {
     "site/feedback/feed.php": "8879e7b5687570b37485313c790f6fd9377d70a850b3c37c3e59342d73b7c15a",
     "site/feedback/lib/FeedbackStore.php": "2662065fad672044ff309f21f1a47a86249a4e93763cc457b91c15a446773a9a",
     "site/feedback/lib/FeedbackAuth.php": "acb6490af7a203a354cd05171989894397aac422e73383411f6cd6c57809e9c7",
-    "site/feedback/lib/bootstrap.php": "f19d403117178c08a589a3120cf3316b5cf4079cf2248f04bf2daf379d7a359f",
+    "site/feedback/lib/bootstrap.php": "95938ba163afc71a2b2ac4e324b8411bf161e7b0f7d574e1551367a35929bb13",
     "site/privacy/index.html": "745ed7d8441086df7ac2c970710ec540ea672f4289bf6bc0e7bb33c2f1386447",
     "site/robots-staging.txt": "331ea9090db0c9f6f597bd9840fd5b171830f6e0b3ba1cb24dfa91f0c95aedc1",
     "site/robots.txt": "6806d9c899e6b514b73f45b56f6ff0eb6193e996027444ecebc88d4c31bbf294",
