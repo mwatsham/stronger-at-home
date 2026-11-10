@@ -40,7 +40,7 @@ if (typeof module !== 'undefined') module.exports = { FeedbackCarousel };
 if (typeof document !== 'undefined') {
   const section = document.querySelector('[data-feedback-carousel]');
   if (section) {
-    fetch('/feedback/feed.php', { credentials: 'omit', cache: 'no-store' })
+    fetch('/feedback/feed.php', { credentials: 'same-origin', cache: 'no-store' })
       .then(response => { if (!response.ok) throw new Error('Unavailable'); return response.json(); })
       .then(data => {
         const quotes = data.quotes;

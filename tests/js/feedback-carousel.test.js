@@ -4,6 +4,20 @@ const fs = require('node:fs');
 const file = require('node:path').join(__dirname, '../../site/assets/js/feedback-carousel.js');
 test('carousel controller exists', () => assert.ok(fs.existsSync(file)));
 if (fs.existsSync(file)) {
+  test('feed request retains same-origin authentication without caching quotes', () => {
+    const vm = require('node:vm');
+    let request;
+    vm.runInNewContext(fs.readFileSync(file, 'utf8'), {
+      document: { querySelector: () => ({}) },
+      fetch: (url, options) => {
+        request = { url, options };
+        return Promise.resolve({ ok: true, json: () => ({ quotes: [] }) });
+      }
+    });
+    assert.equal(request.url, '/feedback/feed.php');
+    assert.equal(request.options.credentials, 'same-origin');
+    assert.equal(request.options.cache, 'no-store');
+  });
   const { FeedbackCarousel } = require(file);
   test('native browser timers are not invoked with the controller as receiver', () => {
     const vm = require('node:vm');
