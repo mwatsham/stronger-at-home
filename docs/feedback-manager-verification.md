@@ -23,7 +23,7 @@ Melanie-only private feedback administration and published-quote carousel. No pu
 - Manager: http://127.0.0.1:58640/feedback/admin/
 - Username: `melanie`; password is a random local-only value in an owner-only temporary file, not in this repository.
 - Sample quotes are explicitly labelled demonstrations, not patient feedback. Enquiry endpoints are disabled in the local runner.
-- Automated HTTP tests exercise the signed-in workflow; interactive signed-in visual review remains for the user, who has been given the local password-file location. Reduced-motion behavior has automated coverage; browser OS reduced-motion preference was not changed.
+- Automated HTTP tests exercise the signed-in workflow. Following the browser-policy correction and local password rotation, the user confirmed that login works and the feedback manager looks good, and approved pushing this branch and opening a pull request. Reduced-motion behavior has automated coverage; browser OS reduced-motion preference was not changed.
 
 ## Before any hosted rollout
 
