@@ -89,7 +89,7 @@ APPROVED_PUBLIC_SOURCE_SHA256 = {
     "site/how-i-can-help/index.html": "a6890ee04dd716764a429957e911c325d3cd1e50d45765493897cb6c5263ba18",
     "site/index.html": "7f6d611b827dbbcea4a179471383f99300b4450a5bb9608c4dd2d93e74391479",
     "site/assets/css/feedback-admin.css": "c4bc642410d8558294089e50f66af60132c079fadfb4abceb3844fdfb852b6da",
-    "site/assets/css/feedback-carousel.css": "6a40b5383f9ea98d1708754ec0f1199cf049b63c64fb757a2a72cce2dc5e8b9d",
+    "site/assets/css/feedback-carousel.css": "5bf6810ab9fbae2af5b15a31ab009c03d73ef13b104e067920fe910ff83bbd08",
     "site/assets/js/feedback-carousel.js": "88a1afd13c5284e696d6cc0b060dba5170f37b49e6e57d42e68c4c0ecc98fdae",
     "site/feedback/admin/index.php": "02c36b27f941b1593ca9222069a89e149827e773a11f63f766759e91c024896d",
     "site/feedback/feed.php": "8879e7b5687570b37485313c790f6fd9377d70a850b3c37c3e59342d73b7c15a",
