@@ -13,7 +13,7 @@ Header always set Content-Security-Policy "default-src 'self'; img-src 'self'; s
 Header always set X-Robots-Tag "noindex, nofollow"
 SetEnv STRONGER_HOME_FEEDBACK_CONFIG "/home/v0398ees6dry/private/stronger-at-home/staging/feedback/feedback.php"
 SetEnv STRONGER_HOME_CONFIG "/home/v0398ees6dry/private/stronger-at-home/staging/site.php"
-SetEnv STRONGER_HOME_AUTOLOAD "/home/v0398ees6dry/stronger-at-home-releases/staging/9c4774517569cef50f289aef17f8b16eaeeaea2d/vendor/autoload.php"
+SetEnv STRONGER_HOME_AUTOLOAD "/home/v0398ees6dry/stronger-at-home-releases/staging/2b26e53684826a12b61455e52d5a40efcb3ac3d5/vendor/autoload.php"
 # Staging privacy: credentials remain outside every release.
 ErrorDocument 401 "Staging authentication required."
 ErrorDocument 403 "Use the HTTPS staging address."
