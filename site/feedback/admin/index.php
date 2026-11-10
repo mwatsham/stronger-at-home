@@ -11,6 +11,7 @@ $field=static function(string $key,string $default=''):string {
 };
 $message='';
 $editing=null;
+$submitted=null;
 try {
     $config=feedbackConfig();
     $store=new FeedbackStore($config['directory']);
@@ -31,10 +32,13 @@ try {
                 } else {
                     $auth->requireAuthenticated();
                     if ($action==='logout') { $auth->logout(); header('Location: /feedback/admin/',true,303); exit; }
+                    if ($action==='save') {
+                        $submitted=['id'=>$field('id'),'text'=>$field('text'),'attribution'=>$field('attribution'),'order'=>$field('order'),'revision'=>$field('revision')];
+                    }
                     $revision=filter_var($field('revision'),FILTER_VALIDATE_INT,['options'=>['min_range'=>0]]);
                     if ($revision===false) throw new InvalidArgumentException('Invalid revision. Reload the page.');
                     $data=$store->read(); $records=$data['records'];
-                    if ($data['revision']!==$revision) throw new DomainException('Someone changed the quotes. Reload before saving.');
+                    if ($data['revision']!==$revision) throw new DomainException('Someone changed the quotes. Copy your unsaved wording, then reload the quote and reconcile the changes before saving.');
                     $id=$field('id'); $index=null;
                     foreach($records as $i=>$record) if ($record['id']===$id) $index=$i;
                     if ($id!=='' && $index===null) throw new InvalidArgumentException('Quote not found.');
@@ -67,6 +71,7 @@ try {
         $data=$store->read();
         $edit=$_GET['edit'] ?? '';
         foreach($data['records'] as $r) if (is_string($edit) && $r['id']===$edit) $editing=$r;
+        if ($submitted!==null) $editing=$submitted;
         usort($data['records'],fn($a,$b)=>[$a['order'],$a['id']]<=>[$b['order'],$b['id']]);
     }
     if ($message==='') $message=is_string($_SESSION['feedback_notice'] ?? null) ? $_SESSION['feedback_notice'] : '';
@@ -112,14 +117,14 @@ try {
     <h2 id="editor-heading"><?= $editing ? 'Edit quote' : 'Add a quote' ?></h2>
     <form method="post" action="/feedback/admin/">
       <input type="hidden" name="csrf" value="<?= $escape($csrf) ?>"><input type="hidden" name="action" value="save">
-      <input type="hidden" name="revision" value="<?= $data['revision'] ?>"><input type="hidden" name="id" value="<?= $escape($editing['id'] ?? '') ?>">
+      <input type="hidden" name="revision" value="<?= $escape((string)($editing['revision'] ?? $data['revision'])) ?>"><input type="hidden" name="id" value="<?= $escape($editing['id'] ?? '') ?>">
       <label for="quote">Quote <span>(up to 600 characters)</span></label>
       <textarea id="quote" name="text" required maxlength="600" rows="6"><?= $escape($editing['text'] ?? '') ?></textarea>
       <label for="attribution">Public attribution <span>(up to 100 characters)</span></label>
       <input id="attribution" name="attribution" required maxlength="100" value="<?= $escape($editing['attribution'] ?? '') ?>" aria-describedby="attribution-help">
       <p class="hint" id="attribution-help">For example, an agreed first name or “Patient’s family member”.</p>
       <label for="order">Display order <span>(lower numbers appear first)</span></label>
-      <input id="order" type="number" name="order" min="0" max="999" required value="<?= $editing['order'] ?? 10 ?>">
+      <input id="order" type="number" name="order" min="0" max="999" required value="<?= $escape((string)($editing['order'] ?? 10)) ?>">
       <button>Save draft</button> <a href="/feedback/admin/">Clear editor</a>
     </form>
   </section>

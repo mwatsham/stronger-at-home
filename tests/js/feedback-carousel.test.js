@@ -5,6 +5,17 @@ const file = require('node:path').join(__dirname, '../../site/assets/js/feedback
 test('carousel controller exists', () => assert.ok(fs.existsSync(file)));
 if (fs.existsSync(file)) {
   const { FeedbackCarousel } = require(file);
+  test('native browser timers are not invoked with the controller as receiver', () => {
+    const vm = require('node:vm');
+    const sandbox = { module: { exports: {} }, setTimeout: function () {
+      assert.ok(!(this instanceof sandbox.module.exports.FeedbackCarousel)); return 1;
+    }, clearTimeout: function () {
+      assert.ok(!(this instanceof sandbox.module.exports.FeedbackCarousel));
+    } };
+    vm.runInNewContext(fs.readFileSync(file, 'utf8'), sandbox);
+    const c = new sandbox.module.exports.FeedbackCarousel(3);
+    c.pause();
+  });
   function fixture(count = 3, reduced = false) {
     let next = null, delay = null;
     const states = [];

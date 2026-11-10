@@ -90,6 +90,17 @@ class FeedbackHTTPTests(unittest.TestCase):
         self.assertIn('Sign in',body)
         self.assertNotIn('Manage feedback',body)
 
+    def test_rejected_saves_preserve_unsaved_wording(self):
+        self.login()
+        for revision, order, expected in [(0, -1, 422), (99, 0, 409)]:
+            status, body, _ = self.post(action='save', revision=revision, id='',
+                text='Unsaved <wording>', attribution='Agreed attribution', order=order)
+            self.assertEqual(status, expected)
+            self.assertIn('Unsaved &lt;wording&gt;</textarea>', body)
+            self.assertIn('value="Agreed attribution"', body)
+            self.assertIn(f'name="revision" value="{revision}"', body)
+            self.assertEqual(self.state()['records'], [])
+
     def test_draft_publish_edit_unpublish_delete_and_conflict(self):
         self.login()
         status,_,_=self.post(action='save',revision=0,text='<script>unsafe</script> Helpful',attribution='Patient',order=2)

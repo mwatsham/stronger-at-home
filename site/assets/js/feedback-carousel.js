@@ -1,7 +1,7 @@
 'use strict';
 
 class FeedbackCarousel {
-  constructor(count, { reduced = false, render = () => {}, schedule = setTimeout, cancel = clearTimeout } = {}) {
+  constructor(count, { reduced = false, render = () => {}, schedule = (fn, ms) => setTimeout(fn, ms), cancel = id => clearTimeout(id) } = {}) {
     this.count = count;
     this.index = 0;
     this.stopped = false;

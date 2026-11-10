@@ -90,6 +90,7 @@ ENVIRONMENTS: Mapping[str, Mapping[str, str]] = MappingProxyType(
 
 CPANEL_CONFIGURATION = "---\ndeployment:\n  tasks:\n    - /bin/bash deploy.sh\n"
 ENVIRONMENT_MARKERS = (
+    "STRONGER_HOME_FEEDBACK_CONFIG",
     "STRONGER_HOME_CONFIG",
     "STRONGER_HOME_AUTOLOAD",
 )
@@ -218,12 +219,13 @@ def extract_approved_archive(archive: Path, destination: Path) -> None:
 
 
 def environment_bindings(environment: str, source_sha: str) -> str:
-    """Return the two reviewed Apache bindings for one immutable release."""
+    """Return reviewed Apache bindings; mutable feedback stays outside releases."""
 
     settings = _environment(environment)
     _validate_source_sha(source_sha)
     autoload_path = f"{settings['releaseRoot']}/{source_sha}/vendor/autoload.php"
     return (
+        f'SetEnv STRONGER_HOME_FEEDBACK_CONFIG "{Path(settings["configPath"]).parent}/feedback/feedback.php"\n'
         f'SetEnv STRONGER_HOME_CONFIG "{settings["configPath"]}"\n'
         f'SetEnv STRONGER_HOME_AUTOLOAD "{autoload_path}"\n'
     )
