@@ -1,4 +1,4 @@
-/* Exploratory layout only. Source: main 7dcae1e, 7 November 2026. */
+/* Seamless treatment imagery shared by the approved staging compositions. */
 .design-preview {
   display: flex;
   flex-wrap: wrap;
@@ -52,6 +52,9 @@
 }
 .services-introduction { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); margin-bottom: 2rem; }
 .services-introduction .section-heading { margin-bottom: 0; }
+.services-introduction--balance { grid-template-columns: minmax(0, 1.25fr) minmax(0, .75fr); }
+.services-introduction--balance .section-heading p { max-width: 48ch; }
+.treatment-photo--balance { max-width: 22rem; }
 .treatment-photo--landscape { max-width: 38rem; }
 .treatment-photo--landscape::after {
   background:
@@ -65,6 +68,7 @@
   .treatment-section, .services-introduction { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
   .treatment-photo { max-width: 27rem; justify-self: center; }
   .treatment-photo--landscape { max-width: 38rem; }
+  .treatment-photo--balance { max-width: 22rem; }
   .treatment-photo::after {
     background:
       linear-gradient(90deg, var(--photo-ground) 0%, transparent 8%, transparent 94%, var(--photo-ground) 100%),
