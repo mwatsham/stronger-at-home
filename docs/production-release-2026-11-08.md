@@ -2,6 +2,8 @@
 
 The owner accepted the production website following publication of the approved treatment photographs, navy-tunic portrait and seamless photo fades.
 
+**Status: Complete.** Production activation, owner acceptance, main-to-develop integration, develop checks and staging artifact preparation are complete. No further live deployment is required for this release.
+
 ## Release provenance
 
 - Production source: `bf51c234150ec2f1f3354854a08e938b768400eb`, merged through PR #33.
@@ -28,4 +30,10 @@ HTTP redirects to HTTPS. Production `/design-preview/` returns 404 and does not 
 
 ## Repository follow-up
 
-The owner requested recording acceptance and syncing `develop` with `main`, keeping both live sites unchanged. This record accompanies the main-to-develop integration. Automatic staging artifact preparation is not a hosting activation; no cPanel checkout update or deployment is authorised by this documentation-only follow-up.
+PR #34 merged the accepted production changes and release record into `develop` at `f7e2c5db0462e475e12999bf1b60ca46b260b699`. Verified that `develop` includes `main`; its only additional file relative to `main` at that point was this release record.
+
+- [Develop CI run 42509320647](https://github.com/mwatsham/stronger-at-home/actions/runs/42509320647): completed successfully for `f7e2c5db0462e475e12999bf1b60ca46b260b699`.
+- [Staging build run 42509320661](https://github.com/mwatsham/stronger-at-home/actions/runs/42509320661): completed successfully for the same revision.
+- Hosting readback confirmed staging remained deployment `64` / `bc1bc419d0723e753489ea1b25cf5f9d4c85c9cf` and production remained deployment `65` / `e8b14333d97a3f28e475c4580b1b6c168ce1cf7a`, with no pending tasks.
+
+The owner requested marking the release complete with both live sites unchanged. The successful staging build prepared an artifact only; it was not activated. No cPanel checkout update, hosting deployment, PHP change or enquiry submission was performed during this closeout.
