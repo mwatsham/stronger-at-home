@@ -68,8 +68,7 @@ $escape = static fn(string $value): string => htmlspecialchars($value, ENT_QUOTE
   <link rel="stylesheet" href="/assets/css/brand-tokens.css">
   <link rel="stylesheet" href="/assets/css/site.css?v=accessibility-20261107">
   <script src="/assets/js/site.js?v=accessibility-20261107" defer></script>
-  <script src="/assets/js/analytics.js?v=prepared-20261126" defer></script>
-</head>
+  </head>
 <body>
   <a class="skip-link" href="#main-content">Skip to main content</a>
   <header class="site-header">
