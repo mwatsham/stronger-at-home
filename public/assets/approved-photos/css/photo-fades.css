@@ -1,4 +1,4 @@
-/* Exploratory layout only. Source: main 7dcae1e, 7 November 2026. */
+/* Seamless treatment imagery shared by the approved staging compositions. */
 .design-preview {
   display: flex;
   flex-wrap: wrap;
@@ -52,6 +52,9 @@
 }
 .services-introduction { grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); margin-bottom: 2rem; }
 .services-introduction .section-heading { margin-bottom: 0; }
+.services-introduction--balance { grid-template-columns: minmax(0, 1.25fr) minmax(0, .75fr); }
+.services-introduction--balance .section-heading p { max-width: 48ch; }
+.treatment-photo--balance { max-width: 22rem; }
 .treatment-photo--landscape { max-width: 38rem; }
 .treatment-photo--landscape::after {
   background:
@@ -61,10 +64,50 @@
 .respiratory-treatment .treatment-copy p { max-width: 60ch; }
 .respiratory-treatment { scroll-margin-top: 1.5rem; }
 
+.photo-carousel { width: 100%; max-width: 32rem; justify-self: end; }
+.photo-carousel-frame { aspect-ratio: 4 / 5; padding: 0; }
+.photo-carousel-frame img { width: 100%; height: 100%; object-fit: contain; }
+.photo-carousel-frame img[hidden], .photo-carousel-controls[hidden] { display: none; }
+.photo-carousel-ready .photo-carousel-frame img {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+.photo-carousel-ready .photo-carousel-frame img.is-active { opacity: 1; }
+.photo-carousel-frame::after { z-index: 1; }
+.photo-carousel-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .4rem;
+  margin-top: .75rem;
+}
+.photo-carousel-controls button {
+  min-height: 44px;
+  min-width: 44px;
+  padding: .5rem .8rem;
+  border: 1px solid currentColor;
+  border-radius: .4rem;
+  color: var(--brand-colour-text-primary, #203e51);
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+.photo-carousel-controls button:focus-visible { outline: 3px solid currentColor; outline-offset: 3px; }
+.photo-carousel-controls button:hover { background: var(--brand-colour-background-soft); }
+.photo-carousel-controls [data-photo-count] { padding-inline: .4rem; font-size: .9rem; }
+@media (prefers-reduced-motion: reduce) {
+  .photo-carousel-ready .photo-carousel-frame img { transition: none; }
+}
+
 @media (max-width: 48rem) {
+  .photo-carousel { max-width: 27rem; justify-self: center; }
   .treatment-section, .services-introduction { grid-template-columns: minmax(0, 1fr); gap: 1.5rem; }
   .treatment-photo { max-width: 27rem; justify-self: center; }
   .treatment-photo--landscape { max-width: 38rem; }
+  .treatment-photo--balance { max-width: 22rem; }
   .treatment-photo::after {
     background:
       linear-gradient(90deg, var(--photo-ground) 0%, transparent 8%, transparent 94%, var(--photo-ground) 100%),
