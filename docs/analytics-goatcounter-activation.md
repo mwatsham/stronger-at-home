@@ -1,4 +1,36 @@
-# GoatCounter — prepared, not activated
+# GoatCounter — minimal analytics activation
+
+## Current authority and release requirements (26 November 2026)
+
+The owner approved updating both sites and enabling tracking, then explicitly approved the minimal account settings and privacy-notice update. This supersedes the preparation-only limits recorded below. Production activation is pending the checked release; do not infer live status from this document.
+
+- Dashboard remains private, public visitor counts disabled and embed access blank.
+- Account settings saved: retention **365 days**; sessions, browser, screen, country, region, language and individual-pageview reporting disabled; referrers retained.
+- Enable only public production pageviews and accepted-enquiry totals. Staging packages omit the analytics adapter entirely. The adapter also rejects every non-production hostname, private route and preview route.
+- Publish the optional-statistics notice and accessible on/off controls together. Honour Do Not Track, Global Privacy Control and a saved opt-out. The only new browser storage is a preference written when someone uses those controls, never an attribution or visitor identifier. Unavailable storage fails closed.
+- Narrow CSP additions allow only the pinned provider script and this account's count endpoint, including its image fallback. No general third-party or inline permission is added.
+- Keep active enquiries, feedback quotes, staging password protection and the current PHP version unchanged. Do not submit a test enquiry.
+
+Provider bytes were rechecked against the audited SHA-384 pin, with cross-origin integrity support. Offline tests cover both beacon and image fallback, sanitized source labels, preference controls, privacy signals, server-success conversions, and final production/staging packaging. A production pageview/dashboard check follows deployment; it is not proof of enquiry inbox delivery. The historical preparation evidence below is retained, not a statement of current account settings.
+
+### Release decisions
+
+1. Use aggregate statistics for improving this website, with a clear opt-out, not advertising or cross-site profiling. The privacy notice describes provider processing and the site's legitimate-interest basis; this is not a certification of legal compliance.
+2. Exclude staging by removing its adapter, in addition to the hostname guard. This is stronger than relying on the runtime guard alone.
+3. Keep source attribution page-level: an accepted-enquiry count does not identify the visitor or establish which earlier leaflet scan led to it.
+4. Preserve unrelated pending external-link edits outside this release. Update only integrity hashes for reviewed task files.
+
+## Historical preparation record
+
+### Activation review and verification ledger
+
+The fresh, read-only final review found two important packaging safeguards. Both were reproduced with failing tests, then fixed: staging now excludes the adapter asset, references, controls and provider permissions in both enquiry and informational modes; production CSP allows the exact `/count.js` and `/count` paths. Other staging security directives remain byte-for-byte unchanged. The production informational fallback is deliberately not altered by the imagery overlay.
+
+The local privacy controls were checked in the browser: turning analytics off updates the visible status and the choice persists after reload. Offline tests use the actual pinned provider script, with both beacon and rejected-beacon image fallback; no real enquiry was submitted.
+
+Minor deferred: the existing notice's overall last-updated date and historical informational-mode date replacement predate this activation. This does not change the new analytics text or its controls; align those dates in a subsequent copy-only update.
+
+Review boundaries: live receipt and saved account settings require separate operational evidence; no private feedback record or inbox is inspected by the code review; formal legal compliance is not certified; unrelated external-link edits remain excluded. No other issues were deferred.
 
 As of 26 November 2026, the owner has approved local preparation only. Neither live site has been changed. The browser entry passes false, so the local adapter neither loads GoatCounter nor sends counts. Existing CSP also blocks GoatCounter. No account API key or patient information belongs in the code.
 

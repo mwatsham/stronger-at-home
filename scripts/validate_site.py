@@ -28,6 +28,7 @@ APPROVED_EXTERNAL_RESOURCES = {
     ("a", "href", "https://g.page/r/CYqDnIzAeBQuEBM/review"),
     ("script", "src", "https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"),
     ("a", "href", "https://uk.trustpilot.com/review/stronger-at-home.co.uk"),
+    ("a", "href", "https://www.goatcounter.com/help/privacy"),
     ("a", "href", "https://legal.trustpilot.com/for-reviewers/end-user-privacy-terms"),
 }
 
@@ -62,7 +63,7 @@ EXPECTED_LOGO_SHA256 = "1802be2b0ac8bfcaf60b83355ee9e3f12d2ba483f1efca39abe5fd79
 APPROVED_PUBLIC_SOURCE_SHA256 = {
     "site/assets/js/photo-carousel.js": "51fb3bfd033be27b24ea44243bc775552717823222e2b62750843f712578a2c9",
     "site/googled25927956a9f99cc.html": "727e794a60581a49b99dec5151b336be565cf40065a5e9013226dfb3ba81ad3b",
-    "site/.htaccess": "9b3093a1981bc7a9bba174dc14d63fae794c6eb8dbafef823815f269f60b1748",
+    "site/.htaccess": "9bcc4bc2b9fda6343fc564ea67a33f98f6ab68142e6529c76c761e29ac8b9dff",
     "site/404.html": "9747c16fca4b4c18a273de6b3cb74dfc08a180f3fe02c8b99cbec84d3727d570",
     "site/about/index.html": "50052d1debf52fe7e0ad25a0cca911672f3d72738fe7e776780131e9f91f3778",
     "site/accessibility/index.html": "65db2d43204e64939c62d6ce07399daaaddff3c72279801cfce4a29e433171f7",
@@ -87,10 +88,10 @@ APPROVED_PUBLIC_SOURCE_SHA256 = {
     "site/assets/images/stronger-at-home-favicon.png": "8bd1993f6ce86320dc8a7753a05aee047f11a23cffbd97e0e5149bb713640528",
     "site/assets/images/stronger-at-home-logo.png": EXPECTED_LOGO_SHA256,
     "site/assets/js/site.js": "b0dbfaed9fdceb9f57236e67c124a43bfdf82d9eac56fc3d54e24824915cee22",
-    "site/assets/js/analytics.js": "8540550dbe5d860c4f3967dc273a3cf4c8a9380ebc30b0ce600cf7e7e6251ab5",
+    "site/assets/js/analytics.js": "9c01f45714b0b701ed64d1a4717f876f7891e7b5ddd3dbbc7a5bad239eef7d6e",
     "site/contact/index.php": "e9a5fcb388ea045b02e4a828e4999b8c6c8cdb510aad568401a06315c527c97a",
     "site/how-i-can-help/index.html": "2c220b18c87006f35b2e1a237dcc26ef463d7afdbeac61663e19a60ffa808fc7",
-    "site/index.html": "46f5ef460bb25bdd367c120bd4757696d21a516e80d3acd80536f7bef916d14e",
+    "site/index.html": "71b26921eff4c7bb40bde835ed9333614c4206acd1b9c47b03c17319033fbf69",
     "site/assets/css/feedback-admin.css": "c4bc642410d8558294089e50f66af60132c079fadfb4abceb3844fdfb852b6da",
     "site/assets/css/feedback-carousel.css": "5bf6810ab9fbae2af5b15a31ab009c03d73ef13b104e067920fe910ff83bbd08",
     "site/assets/js/feedback-carousel.js": "88a1afd13c5284e696d6cc0b060dba5170f37b49e6e57d42e68c4c0ecc98fdae",
@@ -99,7 +100,7 @@ APPROVED_PUBLIC_SOURCE_SHA256 = {
     "site/feedback/lib/FeedbackStore.php": "2662065fad672044ff309f21f1a47a86249a4e93763cc457b91c15a446773a9a",
     "site/feedback/lib/FeedbackAuth.php": "acb6490af7a203a354cd05171989894397aac422e73383411f6cd6c57809e9c7",
     "site/feedback/lib/bootstrap.php": "95938ba163afc71a2b2ac4e324b8411bf161e7b0f7d574e1551367a35929bb13",
-    "site/privacy/index.html": "1bc7bf1fd7ebc76bcbf34b91f5ebae27aeca4332cbcc13a46c3e9f455753c757",
+    "site/privacy/index.html": "822e86982c309c987360187ab9711a7a229005339ef4a821f2be0c1ee733050d",
     "site/robots-staging.txt": "331ea9090db0c9f6f597bd9840fd5b171830f6e0b3ba1cb24dfa91f0c95aedc1",
     "site/robots.txt": "6806d9c899e6b514b73f45b56f6ff0eb6193e996027444ecebc88d4c31bbf294",
     "site/sitemap.xml": "e343bdfdc81a434ba772c17174e8f36fe79fdab8e3b52d03b63e3d7976469101",
@@ -168,7 +169,7 @@ EXPECTED_HTACCESS = (
     'Header always set X-Content-Type-Options "nosniff"\n'
     'Header always set Referrer-Policy "strict-origin-when-cross-origin"\n'
     'Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"\n'
-    'Header always set Content-Security-Policy "default-src \'self\'; img-src \'self\'; style-src \'self\'; script-src \'self\' https://widget.trustpilot.com; frame-src https://widget.trustpilot.com; form-action \'self\'; base-uri \'self\'; frame-ancestors \'none\'"\n'
+    'Header always set Content-Security-Policy "default-src \'self\'; img-src \'self\' https://stronger-at-home.goatcounter.com/count; style-src \'self\'; script-src \'self\' https://widget.trustpilot.com https://gc.zgo.at/count.js; connect-src \'self\' https://stronger-at-home.goatcounter.com/count; frame-src https://widget.trustpilot.com; form-action \'self\'; base-uri \'self\'; frame-ancestors \'none\'"\n'
 )
 
 

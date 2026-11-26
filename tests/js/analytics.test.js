@@ -22,7 +22,10 @@ function browser(url = 'https://stronger-at-home.co.uk/contact/', kind = '') {
     createElement(tag) { assert.equal(tag, 'script'); return {}; },
     head: {appendChild(script) { scripts.push(script); }}
   };
-  const window = {location, document, screen: {width: 1200}};
+  const storage = new Map();
+  const window = {location, document, screen: {width: 1200}, navigator: {}, localStorage: {
+    getItem(key) {return storage.get(key) || null;}, setItem(key,value) {storage.set(key,value);}
+  }};
   window.self = window.top = window;
   const context = vm.createContext({window, document, location, parent: {location},
     navigator: {sendBeacon(url) {requests.push(url); return true;}},
@@ -32,9 +35,41 @@ function browser(url = 'https://stronger-at-home.co.uk/contact/', kind = '') {
     load() {vm.runInContext(provider, context); scripts[0].onload();}};
 }
 test('analytics adapter is implemented', () => assert.equal(exists, true));
-test('checked-in browser entry makes no requests even on production', () => {
+test('approved browser entry loads provider only on production', () => {
   const b = browser(); vm.runInContext(fs.readFileSync(file, 'utf8'), b.context);
-  assert.equal(b.scripts.length, 0); assert.equal(b.requests.length, 0);
+  assert.equal(b.scripts.length, 1); b.load(); assert.equal(b.requests.length, 1);
+});
+test('saved opt-out, browser privacy signals and unavailable storage prevent collection', () => {
+  for (const mode of ['saved','dnt','gpc','blocked']) {
+    const b = browser();
+    if (mode === 'saved') b.window.localStorage.setItem('sah-analytics-opt-out','1');
+    if (mode === 'dnt') b.window.navigator.doNotTrack = '1';
+    if (mode === 'gpc') b.window.navigator.globalPrivacyControl = true;
+    if (mode === 'blocked') b.window.localStorage.getItem = () => {throw Error('blocked');};
+    api.startAnalytics(b.window,b.document,true);
+    assert.equal(b.scripts.length,0,mode);
+  }
+});
+test('opting out while provider loads prevents pending counts', () => {
+  const b = browser(); api.startAnalytics(b.window,b.document,true);
+  b.window.localStorage.setItem('sah-analytics-opt-out','1'); b.load();
+  assert.equal(b.requests.length,0);
+});
+test('privacy controls save a choice and report storage failures without enabling tracking', () => {
+  const b = browser(), handlers = {};
+  const off = {addEventListener(type, fn) {handlers.off = fn;}}, on = {addEventListener(type, fn) {handlers.on = fn;}};
+  const status = {textContent:''};
+  b.document.querySelector = s => ({'[data-analytics-off]':off,'[data-analytics-on]':on,'[data-analytics-status]':status}[s] || null);
+  api.setupPrivacyControls(b.window,b.document);
+  handlers.off();
+  assert.equal(b.window.localStorage.getItem('sah-analytics-opt-out'),'1');
+  assert.match(status.textContent,/off/i);
+  handlers.on();
+  assert.equal(b.window.localStorage.getItem('sah-analytics-opt-out'),'0');
+  assert.match(status.textContent,/next page/i);
+  b.window.localStorage.setItem = () => {throw Error('blocked');};
+  handlers.off(); assert.match(status.textContent,/could not save/i);
+  api.startAnalytics(b.window,b.document,true); assert.equal(b.scripts.length,0);
 });
 test('disabled, local, staging, lookalike, HTTP, private and framed pages never load provider', () => {
   for (const url of ['http://stronger-at-home.co.uk/', 'http://localhost:58642/',
@@ -96,6 +131,25 @@ test('provider script is integrity pinned to the audited fixture and sends no re
   assert.equal(b.scripts[0].integrity, 'sha384-'+crypto.createHash('sha384').update(provider).digest('base64'));
   assert.equal(b.scripts[0].crossOrigin,'anonymous');
   assert.equal(b.scripts[0].referrerPolicy,'no-referrer');
+});
+test('rejected beacon fallback sends the same sanitised payload in a hidden image', () => {
+  const b = browser('https://stronger-at-home.co.uk/contact/?email=PRIVATE#PRIVATE');
+  api.startAnalytics(b.window,b.document,true);
+  const images = [];
+  b.context.navigator.sendBeacon = () => false;
+  b.document.createElement = tag => {
+    assert.equal(tag,'img');
+    return {style:{},setAttribute(){},addEventListener(){}};
+  };
+  b.document.body.appendChild = img => images.push(img);
+  b.load();
+  assert.equal(images.length,1);
+  const url = new URL(images[0].src);
+  assert.equal(url.origin,'https://stronger-at-home.goatcounter.com');
+  assert.deepEqual([...url.searchParams.keys()].sort(),['p','r','rnd','t']);
+  assert.equal(url.searchParams.get('p'),'/contact/');
+  assert.equal(url.searchParams.get('r'),'https://www.google.com');
+  assert.ok(!images[0].src.includes('PRIVATE'));
 });
 test('only server success counts once even with repeated init and load callbacks', () => {
   const b = browser(undefined,'success');
