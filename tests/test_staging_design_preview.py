@@ -1,5 +1,6 @@
 from pathlib import Path
 import hashlib
+import re
 from html.parser import HTMLParser
 from tempfile import TemporaryDirectory
 import unittest
@@ -13,6 +14,18 @@ from scripts.staging_design_preview import include_staging_preview
 ROOT = Path(__file__).resolve().parents[1]
 SHA = '0123456789abcdef0123456789abcdef01234567'
 STAMP = '2026-11-08T12:00:00Z'
+
+
+def without_analytics(content):
+    text = content.decode()
+    text = re.sub(r'<script src="/assets/js/analytics\.js[^\"]*" defer></script>\s*', '', text)
+    return re.sub(r'\s+', ' ', text)
+
+
+def without_analytics_permissions(content):
+    return content.replace(b' https://gc.zgo.at/count.js', b'').replace(
+        b" connect-src 'self' https://stronger-at-home.goatcounter.com/count;", b'').replace(
+        b' https://stronger-at-home.goatcounter.com/count', b'')
 
 
 class StagingDesignPreviewTests(unittest.TestCase):
@@ -31,7 +44,6 @@ class StagingDesignPreviewTests(unittest.TestCase):
             public = release / 'public'
             protection = (public / '.htaccess').read_bytes()
             contact = (public / 'contact/index.php').read_bytes()
-            analytics = (public / 'assets/js/analytics.js').read_bytes()
             include_staging_preview(ROOT, public, 'staging')
             for prefix in ('', 'design-preview/'):
                 elements = Elements((public / prefix / 'index.html').read_text()).elements
@@ -56,9 +68,9 @@ class StagingDesignPreviewTests(unittest.TestCase):
                 self.assertEqual(len(scripts), 1)
                 self.assertIn('defer', scripts[0])
                 self.assertTrue((public / scripts[0]['src'].split('?')[0].lstrip('/')).is_file())
-            self.assertEqual(protection, (public / '.htaccess').read_bytes())
-            self.assertEqual(contact, (public / 'contact/index.php').read_bytes())
-            self.assertEqual(analytics, (public / 'assets/js/analytics.js').read_bytes())
+            self.assertEqual(without_analytics_permissions(protection), (public / '.htaccess').read_bytes())
+            self.assertEqual(without_analytics(contact), without_analytics((public / 'contact/index.php').read_bytes()))
+            self.assertFalse((public / 'assets/js/analytics.js').exists())
 
     def test_new_treatment_images_resolve_on_staging_and_preview_routes(self):
         class Images(HTMLParser):
@@ -122,13 +134,13 @@ class StagingDesignPreviewTests(unittest.TestCase):
             include_staging_preview(ROOT, staging / 'public', 'staging')
             include_staging_preview(ROOT, production / 'public', 'production', approved_production=True)
             for page in ('index.html', 'about/index.html', 'how-i-can-help/index.html'):
-                self.assertEqual((staging / 'public' / page).read_bytes(), (production / 'public' / page).read_bytes())
+                self.assertEqual(without_analytics((staging / 'public' / page).read_bytes()), without_analytics((production / 'public' / page).read_bytes()))
             for asset in (staging / 'public/assets/approved-photos').rglob('*'):
                 if asset.is_file():
                     self.assertEqual(asset.read_bytes(), (production / asset.relative_to(staging)).read_bytes())
             self.assertEqual(security, (production / 'public/.htaccess').read_bytes())
             self.assertNotIn(b'AuthType Basic', security)
-            self.assertEqual(contact, (production / 'public/contact/index.php').read_bytes())
+            self.assertEqual(without_analytics(contact), without_analytics((production / 'public/contact/index.php').read_bytes()))
             self.assertFalse((production / 'public/design-preview').exists())
 
     def test_main_staging_uses_approved_photos_and_keeps_protection(self):
@@ -156,8 +168,8 @@ class StagingDesignPreviewTests(unittest.TestCase):
                                  (ROOT / 'design-previews/seamless-photo/assets' / relative).read_bytes())
             self.assertIn('breathing-support-preview.webp', services)
             self.assertIn('standing-balance-960.webp', services)
-            self.assertEqual(protection, (public / '.htaccess').read_bytes())
-            self.assertEqual(contact, (public / 'contact/index.php').read_bytes())
+            self.assertEqual(without_analytics_permissions(protection), (public / '.htaccess').read_bytes())
+            self.assertEqual(without_analytics(contact), without_analytics((public / 'contact/index.php').read_bytes()))
 
     def test_staging_rejects_preview_parent_symlink_without_output(self):
         with TemporaryDirectory() as directory:

@@ -1,4 +1,4 @@
-/* Prepared only: activation requires owner approval and a reviewed CSP change. */
+/* Owner-approved aggregate analytics: production public pages only. */
 (function () {
   'use strict';
   const HOST = 'stronger-at-home.co.uk';
@@ -32,6 +32,33 @@
     return {path: location.pathname, title: PAGES[location.pathname], referrer: source, event: false};
   }
 
+  function optedOut(window) {
+    try {
+      return window.__sahAnalyticsOptOut === true || window.navigator.doNotTrack === '1' ||
+        window.navigator.globalPrivacyControl === true ||
+        window.localStorage.getItem('sah-analytics-opt-out') === '1';
+    } catch (_) { return true; }
+  }
+
+  function setupPrivacyControls(window, document) {
+    const off = document.querySelector('[data-analytics-off]');
+    const on = document.querySelector('[data-analytics-on]');
+    const status = document.querySelector('[data-analytics-status]');
+    if (!off || !on || !status) return;
+    status.textContent = optedOut(window) ? 'Optional analytics are off in this browser.' : 'Optional analytics are on for production visits.';
+    function save(disabled) {
+      window.__sahAnalyticsOptOut = true;
+      try {
+        window.localStorage.setItem('sah-analytics-opt-out', disabled ? '1' : '0');
+        status.textContent = disabled ? 'Optional analytics are off in this browser.' : 'Your choice is saved for your next page visit. Browser privacy signals still take priority.';
+      } catch (_) {
+        status.textContent = 'We could not save your choice. Analytics are off for this page; enable browser Do Not Track or Global Privacy Control to opt out on future visits.';
+      }
+    }
+    off.addEventListener('click', () => save(true));
+    on.addEventListener('click', () => save(false));
+  }
+
   function startAnalytics(window, document, enabled) {
     if (enabled !== true) return;
     try {
@@ -40,6 +67,7 @@
           window.__sahAnalyticsStarted) return;
       const page = buildPageview(window.location, document.referrer);
       if (!page) return;
+      if (optedOut(window)) return;
       window.__sahAnalyticsStarted = true;
       const status = page.path === '/contact/' ? document.querySelector('[data-form-status]') : null;
       const success = status && status.dataset.flashKind === 'success';
@@ -60,7 +88,7 @@
         finished = true;
         try {
           const counter = window.goatcounter;
-          if (!counter || typeof counter.count !== 'function') return;
+          if (!counter || typeof counter.count !== 'function' || optedOut(window)) return;
           // The upstream default includes location.search and screen size even
           // with an explicit path. Project payloads deliberately omit both.
           // Reviewed against tests/js/fixtures/goatcounter-count.js (2026-11-26).
@@ -76,8 +104,9 @@
   }
 
   if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {buildPageview, startAnalytics};
+    module.exports = {buildPageview, startAnalytics, setupPrivacyControls};
   } else {
-    startAnalytics(window, document, false);
+    setupPrivacyControls(window, document);
+    startAnalytics(window, document, true);
   }
 }());

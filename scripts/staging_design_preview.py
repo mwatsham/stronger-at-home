@@ -8,6 +8,32 @@ import re
 import shutil
 
 
+def configure_analytics(public_root: Path, environment: str) -> None:
+    asset = public_root / 'assets/js/analytics.js'
+    version = hashlib.sha256(asset.read_bytes()).hexdigest()[:16]
+    adapter = f'<script src="/assets/js/analytics.js?v={version}" defer></script>'
+    for page in ("index.html", "about/index.html", "how-i-can-help/index.html",
+                 "appointments-and-fees/index.html", "contact/index.php",
+                 "privacy/index.html", "accessibility/index.html"):
+        target = public_root / page
+        html = target.read_text()
+        html = re.sub(r'<script src="/assets/js/analytics\.js[^"]*" defer></script>\s*', '', html)
+        if environment == 'production':
+            html = html.replace('</head>', '  ' + adapter + '\n</head>', 1)
+        elif page == 'privacy/index.html':
+            html = re.sub(r'<div class="action-group">\s*<button type="button" data-analytics-off>.*?<p data-analytics-status.*?</p>',
+                          '<p>Analytics are off on staging. Preferences can be managed on the production website.</p>', html, flags=re.DOTALL)
+        target.write_text(html)
+    if environment == 'staging':
+        asset.unlink()
+        htaccess = public_root / '.htaccess'
+        policy = htaccess.read_text()
+        policy = policy.replace(' https://gc.zgo.at/count.js', '')
+        policy = policy.replace(" connect-src 'self' https://stronger-at-home.goatcounter.com/count;", '')
+        policy = policy.replace(' https://stronger-at-home.goatcounter.com/count', '')
+        htaccess.write_text(policy)
+
+
 def include_staging_preview(project_root: Path, public_root: Path, environment: str, *, approved_production: bool = False) -> None:
     if environment not in {"staging", "production"}:
         raise ValueError("environment must be staging or production")
@@ -20,6 +46,8 @@ def include_staging_preview(project_root: Path, public_root: Path, environment: 
     # Never restore enquiry CTAs over the disabled-enquiries fallback.
     metadata = json.loads((public_root.parent / "release.json").read_text())
     if metadata.get("publicationMode") == "informational":
+        if environment == 'staging':
+            configure_analytics(public_root, environment)
         return
     htaccess = public_root / ".htaccess"
     if htaccess.is_symlink() or not htaccess.is_file():
@@ -66,6 +94,7 @@ def include_staging_preview(project_root: Path, public_root: Path, environment: 
         raise ValueError("About page must contain the expected portrait")
     html = html.replace(original, replacement)
     about.write_text(html)
+    configure_analytics(public_root, environment)
 
 
 def main() -> None:
