@@ -1,4 +1,5 @@
 from pathlib import Path
+import hashlib
 from html.parser import HTMLParser
 from tempfile import TemporaryDirectory
 import unittest
@@ -34,6 +35,11 @@ class StagingDesignPreviewTests(unittest.TestCase):
             include_staging_preview(ROOT, public, 'staging')
             for prefix in ('', 'design-preview/'):
                 elements = Elements((public / prefix / 'index.html').read_text()).elements
+                styles = [a['href'] for t, a in elements if t == 'link' and 'photo-fades.css' in a.get('href', '')]
+                self.assertEqual(len(styles), 1)
+                path, separator, query = styles[0].partition('?')
+                digest = hashlib.sha256((public / path.lstrip('/')).read_bytes()).hexdigest()[:16]
+                self.assertEqual(query, 'v=' + digest, 'Photo CSS must invalidate older browser caches')
                 photos = [attrs for tag, attrs in elements if tag == 'img' and 'data-photo' in attrs]
                 self.assertEqual(len(photos), 3)
                 self.assertNotIn('hidden', photos[0])
