@@ -1,7 +1,9 @@
 from pathlib import Path
+from html.parser import HTMLParser
 from tempfile import TemporaryDirectory
 import unittest
 from unittest.mock import patch
+from PIL import Image
 
 from scripts.build_git_release import build_git_release
 from scripts.package_site import package_site
@@ -13,6 +15,80 @@ STAMP = '2026-11-08T12:00:00Z'
 
 
 class StagingDesignPreviewTests(unittest.TestCase):
+    def test_photo_crossfade_is_packaged_with_static_fallback_and_local_script(self):
+        class Elements(HTMLParser):
+            def __init__(self, html):
+                super().__init__()
+                self.elements = []
+                self.feed(html)
+
+            def handle_starttag(self, tag, attrs):
+                self.elements.append((tag, dict(attrs)))
+
+        with TemporaryDirectory() as directory:
+            release = build_git_release(ROOT, Path(directory) / 'release', 'staging', SHA, STAMP)
+            public = release / 'public'
+            protection = (public / '.htaccess').read_bytes()
+            contact = (public / 'contact/index.php').read_bytes()
+            analytics = (public / 'assets/js/analytics.js').read_bytes()
+            include_staging_preview(ROOT, public, 'staging')
+            for prefix in ('', 'design-preview/'):
+                elements = Elements((public / prefix / 'index.html').read_text()).elements
+                photos = [attrs for tag, attrs in elements if tag == 'img' and 'data-photo' in attrs]
+                self.assertEqual(len(photos), 3)
+                self.assertNotIn('hidden', photos[0])
+                for photo in photos[1:]:
+                    self.assertIn('hidden', photo)
+                    self.assertEqual(photo['aria-hidden'], 'true')
+                for photo in photos:
+                    self.assertTrue((public / photo['src'].lstrip('/')).is_file())
+                    self.assertTrue(photo['alt'])
+                controls = [a for t, a in elements if 'data-photo-controls' in a]
+                self.assertEqual(controls, [])
+                self.assertFalse(any('data-photo-next' in a or 'data-photo-previous' in a or 'data-photo-toggle' in a for t, a in elements))
+                scripts = [a for t, a in elements if t == 'script' and '/assets/js/photo-carousel.js' in a.get('src', '')]
+                self.assertEqual(len(scripts), 1)
+                self.assertIn('defer', scripts[0])
+                self.assertTrue((public / scripts[0]['src'].split('?')[0].lstrip('/')).is_file())
+            self.assertEqual(protection, (public / '.htaccess').read_bytes())
+            self.assertEqual(contact, (public / 'contact/index.php').read_bytes())
+            self.assertEqual(analytics, (public / 'assets/js/analytics.js').read_bytes())
+
+    def test_new_treatment_images_resolve_on_staging_and_preview_routes(self):
+        class Images(HTMLParser):
+            def __init__(self):
+                super().__init__()
+                self.items = []
+
+            def handle_starttag(self, tag, attrs):
+                if tag == 'img':
+                    self.items.append(dict(attrs))
+
+        with TemporaryDirectory() as directory:
+            release = build_git_release(ROOT, Path(directory) / 'release', 'staging', SHA, STAMP)
+            public = release / 'public'
+            include_staging_preview(ROOT, public, 'staging')
+            for prefix in ('', 'design-preview/'):
+                for page, name in (('index.html', 'seated-treatment'), ('how-i-can-help/index.html', 'standing-balance')):
+                    html = (public / prefix / page).read_text()
+                    images = Images()
+                    images.feed(html)
+                    selected = [item for item in images.items if name in item.get('src', '')]
+                    self.assertEqual(len(selected), 1)
+                    photo = selected[0]
+                    self.assertTrue(photo.get('alt'))
+                    self.assertEqual(photo['loading'], 'lazy')
+                    with Image.open(public / photo['src'].lstrip('/')) as image:
+                        self.assertEqual(image.size, (int(photo['width']), int(photo['height'])))
+                    for source in photo['srcset'].split(','):
+                        url, width = source.split()
+                        with Image.open(public / url.lstrip('/')) as image:
+                            self.assertEqual(image.width, int(width[:-1]))
+                home = (public / prefix / 'index.html').read_text()
+                self.assertIn('data-feedback-carousel', home)
+                self.assertIn('melanie-navy-portrait-preview.webp', home)
+                self.assertIn('breathing-support-preview.webp', (public / prefix / 'how-i-can-help/index.html').read_text())
+
     def test_public_releases_exclude_removed_personal_and_editorial_references(self):
         for environment in ('staging', 'production'):
             with self.subTest(environment=environment), TemporaryDirectory() as directory:
@@ -73,7 +149,7 @@ class StagingDesignPreviewTests(unittest.TestCase):
                 self.assertEqual((public / 'assets/approved-photos' / relative).read_bytes(),
                                  (ROOT / 'design-previews/seamless-photo/assets' / relative).read_bytes())
             self.assertIn('breathing-support-preview.webp', services)
-            self.assertIn('mat-exercise-preview.webp', services)
+            self.assertIn('standing-balance-960.webp', services)
             self.assertEqual(protection, (public / '.htaccess').read_bytes())
             self.assertEqual(contact, (public / 'contact/index.php').read_bytes())
 

@@ -24,6 +24,7 @@ APPROVED_EMAIL = "melanie@stronger-at-home.co.uk"
 APPROVED_EXTERNAL_URLS = {
 }
 APPROVED_EXTERNAL_RESOURCES = {
+    ("a", "href", "https://www.hcpc-uk.org/check-the-register/professional-registration-detail/?query=PH66130&profession=PH"),
     ("a", "href", "https://g.page/r/CYqDnIzAeBQuEBM/review"),
     ("script", "src", "https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"),
     ("a", "href", "https://uk.trustpilot.com/review/stronger-at-home.co.uk"),
@@ -59,11 +60,12 @@ EXPECTED_LOGO_SHA256 = "1802be2b0ac8bfcaf60b83355ee9e3f12d2ba483f1efca39abe5fd79
 # The 2026-10-24 CSS/contact/selector refinement records user-authorised local
 # implementation, not final visual sign-off or staging/production authority.
 APPROVED_PUBLIC_SOURCE_SHA256 = {
+    "site/assets/js/photo-carousel.js": "51fb3bfd033be27b24ea44243bc775552717823222e2b62750843f712578a2c9",
     "site/googled25927956a9f99cc.html": "727e794a60581a49b99dec5151b336be565cf40065a5e9013226dfb3ba81ad3b",
     "site/.htaccess": "9b3093a1981bc7a9bba174dc14d63fae794c6eb8dbafef823815f269f60b1748",
     "site/404.html": "9747c16fca4b4c18a273de6b3cb74dfc08a180f3fe02c8b99cbec84d3727d570",
-    "site/about/index.html": "5e8075b62176d5f3d1009089791fd812c19170aa65bb738478cb6b1ed5d3afdf",
-    "site/accessibility/index.html": "0e1ac01572e3c24b7c83b672b69f5b907af033b4c9e4dd264124a698660569d0",
+    "site/about/index.html": "50052d1debf52fe7e0ad25a0cca911672f3d72738fe7e776780131e9f91f3778",
+    "site/accessibility/index.html": "65db2d43204e64939c62d6ce07399daaaddff3c72279801cfce4a29e433171f7",
     "site/api/enquiry.php": "ed9d7ece29c3aca98e35d6382661daac6df33bed6a6c5339aceb519fbd05d270",
     "site/api/src/EnquiryController.php": "f58b674470922b4b741cc038ee7ce4efe8e021c5b53ca37a1cde7d5b21b56d06",
     "site/api/src/EnquiryMessage.php": "715d322e3bbe1d02c117e9ed698798c27bd2622ee603789d844b6a3b4d5fffc9",
@@ -74,7 +76,7 @@ APPROVED_PUBLIC_SOURCE_SHA256 = {
     "site/api/src/RateLimit.php": "2e1f975f955d86222f2474b66ecaaa2074279a30ce445a8401b2a6b4753aff7a",
     "site/api/src/Response.php": "47fe950982fd6a7bb84bcf50e7346b644a46b6b8cee414fc44dd7f44f67214c1",
     "site/api/src/ValidationResult.php": "2ceb38671310bd93cb04ebcbcd1341bcfbc15bf069229a5b375e258772ff1898",
-    "site/appointments-and-fees/index.html": "940d73dd6d31eb47d565c9052e9678551be7b3067a55b9203729480ffa97f6a7",
+    "site/appointments-and-fees/index.html": "74e44922aae878782ab99e2740e347f8f0a5bb1cfef512d64ff961929743be80",
     "site/assets/css/brand-tokens.css": "9945f6e139a26124a0755d46e0bb4dc93f3e867d87278b0ff4988d0f92d40450",
     "site/assets/css/site.css": "32ff30ae9233400f0529b7e1edd0b98b0bd910d0a99e99daed6832c9841caa6a",
     "site/assets/fonts/atkinson-hyperlegible-next.ttf": "5a455d1cfa099b601ab70751bb9673e8fe1854dc4500c80e1a220d0d75e31745",
@@ -85,9 +87,10 @@ APPROVED_PUBLIC_SOURCE_SHA256 = {
     "site/assets/images/stronger-at-home-favicon.png": "8bd1993f6ce86320dc8a7753a05aee047f11a23cffbd97e0e5149bb713640528",
     "site/assets/images/stronger-at-home-logo.png": EXPECTED_LOGO_SHA256,
     "site/assets/js/site.js": "b0dbfaed9fdceb9f57236e67c124a43bfdf82d9eac56fc3d54e24824915cee22",
-    "site/contact/index.php": "888f0d9261a9f040e74cf5f5094f796a9f8f561ff886419f147f6ae70332297f",
-    "site/how-i-can-help/index.html": "a6890ee04dd716764a429957e911c325d3cd1e50d45765493897cb6c5263ba18",
-    "site/index.html": "7f6d611b827dbbcea4a179471383f99300b4450a5bb9608c4dd2d93e74391479",
+    "site/assets/js/analytics.js": "8540550dbe5d860c4f3967dc273a3cf4c8a9380ebc30b0ce600cf7e7e6251ab5",
+    "site/contact/index.php": "e9a5fcb388ea045b02e4a828e4999b8c6c8cdb510aad568401a06315c527c97a",
+    "site/how-i-can-help/index.html": "2c220b18c87006f35b2e1a237dcc26ef463d7afdbeac61663e19a60ffa808fc7",
+    "site/index.html": "46f5ef460bb25bdd367c120bd4757696d21a516e80d3acd80536f7bef916d14e",
     "site/assets/css/feedback-admin.css": "c4bc642410d8558294089e50f66af60132c079fadfb4abceb3844fdfb852b6da",
     "site/assets/css/feedback-carousel.css": "5bf6810ab9fbae2af5b15a31ab009c03d73ef13b104e067920fe910ff83bbd08",
     "site/assets/js/feedback-carousel.js": "88a1afd13c5284e696d6cc0b060dba5170f37b49e6e57d42e68c4c0ecc98fdae",
@@ -96,7 +99,7 @@ APPROVED_PUBLIC_SOURCE_SHA256 = {
     "site/feedback/lib/FeedbackStore.php": "2662065fad672044ff309f21f1a47a86249a4e93763cc457b91c15a446773a9a",
     "site/feedback/lib/FeedbackAuth.php": "acb6490af7a203a354cd05171989894397aac422e73383411f6cd6c57809e9c7",
     "site/feedback/lib/bootstrap.php": "95938ba163afc71a2b2ac4e324b8411bf161e7b0f7d574e1551367a35929bb13",
-    "site/privacy/index.html": "745ed7d8441086df7ac2c970710ec540ea672f4289bf6bc0e7bb33c2f1386447",
+    "site/privacy/index.html": "1bc7bf1fd7ebc76bcbf34b91f5ebae27aeca4332cbcc13a46c3e9f455753c757",
     "site/robots-staging.txt": "331ea9090db0c9f6f597bd9840fd5b171830f6e0b3ba1cb24dfa91f0c95aedc1",
     "site/robots.txt": "6806d9c899e6b514b73f45b56f6ff0eb6193e996027444ecebc88d4c31bbf294",
     "site/sitemap.xml": "e343bdfdc81a434ba772c17174e8f36fe79fdab8e3b52d03b63e3d7976469101",
@@ -635,7 +638,18 @@ def _validate_contacts_and_claims(
             [parser.visible_text, parser.title, *parser.visitor_attributes]
             + [value for values in parser.meta.values() for value in values]
         )
-        for category in find_prohibited_content_categories(searchable):
+        claims_text = searchable
+        if relative_path == Path("site/about/index.html"):
+            # Owner confirmed current CSP membership and entitlement on 2026-11-26.
+            # Permit only the approved About-page wording, not credentials globally.
+            for approved_phrase in (
+                "Melanie Watsham, MCSP",
+                "Chartered Physiotherapist",
+                "I am a member of the Chartered Society of Physiotherapy (CSP) and registered with the Health and Care Professions Council (HCPC).",
+                "View my HCPC registration (PH66130)",
+            ):
+                claims_text = claims_text.replace(approved_phrase, "")
+        for category in find_prohibited_content_categories(claims_text):
             errors.append(
                 f"Prohibited public content in {relative_path.as_posix()}: {category}"
             )
