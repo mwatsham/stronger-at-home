@@ -71,6 +71,19 @@ class FormParser(HTMLParser):
 
 
 class SiteValidationTests(unittest.TestCase):
+    def test_about_publishes_confirmed_credentials_and_registration_link(self):
+        html = (ROOT / "site/about/index.html").read_text(encoding="utf-8")
+        self.assertIn("Melanie Watsham, MCSP", html)
+        self.assertIn("Chartered Physiotherapist", html)
+        self.assertIn("Chartered Society of Physiotherapy (CSP)", html)
+        parser = LandmarkParser()
+        parser.feed(html)
+        self.assertIn(
+            "https://www.hcpc-uk.org/check-the-register/professional-registration-detail/?query=PH66130&profession=PH",
+            parser.links,
+        )
+        self.assertIn("View my HCPC registration (PH66130)", html)
+
     def test_approved_qualification_does_not_allow_other_credentials(self):
         self.assertEqual(find_prohibited_content_categories("South African-qualified physiotherapist"), [])
         for wording in ("qualified physiotherapist", "registered physiotherapist", "chartered physiotherapist"):
@@ -1010,7 +1023,16 @@ class SiteValidationTests(unittest.TestCase):
         for path in PUBLIC_PAGES:
             parser = LandmarkParser()
             parser.feed((ROOT / path).read_text(encoding="utf-8"))
-            visible_text.extend(parser.text)
+            page_text = " ".join(parser.text)
+            if path == "site/about/index.html":
+                for approved in (
+                    "Melanie Watsham, MCSP",
+                    "Chartered Physiotherapist",
+                    "I am a member of the Chartered Society of Physiotherapy (CSP) and registered with the Health and Care Professions Council (HCPC).",
+                    "View my HCPC registration (PH66130)",
+                ):
+                    page_text = page_text.replace(approved, "")
+            visible_text.append(page_text)
         combined = " ".join(visible_text).lower()
 
         for text in (
