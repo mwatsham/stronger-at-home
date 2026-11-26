@@ -38,6 +38,14 @@ class EmbedParser(HTMLParser):
 
 
 class TrustpilotWidgetTests(unittest.TestCase):
+    def test_review_widgets_use_uk_locale_and_profile_link(self):
+        for page in ('site/index.html', 'design-previews/seamless-photo/index.html'):
+            with self.subTest(page=page):
+                parser = EmbedParser((ROOT / page).read_text())
+                self.assertEqual(len(parser.widgets), 1)
+                self.assertEqual(parser.widgets[0]['data-locale'], 'en-GB')
+                self.assertTrue(any(link.get('href') == PROFILE for link in parser.links))
+
     def test_homepage_offers_the_supplied_google_review_destination_as_a_safe_link(self):
         parser = EmbedParser((ROOT / "site/index.html").read_text())
         links = [link for link in parser.links if link.get("href") == GOOGLE_REVIEW]
