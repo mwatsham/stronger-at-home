@@ -23,6 +23,7 @@
   <link rel="stylesheet" href="/assets/approved-photos/css/photo-fades.css">
   <link rel="stylesheet" href="/assets/css/feedback-carousel.css">
   <script src="/assets/js/feedback-carousel.js" defer></script>
+  <script src="/assets/js/photo-carousel.js?v=crossfade-20261126" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -109,9 +110,13 @@
         </div>
       </div>
       </div>
-<figure class="treatment-photo ">
-      <img src="/assets/approved-photos/images/seated-treatment-960.webp" srcset="/assets/approved-photos/images/seated-treatment-480.webp 480w, /assets/approved-photos/images/seated-treatment-960.webp 960w" sizes="(max-width: 48rem) min(100vw, 27rem), (max-width: 80rem) 42vw, 32rem" alt="Melanie beside a man doing a seated leg exercise at home, with an exercise ball and ankle weights." width="960" height="1200" loading="lazy" decoding="async">
-    </figure>
+      <div class="photo-carousel" data-photo-carousel role="region" aria-label="Home physiotherapy photos" aria-roledescription="carousel">
+        <div class="treatment-photo photo-carousel-frame">
+          <img data-photo class="is-active" src="/assets/approved-photos/images/seated-treatment-960.webp" srcset="/assets/approved-photos/images/seated-treatment-480.webp 480w, /assets/approved-photos/images/seated-treatment-960.webp 960w" sizes="(max-width: 48rem) min(100vw, 27rem), (max-width: 80rem) 42vw, 32rem" alt="Melanie beside a man doing a seated leg exercise at home, with an exercise ball and ankle weights." width="960" height="1200" loading="lazy" decoding="async">
+          <img data-photo hidden aria-hidden="true" src="/assets/approved-photos/images/standing-balance-960.webp" srcset="/assets/approved-photos/images/standing-balance-480.webp 480w, /assets/approved-photos/images/standing-balance-960.webp 960w" sizes="(max-width: 48rem) min(100vw, 27rem), (max-width: 80rem) 42vw, 32rem" alt="Melanie supporting a standing balance exercise at home." width="960" height="1200" loading="lazy" decoding="async">
+          <img data-photo hidden aria-hidden="true" src="/assets/approved-photos/images/home-exercise-preview.webp" alt="Melanie guiding a home exercise session." width="880" height="1100" loading="lazy" decoding="async">
+        </div>
+      </div>
     </section>
 
     <section id="meet-melanie" class="section section-navy split">
