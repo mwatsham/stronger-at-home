@@ -24,6 +24,7 @@ APPROVED_EMAIL = "melanie@stronger-at-home.co.uk"
 APPROVED_EXTERNAL_URLS = {
 }
 APPROVED_EXTERNAL_RESOURCES = {
+    ("a", "href", "https://www.hcpc-uk.org/check-the-register/professional-registration-detail/?query=PH66130&profession=PH"),
     ("a", "href", "https://g.page/r/CYqDnIzAeBQuEBM/review"),
     ("script", "src", "https://widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js"),
     ("a", "href", "https://uk.trustpilot.com/review/stronger-at-home.co.uk"),
@@ -62,7 +63,7 @@ APPROVED_PUBLIC_SOURCE_SHA256 = {
     "site/googled25927956a9f99cc.html": "727e794a60581a49b99dec5151b336be565cf40065a5e9013226dfb3ba81ad3b",
     "site/.htaccess": "9b3093a1981bc7a9bba174dc14d63fae794c6eb8dbafef823815f269f60b1748",
     "site/404.html": "9747c16fca4b4c18a273de6b3cb74dfc08a180f3fe02c8b99cbec84d3727d570",
-    "site/about/index.html": "5e8075b62176d5f3d1009089791fd812c19170aa65bb738478cb6b1ed5d3afdf",
+    "site/about/index.html": "8b756aba4a864a3bb3fc0d572e5d3b206b3699e1f0b368c92dba58fdaced8e6a",
     "site/accessibility/index.html": "0e1ac01572e3c24b7c83b672b69f5b907af033b4c9e4dd264124a698660569d0",
     "site/api/enquiry.php": "ed9d7ece29c3aca98e35d6382661daac6df33bed6a6c5339aceb519fbd05d270",
     "site/api/src/EnquiryController.php": "f58b674470922b4b741cc038ee7ce4efe8e021c5b53ca37a1cde7d5b21b56d06",
@@ -635,7 +636,18 @@ def _validate_contacts_and_claims(
             [parser.visible_text, parser.title, *parser.visitor_attributes]
             + [value for values in parser.meta.values() for value in values]
         )
-        for category in find_prohibited_content_categories(searchable):
+        claims_text = searchable
+        if relative_path == Path("site/about/index.html"):
+            # Owner confirmed current CSP membership and entitlement on 2026-11-26.
+            # Permit only the approved About-page wording, not credentials globally.
+            for approved_phrase in (
+                "Melanie Watsham, MCSP",
+                "Chartered Physiotherapist",
+                "I am a member of the Chartered Society of Physiotherapy (CSP) and registered with the Health and Care Professions Council (HCPC).",
+                "View my HCPC registration (PH66130)",
+            ):
+                claims_text = claims_text.replace(approved_phrase, "")
+        for category in find_prohibited_content_categories(claims_text):
             errors.append(
                 f"Prohibited public content in {relative_path.as_posix()}: {category}"
             )
